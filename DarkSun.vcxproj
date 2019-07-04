@@ -19,7 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\LuaEngine.cpp" />
+    <ClCompile Include="src\LuaPlugin.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Renderer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\LuaEngine.h" />
+    <ClInclude Include="src\LuaPlugin.h" />
+    <ClInclude Include="src\Renderer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -87,11 +95,13 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\SFML\SFML-2.5.1-windows-vc15-64-bit\SFML-2.5.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\LUA\lua-5.3.5_Win64_dll15_lib\include;C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\LUA\lua-5.3.5\src;C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\LuaBridge-2.3.2\Source;C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\LuaState-2.1\include;C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\LuaBridge-2.3.2\Source\LuaBridge;C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\SFML\SFML-2.5.1-windows-vc15-64-bit\SFML-2.5.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;LUA_COMPAT_APIINTCASTS;LUA_COMPAT_ALL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\SFML\SFML-2.5.1-windows-vc15-64-bit\SFML-2.5.1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-audio-d.lib;sfml-graphics-d.lib;sfml-main-d.lib;sfml-network-d.lib;sfml-system-d.lib;sfml-window-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\LUA\lua-5.3.5_Win64_dll15_lib;C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\SFML\SFML-2.5.1-windows-vc15-64-bit\SFML-2.5.1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-audio-d.lib;sfml-graphics-d.lib;sfml-main-d.lib;sfml-network-d.lib;sfml-system-d.lib;sfml-window-d.lib;opengl32.lib;lua53.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -116,13 +126,15 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\SFML\SFML-2.5.1-windows-vc15-64-bit\SFML-2.5.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\LUA\lua-5.3.5_Win64_dll15_lib\include;C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\LUA\lua-5.3.5\src;C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\LuaBridge-2.3.2\Source;C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\LuaState-2.1\include;C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\LuaBridge-2.3.2\Source\LuaBridge;C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\SFML\SFML-2.5.1-windows-vc15-64-bit\SFML-2.5.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;LUA_COMPAT_APIINTCASTS;LUA_COMPAT_ALL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\SFML\SFML-2.5.1-windows-vc15-64-bit\SFML-2.5.1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-audio.lib;sfml-graphics.lib;sfml-main.lib;sfml-network.lib;sfml-system.lib;sfml-window.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\LUA\lua-5.3.5_Win64_dll15_lib;C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\SFML\SFML-2.5.1-windows-vc15-64-bit\SFML-2.5.1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-audio.lib;sfml-graphics.lib;sfml-main.lib;sfml-network.lib;sfml-system.lib;sfml-window.lib;opengl32.lib;lua53.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
