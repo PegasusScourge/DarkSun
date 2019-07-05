@@ -7,38 +7,17 @@ Entry point of the application (main())
 
 */
 
-#include "Renderer.h"
+#include "Log.h"
+#include "DarkSun.h"
 
-#include <SFML/Graphics.hpp>
+using namespace darksun;
 
-int main()
-{
-	// Init our rendering
-	Renderer renderer;
-	renderer.create();
-	
-	// Test shapes
-	sf::CircleShape shape(100.f);
-	shape.setFillColor(sf::Color::Green);
+int main(int argc, char *argv[]) {
+	DarkSun engine;
 
-	sf::RenderWindow * window = renderer.getWindowHandle();
+	engine.processArgs(argc, argv);
 
-	bool running = true;
-	while (running)
-	{
-		sf::Event event;
-		while (window->pollEvent(event))
-		{
-			if (event.type == sf::Event::Closed)
-				running = false;
-		}
-
-		window->clear();
-		window->draw(shape);
-		window->display();
-	}
-
-	renderer.cleanup();
+	engine.run();
 
 	return 0;
 }

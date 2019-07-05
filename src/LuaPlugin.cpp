@@ -8,7 +8,8 @@ Default C++/Lua plugin functions
 */
 #include "LuaPlugin.h"
 
-int LuaPlugin::lua_testFunction() {
-	cout << "Hello world!" << endl;
-	return 0;
+using namespace darksun;
+
+void LuaPlugin::helloworld() {
+	dlua.log("Hello world!");
 }

@@ -10,11 +10,18 @@ Default C++/Lua plugin functions
 
 #include <iostream>
 
+#include "Log.h"
+
 using namespace std;
 
-class LuaPlugin {
+namespace darksun {
 
-public:
-	int lua_testFunction();
+	class LuaPlugin {
 
-};
+	public:
+		void helloworld();
+	};
+
+}
+
+

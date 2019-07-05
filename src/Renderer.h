@@ -8,31 +8,42 @@ Header file for Renderer.cpp. A class that handles a window and the rendering to
 
 */
 
+// Must include first
+#include <GL/glew.h>
+
 #include <SFML/OpenGL.hpp>
 #include <SFML/Graphics.hpp>
 
-class Renderer {
+#include "Log.h"
 
-private:
-	sf::RenderWindow defaultWindow;
+namespace darksun {
 
-public:
-	/* 
-	Creation
-	*/
-	// Used to create the necessary resources on open of the program
-	void create();
-	// (Re)Creates the window with the specified settings (passed by reference)
-	void createWindow(sf::ContextSettings& settings);
+	class Renderer {
 
-	/*
-	Destruction
-	*/
-	void cleanup();
+	private:
+		sf::RenderWindow defaultWindow;
 
-	/*
-	Getters
-	*/
-	sf::RenderWindow* getWindowHandle();
+	public:
+		/*
+		Creation
+		*/
+		// Used to create the necessary resources on open of the program
+		void create();
+		// (Re)Creates the window with the specified settings (passed by reference)
+		void createWindow(sf::ContextSettings& settings);
 
-};
+		/*
+		Destruction
+		*/
+		void cleanup();
+
+		/*
+		Getters
+		*/
+		sf::RenderWindow* getWindowHandle();
+
+	};
+
+}
+
+
