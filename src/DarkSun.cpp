@@ -34,6 +34,9 @@ void DarkSun::run() {
 	// Add tick function
 	engine.addFile("null.lua");
 
+	// Test the model
+
+
 	sf::RenderWindow * window = renderer.getWindowHandle();
 
 	dout.log("Entering the main game engine loop");
@@ -46,8 +49,15 @@ void DarkSun::run() {
 				running = false;
 		}
 
-		window->clear();
-		window->draw(shape);
+		//window->clear();
+		//window->draw(shape);
+
+		// Clear the screen to black
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+
+
+		// Do the displaying
 		window->display();
 
 		// tick the engine
