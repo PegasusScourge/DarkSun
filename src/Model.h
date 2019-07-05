@@ -12,6 +12,7 @@ Header file for Model.cpp
 #include <SFML/OpenGL.hpp>
 #include <glm/glm.hpp>
 #include <vector>
+#include <filesystem>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -20,7 +21,6 @@ Header file for Model.cpp
 #include "Log.h"
 #include "Shader.h"
 
-#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
 using string = std::string;
@@ -60,8 +60,7 @@ namespace darksun {
 		void setupMesh();
 	};
 
-	class Model
-	{
+	class Model {
 	public:
 		/*  Model Data */
 		std::vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
@@ -72,7 +71,10 @@ namespace darksun {
 		/*  Functions   */
 		// constructor
 		Model(string const &path, bool gamma = false) : gammaCorrection(gamma) {
-			loadModel(path);
+			std::filesystem::path p2 = std::filesystem::absolute(path);
+			string p = p2.u8string();
+			dout.log("Load model: " + p);
+			loadModel(p);
 		}
 
 		// draws the model, and thus all its meshes

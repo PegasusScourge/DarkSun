@@ -12,7 +12,7 @@ A class that handles a window and the rendering to and from it
 using namespace darksun;
 
 void Renderer::createWindow(sf::ContextSettings& settings) {
-	defaultWindow.create(sf::VideoMode(800, 600), "DarkSun", sf::Style::Default, settings);
+	defaultWindow.create(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "DarkSun", sf::Style::Default, settings);
 }
 
 void Renderer::create() {
@@ -28,6 +28,9 @@ void Renderer::create() {
 	glewExperimental = GL_TRUE;
 	glewInit();
 
+	// Do state init for opengl
+	glEnable(GL_DEPTH_TEST);
+
 	// Do a glew test:
 	GLuint vertexBuffer;
 	glGenBuffers(1, &vertexBuffer);
@@ -35,8 +38,17 @@ void Renderer::create() {
 	dout.log("glewTest: " + std::to_string(vertexBuffer));
 }
 
+void Renderer::clearscreen() {
+	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
 sf::RenderWindow* Renderer::getWindowHandle() {
 	return &defaultWindow;
+}
+
+Camera* Renderer::getCamera() {
+	return &camera;
 }
 
 void Renderer::cleanup() {

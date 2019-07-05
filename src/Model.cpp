@@ -52,12 +52,10 @@ void Mesh::setupMesh() {
 	glBindVertexArray(0);
 }
 
-void Mesh::draw(Shader shader)
-{
+void Mesh::draw(Shader shader) {
 	unsigned int diffuseNr = 1;
 	unsigned int specularNr = 1;
-	for (unsigned int i = 0; i < textures.size(); i++)
-	{
+	for (unsigned int i = 0; i < textures.size(); i++) {
 		glActiveTexture(GL_TEXTURE0 + i); // activate proper texture unit before binding
 		// retrieve texture number (the N in diffuse_textureN)
 		string number;
@@ -94,7 +92,7 @@ void Model::loadModel(string const &path) {
 		return;
 	}
 	// retrieve the directory path of the filepath
-	directory = path.substr(0, path.find_last_of('/'));
+	directory = path.substr(0, path.find_last_of('\\'));
 
 	// process ASSIMP's root node recursively
 	processNode(scene->mRootNode, scene);
@@ -161,8 +159,7 @@ unsigned int Model::TextureFromFile(const char *path, const string &directory, b
 		stbi_image_free(data);
 	}
 	else {
-		string p(path);
-		dout.error("Texture failed to load at path: " + p);
+		dout.error("Texture failed to load at path: " + filename);
 		stbi_image_free(data);
 	}
 

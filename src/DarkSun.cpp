@@ -34,8 +34,9 @@ void DarkSun::run() {
 	// Add tick function
 	engine.addFile("null.lua");
 
-	// Test the model
-
+	// Test the models
+	Shader defaultShader;
+	Model testModel("spider.obj");
 
 	sf::RenderWindow * window = renderer.getWindowHandle();
 
@@ -53,15 +54,29 @@ void DarkSun::run() {
 		//window->draw(shape);
 
 		// Clear the screen to black
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		renderer.clearscreen();
+		defaultShader.use();
 
+		// view/projection matricies input
+		Camera *camera = renderer.getCamera();
+		glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), (float)renderer.SCREEN_WIDTH / (float)renderer.SCREEN_HEIGHT, 0.1f, 100.0f);
+		glm::mat4 view = camera->GetViewMatrix();
+		defaultShader.setMat4("projection", projection);
+		defaultShader.setMat4("view", view);
+
+		// render the loaded model
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, -2.0f, -20.0f)); // translate it down so it's at the center of the scene
+		model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));	// it's a bit too big for our scene, so scale it down
+		defaultShader.setMat4("model", model);
+
+		testModel.draw(defaultShader);
 
 		// Do the displaying
 		window->display();
 
 		// tick the engine
-		engine.tick();
+		//engine.tick();
 	}
 
 	renderer.cleanup();

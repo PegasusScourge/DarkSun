@@ -15,6 +15,8 @@ Header file for Renderer.cpp. A class that handles a window and the rendering to
 #include <SFML/Graphics.hpp>
 
 #include "Log.h"
+#include "Camera.h"
+#include "Shader.h"
 
 namespace darksun {
 
@@ -23,7 +25,12 @@ namespace darksun {
 	private:
 		sf::RenderWindow defaultWindow;
 
+		Camera camera;
+
 	public:
+		const int SCREEN_WIDTH = 800;
+		const int SCREEN_HEIGHT = 600;
+
 		/*
 		Creation
 		*/
@@ -31,6 +38,9 @@ namespace darksun {
 		void create();
 		// (Re)Creates the window with the specified settings (passed by reference)
 		void createWindow(sf::ContextSettings& settings);
+
+		// Clears the screen
+		void clearscreen();
 
 		/*
 		Destruction
@@ -41,6 +51,8 @@ namespace darksun {
 		Getters
 		*/
 		sf::RenderWindow* getWindowHandle();
+
+		Camera* getCamera();
 
 	};
 

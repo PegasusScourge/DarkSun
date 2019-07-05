@@ -28,6 +28,7 @@
     <ClCompile Include="src\Renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\DarkSun.h" />
     <ClInclude Include="src\Log.h" />
     <ClInclude Include="src\LuaEngine.h" />

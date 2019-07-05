@@ -9,6 +9,7 @@ Borrowed from https://learnopengl.com/code_viewer_gh.php?code=includes/learnopen
 */
 
 #include <GL/glew.h>
+#include <glm/glm.hpp>
 
 #include <string>
 #include <fstream>
@@ -41,24 +42,35 @@ namespace darksun {
 
 		// Shader sources
 		const GLchar* basicVertex = R"glsl(
-    #version 150 core
-    in vec2 position;
-    in vec3 color;
-    out vec3 Color;
-    void main()
-    {
-        Color = color;
-        gl_Position = vec4(position, 0.0, 1.0);
-    }
+    #version 330 core
+	layout (location = 0) in vec3 aPos;
+	layout (location = 1) in vec3 aNormal;
+	layout (location = 2) in vec2 aTexCoords;
+
+	out vec2 TexCoords;
+
+	uniform mat4 model;
+	uniform mat4 view;
+	uniform mat4 projection;
+
+	void main()
+	{
+		TexCoords = aTexCoords;    
+		gl_Position = projection * view * model * vec4(aPos, 1.0);
+	}
 )glsl";
 		const GLchar* basicFragment = R"glsl(
-    #version 150 core
-    in vec3 Color;
-    out vec4 outColor;
-    void main()
-    {
-        outColor = vec4(Color, 1.0);
-    }
+	#version 330 core
+	out vec4 FragColor;
+
+	in vec2 TexCoords;
+
+	uniform sampler2D texture_diffuse1;
+
+	void main()
+	{    
+		FragColor = texture(texture_diffuse1, TexCoords);
+	}
 )glsl";
 
 	public:
