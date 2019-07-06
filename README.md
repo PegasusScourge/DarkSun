@@ -15,6 +15,8 @@ Assimp: 4.1.0
 
 GLM: 0.9.9.5
 
+TGUI: 0.8.5
+
 ## Resources
 ### LuaBridge + LuaState
 LuaBridge + LuaState question: https://stackoverflow.com/questions/25498277/binding-c-functions-calling-lua-functions-with-class-as-parameter
@@ -26,6 +28,8 @@ LuaState: https://github.com/AdUki/LuaState
 Info on bindings: http://lua-users.org/wiki/BindingCodeToLua
 
 LuaBridge: https://github.com/vinniefalco/LuaBridge
+
+TGUI: https://tgui.eu/
 
 ### OpenGL
 OpenGL info thread: https://en.sfml-dev.org/forums/index.php?topic=20906.0
