@@ -54,7 +54,7 @@ void Renderer::prepLights(Shader* shader) {
 	glUniform3fv(glGetUniformLocation(shader->ID, "lightPositions"), NUMBER_OF_LIGHTS, &lightPositions[0][0]);
 	glUniform3fv(glGetUniformLocation(shader->ID, "lightColors"), NUMBER_OF_LIGHTS, &lightColors[0][0]);
 	glUniform1iv(glGetUniformLocation(shader->ID, "lightAttenuates"), NUMBER_OF_LIGHTS, &lightAttenuates[0]);
-	shader->setVec3("viewPos", camera.Position);
+	shader->setVec3("viewPos", camera.position);
 }
 
 void Renderer::setGammaCorrection(Shader& shader, bool g) {

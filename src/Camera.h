@@ -1,12 +1,13 @@
 #pragma once
-#ifndef CAMERA_H
-#define CAMERA_H
-
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <SFML/Window.hpp>
+#include <SFML/Window/Event.hpp>
+
 #include <vector>
+#include <algorithm>
 
 namespace darksun {
 	// Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
@@ -14,121 +15,132 @@ namespace darksun {
 		FORWARD,
 		BACKWARD,
 		LEFT,
-		RIGHT
+		RIGHT,
+		NONE
 	};
-
-	// Default camera values
-	const float YAW = -90.0f;
-	const float PITCH = 0.0f;
-	const float SPEED = 2.5f;
-	const float SENSITIVITY = 0.1f;
-	const float ZOOM = 45.0f;
-
 
 	// An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL
 	class Camera
 	{
 	public:
 		// Camera Attributes
-		glm::vec3 Position;
-		glm::vec3 Front;
-		glm::vec3 Up;
-		glm::vec3 Right;
-		glm::vec3 WorldUp;
-		// Euler Angles
-		float Yaw;
-		float Pitch;
+		glm::vec3 position; // This is manipulated for the tactical zoom
+		glm::vec3 groundPosition; // This is the value that moves through space
+		glm::vec3 Front = glm::vec3(1, 0, 0);;
+		glm::vec3 Up = glm::vec3(0, 1, 0);
+		glm::vec3 Right = glm::vec3(0, 0, 1);
 		// Camera options
-		float MovementSpeed;
-		float MouseSensitivity;
-		float Zoom;
+		float movementSpeed = 25.0f;
+		float mouseSensitivity = 0.1f;
+		float Zoom = 45.0f;
 
-		// Constructor with vectors
-		Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
-		{
-			Position = position;
-			WorldUp = up;
-			Yaw = yaw;
-			Pitch = pitch;
-			updateCameraVectors();
-		}
-		// Constructor with scalar values
-		Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
-		{
-			Position = glm::vec3(posX, posY, posZ);
-			WorldUp = glm::vec3(upX, upY, upZ);
-			Yaw = yaw;
-			Pitch = pitch;
-			updateCameraVectors();
+		float tacticalZPercent = 0.5f; // Between 0 and 1
+
+		float tacticalMinHeight = 60.0f;
+		float tacticalHeightDelta = 140.0f;
+		float tacticalXDelta = 45.0f;
+
+		// Camera values we store
+		float lastMouseX = 0;
+		float lastMouseY = 0;
+
+		// Constructor
+		Camera() {
+			position = glm::vec3(0, 0, 0);
+			groundPosition = glm::vec3(0, 0, 0);
+			tacticalZoom(0, 0);
 		}
 
 		// Returns the view matrix calculated using Euler Angles and the LookAt Matrix
-		glm::mat4 GetViewMatrix()
-		{
-			return glm::lookAt(Position, Position + Front, Up);
+		glm::mat4 GetViewMatrix() {
+			update();
+			return glm::lookAt(position, groundPosition, Up);
+		}
+
+		// Handle events
+		void handleEvent(sf::Event& event, float deltaTime, bool hasFocus) {
+			if (!hasFocus) // Don't process if we aren't focused
+				return;
+			
+			//if (event.type == sf::Event::MouseMoved) {
+			//	int newX = event.mouseMove.x;
+			//	int newY = event.mouseMove.y;
+			//	float dX = newX - lastMouseX;
+			//	float dY = newY - lastMouseY;
+			//	dout.verbose("Mouse move event, dX=" + std::to_string(dX) + " dY=" + std::to_string(dY));
+			//	ProcessMouseMovement(dX, dY);
+			//	lastMouseX = newX; lastMouseY = newY;
+			//}
+			//else 
+			if (event.type == sf::Event::MouseWheelScrolled) {
+				//dout.verbose("Got mouse scroll event: " + std::to_string(event.mouseWheelScroll.delta));
+				tacticalZoom(event.mouseWheelScroll.delta, deltaTime);
+			}
+		}
+		void pollKeyboard(float deltaTime) {
+			Camera_Movement mov = Camera_Movement::NONE;
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+				mov = Camera_Movement::FORWARD;
+				ProcessKeyboard(mov, deltaTime);
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+				mov = Camera_Movement::LEFT;
+				ProcessKeyboard(mov, deltaTime);
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+				mov = Camera_Movement::BACKWARD;
+				ProcessKeyboard(mov, deltaTime);
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+				mov = Camera_Movement::RIGHT;
+				ProcessKeyboard(mov, deltaTime);
+			}
+		}
+
+		void tacticalZoom(float ticks, float deltaTime) {
+			// Apply a zoom amount
+			tacticalZPercent += ticks * 2.0f * sqrtf(0.05f + tacticalZPercent) * deltaTime;
+			if (tacticalZPercent > 0.8f)
+				tacticalZPercent = 0.8f;
+			if (tacticalZPercent < 0.0f) 
+				tacticalZPercent = 0.0f;
+
+			position.z = groundPosition.z;
+			position.x = groundPosition.x - ((1.0f - tacticalZPercent) * + tacticalXDelta);
+			position.y = tacticalMinHeight + std::min(tacticalZPercent * tacticalHeightDelta, 2000.0f);
 		}
 
 		// Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
 		void ProcessKeyboard(Camera_Movement direction, float deltaTime)
 		{
-			float velocity = MovementSpeed * deltaTime;
+			float velocity = movementSpeed * deltaTime;
 			if (direction == FORWARD)
-				Position += Front * velocity;
+				groundPosition += Front * velocity;
 			if (direction == BACKWARD)
-				Position -= Front * velocity;
+				groundPosition -= Front * velocity;
 			if (direction == LEFT)
-				Position -= Right * velocity;
+				groundPosition -= Right * velocity;
 			if (direction == RIGHT)
-				Position += Right * velocity;
+				groundPosition += Right * velocity;
 		}
 
-		// Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
-		void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true)
-		{
-			xoffset *= MouseSensitivity;
-			yoffset *= MouseSensitivity;
-
-			Yaw += xoffset;
-			Pitch += yoffset;
-
-			// Make sure that when pitch is out of bounds, screen doesn't get flipped
-			if (constrainPitch)
-			{
-				if (Pitch > 89.0f)
-					Pitch = 89.0f;
-				if (Pitch < -89.0f)
-					Pitch = -89.0f;
-			}
-
-			// Update Front, Right and Up Vectors using the updated Euler angles
-			updateCameraVectors();
+		void update(glm::vec3 nPos, float nZoom) {
+			groundPosition = glm::vec3(nPos.x, 0.0f, nPos.y);
+			if (nZoom >= 0.0f && nZoom <= 0.8f)
+				tacticalZPercent = nZoom;
+			tacticalZoom(0, 0);
 		}
 
-		// Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
-		void ProcessMouseScroll(float yoffset)
-		{
-			if (Zoom >= 1.0f && Zoom <= 45.0f)
-				Zoom -= yoffset;
-			if (Zoom <= 1.0f)
-				Zoom = 1.0f;
-			if (Zoom >= 45.0f)
-				Zoom = 45.0f;
+		void update() {
+			tacticalZoom(0, 0);
 		}
 
-	private:
-		// Calculates the front vector from the Camera's (updated) Euler Angles
-		void updateCameraVectors()
-		{
-			// Calculate the new Front vector
-			glm::vec3 front;
-			front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-			front.y = sin(glm::radians(Pitch));
-			front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-			Front = glm::normalize(front);
-			// Also re-calculate the Right and Up vector
-			Right = glm::normalize(glm::cross(Front, WorldUp));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-			Up = glm::normalize(glm::cross(Right, Front));
+		void setTacticalZoomParams(float minHeight, float maxHeight, float xDelta) {
+			tacticalMinHeight = minHeight;
+			tacticalHeightDelta = maxHeight - minHeight;
+			tacticalXDelta = xDelta;
+			tacticalZoom(0, 0);
 		}
 	};
 }
-#endif
+

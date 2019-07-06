@@ -14,6 +14,7 @@ Header file for Scene.cpp, defines all scenes
 #include "Shader.h"
 #include "Renderer.h"
 #include "Log.h"
+#include "UiHandler.h"
 
 namespace darksun {
 
@@ -39,17 +40,22 @@ namespace darksun {
 		// Default shader
 		Shader defaultShader;
 
-	protected:
 		// Renderer
 		std::shared_ptr<Renderer> renderer;
+
+		// UIWrangler
+		std::shared_ptr<UIWrangler> ui;
 
 	public:
 		static long createNewId();
 
-		Scene(std::shared_ptr<Renderer> r, string n, long nid = createNewId()) : renderer(r), sceneName(n), myId(nid) { dout.log("Scene constructor called"); };
+		Scene(std::shared_ptr<Renderer>, string, long);
 
 		// Draw the scene
 		void draw(Shader* shader);
+
+		// Pass events
+		void handleEvent(sf::Event& ev);
 
 		// Tick the scene
 		void tick();

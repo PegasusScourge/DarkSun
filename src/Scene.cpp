@@ -18,6 +18,17 @@ long Scene::createNewId() {
 	return ++LastSceneId;
 }
 
+Scene::Scene(std::shared_ptr<Renderer> r, string n, long nid) {
+	renderer = r;
+	sceneName = n;
+	myId = nid;
+	
+	dout.log("Scene constructor called");
+
+	// Create the ui
+	ui = std::shared_ptr<UIWrangler>(new UIWrangler(renderer, sceneName));
+}
+
 void Scene::init() {
 	dout.log("Creating scene '" + sceneName + "'");
 
@@ -30,7 +41,8 @@ void Scene::init() {
 
 void Scene::initTest() {
 	dout.log("initTest() called on scene '" + sceneName + "'");
-	renderer->getCamera()->Position = glm::vec3(-15.0f, 28.0f, -10.0f);
+	renderer->getCamera()->setTacticalZoomParams(14.0f, 1500.0f, 15.0f);
+	renderer->getCamera()->update(glm::vec3(0.0f, 0.0f, 0.0f), 0.5f);
 	
 	// Put a light under the spider at 0,0,0
 	renderer->setLightPosition(1, glm::vec3(0, 5.5f, 0)); // Make sure it is above the floor
@@ -55,7 +67,7 @@ void Scene::initTest() {
 }
 
 void Scene::close() {
-
+	// Do something?
 }
 
 void Scene::draw(Shader* shader) {
@@ -77,9 +89,9 @@ void Scene::draw(Shader* shader) {
 
 	// view/projection matricies input
 
-	glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), (float)renderer->SCREEN_WIDTH / (float)renderer->SCREEN_HEIGHT, 0.1f, 100.0f);
-	//glm::mat4 view = camera->GetViewMatrix();
-	glm::mat4 view = glm::lookAt(camera->Position, glm::vec3(0,0,0), camera->WorldUp);
+	glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), (float)renderer->SCREEN_WIDTH / (float)renderer->SCREEN_HEIGHT, 0.1f, 2000.0f);
+	glm::mat4 view = camera->GetViewMatrix();
+	//glm::mat4 view = glm::lookAt(camera->Position, glm::vec3(camera->Position.x, 0, camera->Position.z), camera->WorldUp);
 	shader->setMat4("projection", projection);
 	shader->setMat4("view", view);
 
@@ -93,8 +105,12 @@ void Scene::draw(Shader* shader) {
 		}
 	}
 
-	// Draw the UI?
-	// Well we have none so far
+	// Draw the UI
+	ui->draw();
+}
+
+void Scene::handleEvent(sf::Event& ev) {
+	ui->handleEvent(ev);
 }
 
 void Scene::tick() {

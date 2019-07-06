@@ -60,5 +60,5 @@ void Log::verbose(std::string v) {
 		log("[verbose] " + v);
 }
 
-Log darksun::dout("DarkSun.log", true);
-Log darksun::dlua("DarkSun_lua.log", true);
+Log darksun::dout("DarkSun.log", VERBOSE_LOGGING_DARKSUN);
+Log darksun::dlua("DarkSun_lua.log", VERBOSE_LOGGING_DARKSUN);

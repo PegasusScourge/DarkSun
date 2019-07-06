@@ -13,6 +13,8 @@ Header file for Log.cpp, provides standard logging functionality for the program
 #include <iostream>
 #include <ctime>
 
+#define VERBOSE_LOGGING_DARKSUN true
+
 namespace darksun {
 
 	inline std::string BoolToString(bool b)

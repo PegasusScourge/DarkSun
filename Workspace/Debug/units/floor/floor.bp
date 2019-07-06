@@ -2,6 +2,6 @@ blueprints.floor = {
 	InternalName = 'testFloor',
 	Model = {
 		lod_0 = 'units/floor/square.obj',
-		UniformScale = 5,
+		UniformScale = 15.0,
 	},
 }
