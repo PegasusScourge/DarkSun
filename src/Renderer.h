@@ -22,14 +22,10 @@ namespace darksun {
 
 	class Renderer {
 
-	private:
-		sf::RenderWindow defaultWindow;
-
-		Camera camera;
-
 	public:
 		const int SCREEN_WIDTH = 800;
 		const int SCREEN_HEIGHT = 600;
+		const static int NUMBER_OF_LIGHTS = 4; // WARNING: You must update the number of lights the shader can take if you update this value!!!!!
 
 		/*
 		Creation
@@ -42,6 +38,24 @@ namespace darksun {
 		// Clears the screen
 		void clearscreen();
 
+		// Applies the current lighting effects
+		void prepLights(Shader& shader);
+
+		// sets the position of the light
+		void setLightPosition(int index, glm::vec3 p) { 
+			if (index < 0 || index >= NUMBER_OF_LIGHTS) { return; } lightPositions[index] = p;
+		}
+		// sets the color of a light
+		void setLightColor(int index, glm::vec3 p) { 
+			if (index < 0 || index >= NUMBER_OF_LIGHTS) { return; } lightColors[index] = p; 
+		}
+		// sets attenuation on a light
+		void setLightAttenuation(int index, bool a) {
+			if (index < 0 || index >= NUMBER_OF_LIGHTS) { return; } lightAttenuates[index] = a;
+		}
+		// sets if gamma correction is enabled in the shaders
+		void setGammaCorrection(Shader& shader, bool g);
+
 		/*
 		Destruction
 		*/
@@ -53,6 +67,32 @@ namespace darksun {
 		sf::RenderWindow* getWindowHandle();
 
 		Camera* getCamera();
+
+	private:
+		sf::RenderWindow defaultWindow;
+
+		Camera camera;
+
+		// lighting
+		glm::vec3 lightPositions[NUMBER_OF_LIGHTS] = {
+			glm::vec3(-3.0f, 0.0f, 0.0f),
+			glm::vec3(-1.0f, 0.0f, 0.0f),
+			glm::vec3(1.0f, 0.0f, 0.0f),
+			glm::vec3(3.0f, 0.0f, 0.0f)
+		};
+		glm::vec3 lightColors[NUMBER_OF_LIGHTS] = {
+			glm::vec3(1.0),
+			glm::vec3(0),
+			glm::vec3(0),
+			glm::vec3(0)
+		};
+
+		int lightAttenuates[NUMBER_OF_LIGHTS] = {
+			true,
+			true,
+			true,
+			true
+		};
 
 	};
 

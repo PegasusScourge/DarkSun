@@ -30,6 +30,11 @@ void Renderer::create() {
 
 	// Do state init for opengl
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	// For gamma correction
+	glEnable(GL_FRAMEBUFFER_SRGB);
 
 	// Do a glew test:
 	GLuint vertexBuffer;
@@ -41,6 +46,19 @@ void Renderer::create() {
 void Renderer::clearscreen() {
 	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void Renderer::prepLights(Shader& shader) {
+	shader.setVec3("objectColor", 1.0f, 1.0f, 1.0f);
+	// set light uniforms
+	glUniform3fv(glGetUniformLocation(shader.ID, "lightPositions"), NUMBER_OF_LIGHTS, &lightPositions[0][0]);
+	glUniform3fv(glGetUniformLocation(shader.ID, "lightColors"), NUMBER_OF_LIGHTS, &lightColors[0][0]);
+	glUniform1iv(glGetUniformLocation(shader.ID, "lightAttenuates"), NUMBER_OF_LIGHTS, &lightAttenuates[0]);
+	shader.setVec3("viewPos", camera.Position);
+}
+
+void Renderer::setGammaCorrection(Shader& shader, bool g) {
+	shader.setInt("gamma", g);
 }
 
 sf::RenderWindow* Renderer::getWindowHandle() {

@@ -8,12 +8,15 @@ Main app
 
 */
 
+#include <filesystem>
+#include <vector>
+
 #include "Renderer.h"
 #include "LuaEngine.h"
 #include "Log.h"
 
 #include "Shader.h"
-#include "Model.h"
+#include "Entity.h"
 
 #include <SFML/Graphics.hpp>
 #include <glm/glm.hpp>

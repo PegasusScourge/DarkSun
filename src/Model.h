@@ -51,7 +51,7 @@ namespace darksun {
 
 		/*  Functions  */
 		Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
-		void draw(Shader shader);
+		void draw(Shader& shader);
 	private:
 		/*  Render data  */
 		unsigned int VAO, VBO, EBO;
@@ -65,7 +65,7 @@ namespace darksun {
 		/*  Model Data */
 		std::vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
 		std::vector<Mesh> meshes;
-		string directory;
+		string directory = "";
 		bool gammaCorrection;
 
 		/*  Functions   */
@@ -73,14 +73,14 @@ namespace darksun {
 		Model(string const &path, bool gamma = false) : gammaCorrection(gamma) {
 			std::filesystem::path p2 = std::filesystem::absolute(path);
 			string p = p2.u8string();
-			dout.log("Load model: " + p);
+			//dout.log("Load model: " + p);
 			loadModel(p);
 		}
 
 		// draws the model, and thus all its meshes
-		void draw(Shader shader);
+		void draw(Shader& shader);
 
-		// loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
+		// MUST HAVE A GENERIC FORWARD SLASHED PATH! Loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
 		void loadModel(string const &path);
 
 		unsigned int TextureFromFile(const char * path, const string &directory, bool gamma);

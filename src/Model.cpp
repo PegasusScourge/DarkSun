@@ -52,7 +52,7 @@ void Mesh::setupMesh() {
 	glBindVertexArray(0);
 }
 
-void Mesh::draw(Shader shader) {
+void Mesh::draw(Shader& shader) {
 	unsigned int diffuseNr = 1;
 	unsigned int specularNr = 1;
 	for (unsigned int i = 0; i < textures.size(); i++) {
@@ -82,7 +82,7 @@ void Mesh::draw(Shader shader) {
 
 */
 
-void Model::loadModel(string const &path) {
+void Model::loadModel(string const &path = "") {
 	// read file via ASSIMP
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -91,9 +91,26 @@ void Model::loadModel(string const &path) {
 		dout.error("Scene (" + path + ") doesn't have the correct information!");
 		return;
 	}
+	dout.verbose("Model::loadModel -> Loaded scene '" + path + "' (plength="  + std::to_string(path.length()) + ")");
 	// retrieve the directory path of the filepath
-	directory = path.substr(0, path.find_last_of('\\'));
-
+	try {
+		size_t pos = path.find_last_of('\\');
+		if (pos < 0 || pos >= path.size()) {
+			dout.error("LOAD MODEL ERROR: unable to parse the directory for '" + path + "' (value=" + std::to_string(pos) + ")");
+			return;
+		}
+		//else {
+		//	dout.verbose("Model::loadModel -> Found last / at " + std::to_string(pos));
+		//}
+		size_t zero = 0;
+		directory = path.substr(zero, pos);
+	}
+	catch (std::exception& e) {
+		string what = e.what();
+		dout.error("LOAD MODEL ERROR: " + what);
+		return;
+	}
+	dout.verbose("Model::loadModel -> Found directory = '" + directory + "'");
 	// process ASSIMP's root node recursively
 	processNode(scene->mRootNode, scene);
 }
@@ -124,7 +141,10 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
 	return textures;
 }
 
-void Model::draw(Shader shader) {
+void Model::draw(Shader& shader) {
+	// Set gamma correction on before we start
+	shader.setInt("gamma", gammaCorrection);
+	
 	for (unsigned int i = 0; i < meshes.size(); i++)
 		meshes[i].draw(shader);
 }

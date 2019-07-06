@@ -45,12 +45,62 @@ void LuaEngine::addFile(string f) {
 		return;
 
 	try {
-		L.doFile(lua_getLuaDir() + f);
+		L.doFile(f);
 	}
 	catch (exception& e) {
 		string what = e.what();
 		dlua.error("Attempted to add file: " + what);
 		validEngine = false; // Fail the engine here so execution stops
+	}
+}
+
+void LuaEngine::addFilesRecursive(string p, string ext) {
+	dlua.log("Recursive add files:");
+
+	if (!std::filesystem::exists(p)) {
+		dlua.error(" - Attempted to find files in path '" + p + "', but the path does not exist");
+		return;
+	}
+
+	std::vector<std::string> allFiles(0);
+	recursiveListFiles(p, &allFiles);
+
+	if (allFiles.size() == 0) {
+		// No files detected
+		dlua.log(" - No files found on path '" + p + "'!");
+		return;
+	}
+
+	for (std::string &fpath : allFiles) {
+		std::filesystem::path file(fpath);
+		std::string extension = file.extension().generic_string();
+
+		if (extension.compare(ext) == 0) {
+			// We have a valid file, register
+			dlua.log(" - Registering file '" + fpath + "'");
+			addFile(fpath);
+		}
+	}
+
+	// Done
+}
+
+void LuaEngine::recursiveListFiles(std::string path, std::vector<std::string> *list) {
+	for (std::filesystem::directory_entry entry : std::filesystem::directory_iterator(path)) {
+		list->push_back(entry.path().generic_string());
+		if (entry.is_directory()) {
+			recursiveListFiles(entry.path().generic_string(), list);
+		}
+	}
+}
+
+void LuaEngine::doString(string s) {
+	try {
+		L.doString(s);
+	}
+	catch (std::exception& e) {
+		string what = e.what();
+		dlua.error("LuaEngine.doString() failure: " + what);
 	}
 }
 
@@ -88,6 +138,10 @@ bool LuaEngine::initConnection() {
 		return false;
 	}
 	return true;
+}
+
+lua::State* LuaEngine::getState() {
+	return &L;
 }
 
 void lua_log(const char * s) {

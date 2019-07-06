@@ -32,12 +32,16 @@ namespace darksun {
 		// The file we are writing to (for admin purposes)
 		std::string outf;
 
+		bool isVerbose = false;
+
 	public:
-		Log(std::string file) : outs(file), outf(file) {};
+		Log(std::string file, bool verbose = false) : outs(file), outf(file), isVerbose(verbose) {};
 		~Log();
 
 		void log(std::string v);
 		void error(std::string v);
+		void warn(std::string v);
+		void verbose(std::string v);
 	};
 
 	extern Log dout;

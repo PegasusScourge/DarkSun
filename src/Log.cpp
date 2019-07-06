@@ -51,5 +51,14 @@ void Log::error(std::string v) {
 		darksun::dout.log("ERROR logged in " + outf); // Notify the std log that there was an error we need to see
 }
 
-Log darksun::dout("DarkSun.log");
-Log darksun::dlua("DarkSun_lua.log");
+void Log::warn(std::string v) {
+	log("[warn] " + v);
+}
+
+void Log::verbose(std::string v) {
+	if(isVerbose)
+		log("[verbose] " + v);
+}
+
+Log darksun::dout("DarkSun.log", true);
+Log darksun::dlua("DarkSun_lua.log", true);

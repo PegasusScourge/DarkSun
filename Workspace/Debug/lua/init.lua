@@ -1,3 +1,11 @@
+-- *****************************************************
+-- init.lua
+-- *****************************************************
+-- Initialisation file for in-lua functions etc. that are loaded for all engines
+--
+--
+--
+
 -- add the recursive function for listing
 function recursiveList(object)
 	for key, value in pairs(object) do
@@ -10,3 +18,6 @@ end
 
 -- init the luaplug
 luaplug = darksun.LuaPlugin()
+
+blueprints = {}
+

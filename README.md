@@ -32,5 +32,7 @@ OpenGL info thread: https://en.sfml-dev.org/forums/index.php?topic=20906.0
 
 OpenGL tutorial (basis for code): https://open.gl/introduction
 
+OpenGL tutorial: https://learnopengl.com/
+
 Assimp loading tutorial: https://learnopengl.com/Model-Loading/Assimp
 
