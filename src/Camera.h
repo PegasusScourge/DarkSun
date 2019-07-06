@@ -30,7 +30,7 @@ namespace darksun {
 		glm::vec3 Up = glm::vec3(0, 1, 0);
 		glm::vec3 Right = glm::vec3(0, 0, 1);
 		// Camera options
-		float movementSpeed = 25.0f;
+		float movementSpeed = 50.0f;
 		float mouseSensitivity = 0.1f;
 		float Zoom = 45.0f;
 
@@ -58,9 +58,7 @@ namespace darksun {
 		}
 
 		// Handle events
-		void handleEvent(sf::Event& event, float deltaTime, bool hasFocus) {
-			if (!hasFocus) // Don't process if we aren't focused
-				return;
+		void handleEvent(sf::Event& event, float deltaTime) {
 			
 			//if (event.type == sf::Event::MouseMoved) {
 			//	int newX = event.mouseMove.x;
@@ -113,7 +111,7 @@ namespace darksun {
 		// Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
 		void ProcessKeyboard(Camera_Movement direction, float deltaTime)
 		{
-			float velocity = movementSpeed * deltaTime;
+			float velocity = movementSpeed * deltaTime * (1.0f + (tacticalZPercent*3.0f));
 			if (direction == FORWARD)
 				groundPosition += Front * velocity;
 			if (direction == BACKWARD)

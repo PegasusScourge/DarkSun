@@ -25,11 +25,11 @@ void DarkSun::run() {
 	std::shared_ptr<Renderer> renderer = std::shared_ptr<Renderer>(new Renderer());
 	renderer->create();
 
-	Scene testScene(renderer, "testScene", Scene::createNewId());
-	testScene.init();
-	testScene.initTest();
+	Scene activeScene(renderer, "testScene", Scene::createNewId());
+	activeScene.init();
+	activeScene.initTest();
 
-	if (!testScene.isValid()) {
+	if (!activeScene.isValid()) {
 		dout.error("SCENE IS NOT VALID!");
 	}
 
@@ -59,13 +59,8 @@ void DarkSun::run() {
 
 		sf::Event event;
 		while (window->pollEvent(event)) {
-			//dout.verbose("Event got");
-
 			// Check for window focus
 			hasFocus = window->hasFocus();
-
-			// Pass the event to the camera
-			renderer->getCamera()->handleEvent(event, deltaTime/1000.0f, hasFocus);
 
 			// Check for close orders
 			if (event.type == sf::Event::Closed) {
@@ -81,6 +76,10 @@ void DarkSun::run() {
 						break;
 					}
 				}
+
+				if (activeScene.isCameraEnabled()) { // Only allow the camera to recieve input if the scene allows it
+					renderer->getCamera()->handleEvent(event, deltaTime / 1000.0f);
+				}
 			}
 
 			// Set the mouse grabbing
@@ -88,14 +87,14 @@ void DarkSun::run() {
 			window->setMouseCursorVisible(!hasFocus);
 
 			// Pass the event to the scene
-			testScene.handleEvent(event);
+			activeScene.handleEvent(event);
 		}
 		// Poll the keyboard checks for the mouse
-		if(hasFocus)
+		if(hasFocus && activeScene.isCameraEnabled())
 			renderer->getCamera()->pollKeyboard(deltaTime/1000.0f);
 
-		testScene.draw(testScene.getDefaultShader());
-		testScene.tick();
+		activeScene.draw(activeScene.getDefaultShader());
+		activeScene.tick();
 
 		// Do the displaying
 		window->display();
@@ -104,5 +103,5 @@ void DarkSun::run() {
 		lastElapsedMS = currentElapsedMS;
 	}
 
-	testScene.close();
+	activeScene.close();
 }

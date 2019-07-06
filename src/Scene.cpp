@@ -43,6 +43,8 @@ void Scene::initTest() {
 	dout.log("initTest() called on scene '" + sceneName + "'");
 	renderer->getCamera()->setTacticalZoomParams(14.0f, 1500.0f, 15.0f);
 	renderer->getCamera()->update(glm::vec3(0.0f, 0.0f, 0.0f), 0.5f);
+
+	setCameraEnabled(true);
 	
 	// Put a light under the spider at 0,0,0
 	renderer->setLightPosition(1, glm::vec3(0, 5.5f, 0)); // Make sure it is above the floor

@@ -37,6 +37,8 @@ namespace darksun {
 		// Tick variables
 		float sinArg = 0.0f;
 
+		bool cameraEnabled = false;
+
 		// Default shader
 		Shader defaultShader;
 
@@ -74,6 +76,10 @@ namespace darksun {
 
 		// Returns if we are valid
 		bool isValid() { return valid; }
+
+		// Enable/disable the camera
+		bool isCameraEnabled() { return cameraEnabled; }
+		void setCameraEnabled(bool m) { cameraEnabled = m; };
 
 	};
 
