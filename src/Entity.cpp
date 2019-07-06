@@ -73,7 +73,7 @@ void Entity::init(string blueprintn, long newId) {
 		if (ref.isString()) {
 			
 			//std::filesystem::path p = std::filesystem::absolute(ref.tostring());
-			std::filesystem::path p(std::filesystem::current_path().generic_string() + ref.tostring());
+			std::filesystem::path p(std::filesystem::current_path().generic_string() + "/" + ref.tostring());
 			if (std::filesystem::exists(p)) {
 				dout.verbose("Entity::init -> Model.lod_0 = '" + p.generic_string() + "'");
 				model = std::shared_ptr<Model>(new Model(p.generic_string())); // Close-range, high detail model

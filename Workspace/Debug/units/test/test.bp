@@ -2,7 +2,7 @@ blueprints.test = {
 	InternalName = 'testSpider',
 	Script = 'units/test/test_script.lua',
 	Model = {
-		lod_0 = '/units/test/spider.obj',
+		lod_0 = 'units/test/spider.obj',
 		UniformScale = 0.06,
 	},
 }
