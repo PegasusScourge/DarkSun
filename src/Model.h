@@ -51,7 +51,7 @@ namespace darksun {
 
 		/*  Functions  */
 		Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
-		void draw(Shader& shader);
+		void draw(Shader* shader);
 	private:
 		/*  Render data  */
 		unsigned int VAO, VBO, EBO;
@@ -78,7 +78,7 @@ namespace darksun {
 		}
 
 		// draws the model, and thus all its meshes
-		void draw(Shader& shader);
+		void draw(Shader* shader);
 
 		// MUST HAVE A GENERIC FORWARD SLASHED PATH! Loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
 		void loadModel(string const &path);

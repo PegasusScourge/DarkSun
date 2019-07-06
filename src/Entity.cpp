@@ -133,7 +133,7 @@ void Entity::initLuaEngine() {
 	engine.addFilesRecursive("lua/std/", ".lua");
 }
 
-void Entity::draw(Shader& shader, bool drawReflection, bool reflectiveSurface) {
+void Entity::draw(Shader* shader, bool drawReflection, bool reflectiveSurface) {
 	if (!valid) {
 		dout.error("ATTEMPTED TO DRAW INVALID ENTITY?!");
 		return;
@@ -146,7 +146,7 @@ void Entity::draw(Shader& shader, bool drawReflection, bool reflectiveSurface) {
 	modelm = glm::rotate(modelm, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)); //X
 	modelm = glm::rotate(modelm, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)); //Y
 	modelm = glm::rotate(modelm, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f)); //Z
-	shader.setMat4("model", modelm);
+	shader->setMat4("model", modelm);
 	
 	if (reflectiveSurface) {
 		glEnable(GL_STENCIL_TEST);
@@ -176,7 +176,7 @@ void Entity::draw(Shader& shader, bool drawReflection, bool reflectiveSurface) {
 		modelm = glm::rotate(modelm, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)); //X
 		modelm = glm::rotate(modelm, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)); //Y
 		modelm = glm::rotate(modelm, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f)); //Z
-		shader.setMat4("model", modelm);
+		shader->setMat4("model", modelm);
 		
 		// Draw the reflection
 		model->draw(shader);

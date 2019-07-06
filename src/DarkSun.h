@@ -12,11 +12,9 @@ Main app
 #include <vector>
 
 #include "Renderer.h"
-#include "LuaEngine.h"
 #include "Log.h"
 
-#include "Shader.h"
-#include "Entity.h"
+#include "Scene.h"
 
 #include <SFML/Graphics.hpp>
 #include <glm/glm.hpp>

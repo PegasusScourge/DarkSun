@@ -52,7 +52,7 @@ void Mesh::setupMesh() {
 	glBindVertexArray(0);
 }
 
-void Mesh::draw(Shader& shader) {
+void Mesh::draw(Shader* shader) {
 	unsigned int diffuseNr = 1;
 	unsigned int specularNr = 1;
 	for (unsigned int i = 0; i < textures.size(); i++) {
@@ -65,7 +65,7 @@ void Mesh::draw(Shader& shader) {
 		else if (name == "texture_specular")
 			number = std::to_string(specularNr++);
 
-		shader.setFloat(("material." + name + number).c_str(), i);
+		shader->setFloat(("material." + name + number).c_str(), i);
 		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 	}
 	glActiveTexture(GL_TEXTURE0);
@@ -141,9 +141,9 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
 	return textures;
 }
 
-void Model::draw(Shader& shader) {
+void Model::draw(Shader* shader) {
 	// Set gamma correction on before we start
-	shader.setInt("gamma", gammaCorrection);
+	shader->setInt("gamma", gammaCorrection);
 	
 	for (unsigned int i = 0; i < meshes.size(); i++)
 		meshes[i].draw(shader);

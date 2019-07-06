@@ -56,7 +56,7 @@ namespace darksun {
 		Entity(string blueprintn, long newId = Entity::createNewId());
 
 		// Draw the entity
-		void draw(Shader& shader, bool drawReflection = false, bool reflectiveSurface = false);
+		void draw(Shader* shader, bool drawReflection = false, bool reflectiveSurface = false);
 
 		// Returns if the entity init correctly
 		bool isValid() { return valid; }

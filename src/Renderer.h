@@ -39,7 +39,7 @@ namespace darksun {
 		void clearscreen();
 
 		// Applies the current lighting effects
-		void prepLights(Shader& shader);
+		void prepLights(Shader* shader);
 
 		// sets the position of the light
 		void setLightPosition(int index, glm::vec3 p) { 
