@@ -111,7 +111,7 @@ void Entity::init(string blueprintn, long newId) {
 			hasScript = true;
 		}
 		else {
-			dout.warn("No/invalid script found for blueprint '" + bpName + "'");
+			dout.warn("No/invalid script found for blueprint '" + bpName + "', won't attempt to run a script");
 		}
 
 		// Anything else?

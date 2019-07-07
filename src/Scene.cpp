@@ -107,6 +107,10 @@ void Scene::draw(Shader* shader) {
 		}
 	}
 
+	
+}
+
+void Scene::drawUI() {
 	// Draw the UI
 	ui->draw();
 }

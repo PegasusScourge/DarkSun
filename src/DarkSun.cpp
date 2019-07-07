@@ -34,11 +34,14 @@ void DarkSun::run() {
 	}
 
 	sf::RenderWindow * window = renderer->getWindowHandle();
+	window->setVerticalSyncEnabled(false);
+	window->setFramerateLimit(2000);
 
 	dout.log("Entering the main game engine loop");
 
 	bool running = true;
 	bool hasFocus = false;
+	bool captureMouse = false;
 
 	int tickNo = 0;
 	float sinArg = 0.0f;
@@ -72,7 +75,7 @@ void DarkSun::run() {
 				if (event.type == sf::Event::KeyPressed) {
 					switch (event.key.code) {
 					case sf::Keyboard::Escape:
-						running = false;
+						captureMouse = !captureMouse;
 						break;
 					}
 				}
@@ -83,8 +86,8 @@ void DarkSun::run() {
 			}
 
 			// Set the mouse grabbing
-			window->setMouseCursorGrabbed(hasFocus);
-			window->setMouseCursorVisible(!hasFocus);
+			window->setMouseCursorGrabbed(hasFocus && captureMouse);
+			window->setMouseCursorVisible(!(hasFocus && captureMouse));
 
 			// Pass the event to the scene
 			activeScene.handleEvent(event);
@@ -93,7 +96,13 @@ void DarkSun::run() {
 		if(hasFocus && activeScene.isCameraEnabled())
 			renderer->getCamera()->pollKeyboard(deltaTime);
 
+		// Draw the scene entities
 		activeScene.draw(activeScene.getDefaultShader());
+		// Draw the scene UI, area to optimise
+		window->pushGLStates();
+		activeScene.drawUI();
+		window->popGLStates();
+
 		activeScene.tick(deltaTime);
 
 		// Do the displaying

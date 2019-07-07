@@ -24,16 +24,27 @@ namespace darksun {
 		LuaEngine uiEngine;
 
 		string uiName = "";
+		string lua_callbackTable = "FunctionCallbacks";
 
 		// Hook the UI into the lua engine
 		void hookUIInterface();
 
 		/* LUA EXPOSED FUNCTIONS FOR UI CREATION ETC */
 		
+		// Callback function
+		void callbackFunc(tgui::Widget::Ptr widget, const std::string& signalName);
+
+		// Add a callback
+		void registerWidgetCallback(string n, string t);
+
 		// Add the widget to the current active parent
 		void addNewWidget(tgui::Widget::Ptr widget, string n) {
+			widget->setUserData(n);
 			gui->add(widget, n);
 		}
+
+		// Set the callback table
+		void setCallbackTable(string n) { lua_callbackTable = n; }
 
 		void addNewChatBox(string n) { tgui::ChatBox::Ptr w = tgui::ChatBox::create(); addNewWidget(w, n); }
 		void addNewButton(string n) { tgui::Button::Ptr w = tgui::Button::create(); addNewWidget(w, n); }
@@ -57,6 +68,61 @@ namespace darksun {
 		void addNewTreeView(string n) { tgui::TreeView::Ptr w = tgui::TreeView::create(); addNewWidget(w, n); }
 
 		// Add container stuff (tgui::Container)
+
+		// Set the size of a widget (in percentage)
+		void setWidgetSizePercent(string n, string x, string y) {
+			auto w = gui->get(n);
+			if (w == nullptr) {// Attempted to get non-existant widget
+				dlua.error("Attempted to access non-existant widget");
+				return;
+			}
+			w->setSize(x, y);
+		}
+		// Set the size of a widget (absolute)
+		void setWidgetSize(string n, int x, int y) {
+			auto w = gui->get(n);
+			if (w == nullptr) {// Attempted to get non-existant widget
+				dlua.error("Attempted to access non-existant widget");
+				return;
+			}
+			w->setSize(x, y);
+		}
+		// Set the position of a widget (in percentage)
+		void setWidgetPositionPercent(string n, string x, string y) {
+			auto w = gui->get(n);
+			if (w == nullptr) {// Attempted to get non-existant widget
+				dlua.error("Attempted to access non-existant widget");
+				return;
+			}
+			w->setPosition(x, y);
+		}
+		// Set the position of a widget (absolute)
+		void setWidgetPosition(string n, int x, int y) {
+			auto w = gui->get(n);
+			if (w == nullptr) {// Attempted to get non-existant widget
+				dlua.error("Attempted to access non-existant widget");
+				return;
+			}
+			w->setPosition(x, y);
+		}
+		// Set the text of a button widget
+		void setButtonWidgetText(string n, string text) {
+			tgui::Button::Ptr w = gui->get<tgui::Button>(n);
+			if (w == nullptr) {// Attempted to get non-existant widget
+				dlua.error("Attempted to access non-existant widget");
+				return;
+			}
+			w->setText(text);
+		}
+		// Set the text of a label widget
+		void setLabelWidgetText(string n, string text) {
+			tgui::Label::Ptr w = gui->get<tgui::Label>(n);
+			if (w == nullptr) {// Attempted to get non-existant widget
+				dlua.error("Attempted to access non-existant widget");
+				return;
+			}
+			w->setText(text);
+		}
 
 	public:
 		UIWrangler(std::shared_ptr<Renderer> r, string uN);

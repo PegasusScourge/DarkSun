@@ -71,6 +71,14 @@ void UIWrangler::hookUIInterface() {
 					.addFunction("addNewTabs", &darksun::UIWrangler::addNewTabs)
 					.addFunction("addNewTextBox", &darksun::UIWrangler::addNewTextBox)
 					.addFunction("addNewTreeView", &darksun::UIWrangler::addNewTreeView)
+					.addFunction("setWidgetSizePercent", &darksun::UIWrangler::setWidgetSizePercent)
+					.addFunction("setWidgetSize", &darksun::UIWrangler::setWidgetSize)
+					.addFunction("setWidgetPositionPercent", &darksun::UIWrangler::setWidgetPositionPercent)
+					.addFunction("setWidgetPosition", &darksun::UIWrangler::setWidgetPosition)
+					.addFunction("setButtonWidgetText", &darksun::UIWrangler::setButtonWidgetText)
+					.addFunction("setLabelWidgetText", &darksun::UIWrangler::setLabelWidgetText)
+					.addFunction("registerWidgetCallback", &darksun::UIWrangler::registerWidgetCallback)
+					.addFunction("setCallbackTable", &darksun::UIWrangler::setCallbackTable)
 				.endClass()
 			.endNamespace()
 			.addFunction("LOG", lua_log);
@@ -107,11 +115,52 @@ void UIWrangler::tick(float deltaTime) {
 			throw new std::exception("Scene table global not found");
 		LuaRef onTick = sceneTable["OnTick"];
 		if (!onTick.isFunction())
-			throw new std::exception("OnTick function not found/mot a function");
+			throw new std::exception("OnTick function not found/not a function");
 		onTick(deltaTime);
 	}
 	catch (std::exception& e) {
 		string what = e.what();
 		dlua.error("Failed UI OnTick (" + uiName + "): " + what);
+	}
+}
+
+void UIWrangler::registerWidgetCallback(string n, string t) {
+	lua::State *L = uiEngine.getState();
+	try {
+		auto w = gui->get(n);
+		if (w == nullptr) {// Attempted to get non-existant widget
+			throw new std::exception("Attempted to access non-existant widget");
+		}
+		w->connect(t.c_str(), &darksun::UIWrangler::callbackFunc, this);
+	}
+	catch (std::exception& e) {
+		string what = e.what();
+		dlua.error("Failed UI registerCallback (" + uiName + "): " + what);
+	}
+}
+
+void UIWrangler::callbackFunc(tgui::Widget::Ptr widget, const std::string& signalName) {
+	lua::State *L = uiEngine.getState();
+	try {
+		LuaRef sceneTable = getGlobal(L->getState(), uiName.c_str());
+		if (!sceneTable.isTable()) // Check to see if the scene table exists
+			throw new std::exception("Scene table global not found");
+
+		// Find the callback function we wantin the FunctionCallbacks table
+		LuaRef callbackTable = sceneTable["FunctionCallbacks"];
+		if (!callbackTable.isTable())
+			throw new std::exception("FunctionCallbacks table not found");
+
+		string widgetName = widget->getUserData<string>();
+		LuaRef func = callbackTable[widgetName.c_str()];
+
+		if (!func.isFunction())
+			throw new std::exception("Function not found/not a function");
+		dlua.verbose("Callback: f=" + func.tostring() + ", widget=" + widgetName);
+		func(widgetName);
+	}
+	catch (std::exception& e) {
+		string what = e.what();
+		dlua.error("Failed UI callback (" + uiName + "): " + what);
 	}
 }

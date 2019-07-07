@@ -55,6 +55,7 @@ namespace darksun {
 
 		// Draw the scene
 		void draw(Shader* shader);
+		void drawUI();
 
 		// Pass events
 		void handleEvent(sf::Event& ev);
