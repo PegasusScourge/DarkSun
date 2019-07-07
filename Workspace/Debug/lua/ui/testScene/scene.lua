@@ -7,15 +7,12 @@ testScene = {
 	},
 
 	FunctionCallbacks = {
-		clickableButton = function(what)
-			--LOG('Button ' .. what .. ' was clicked!')
-			--local vis = not myGui:isWidgetVisible('fpsLabel')
-			--if vis then
-			--	myGui:showWithEffect('fpsLabel', 'slideFromBottom', 500)
-			--else
-			--	myGui:hideWithEffect('fpsLabel', 'slideToTop', 250)
-			--end
+		exitButton = function(what)
 			testScene.SceneTransition.To = 'exit'
+			myGui:transitionScene()
+		end,
+		testButton = function(what)
+			testScene.SceneTransition.To = 'testScene'
 			myGui:transitionScene()
 		end,
 	},
@@ -24,32 +21,30 @@ testScene = {
 		LOG('Create scene "' .. myGui.name .. '"')
 		myGui:setCallbackTable('FunctionCallbacks')
 		
-		myGui:addNewButton('clickableButton')
-		myGui:setWidgetPositionPercent('clickableButton', '0%', '14%')
-		myGui:setButtonWidgetText('clickableButton', 'Close')
-		myGui:registerWidgetCallback('clickableButton', 'pressed')
+		myGui:addNewButton('exitButton')
+		myGui:setWidgetPositionPercent('exitButton', '0%', '14%')
+		myGui:setButtonWidgetText('exitButton', 'Close')
+		myGui:registerWidgetCallback('exitButton', 'pressed')
 		
-		for i=0,100 do
-			local name = 'clickableButton_' .. tostring(i)
-			myGui:addNewButton(name)
-			myGui:setWidgetPosition(name, (i % 10) * 60, 100 + (math.floor(i / 10) * 20))
-			myGui:setButtonWidgetText(name, 'Crash Me!')
-			
-			testScene.FunctionCallbacks[name] = function(what)
-				-- Do nothing
-			end
-			
-			myGui:registerWidgetCallback(name, 'pressed')
-		end
+		myGui:addNewButton('testButton')
+		myGui:setWidgetPositionPercent('testButton', '10%', '14%')
+		myGui:setButtonWidgetText('testButton', 'Switch Scene')
+		myGui:registerWidgetCallback('testButton', 'pressed')
 		
 		myGui:addNewLabel('fpsLabel')
 		myGui:setWidgetPositionPercent('fpsLabel', '0%', '10%')
 		myGui:setLabelWidgetText('fpsLabel', 'Hello World!')
+		
+		myGui:addNewLabel('cameraInfo')
+		myGui:setWidgetPositionPercent('cameraInfo', '0%', '5%')
+		myGui:setLabelWidgetText('cameraInfo', 'Hello World!')
 	end,
 	
 	OnTick = function(deltaTime)
-		local fps = math.ceil(1/deltaTime)
-		myGui:setLabelWidgetText('fpsLabel', 'FPS=' .. tostring(fps) .. ', dt:' .. tostring(deltaTime) .. 's')
+		local fps = round(1/deltaTime, 2)
+		myGui:setLabelWidgetText('fpsLabel', 'FPS=' .. tostring(fps) .. ', dt:' .. tostring(round(deltaTime, 4)) .. 's')
+		
+		myGui:setLabelWidgetText('cameraInfo', 'Pos = (' .. tostring(round(myGui:cameraX())) .. ',' .. tostring(round(myGui:cameraZ())) .. ')')
 	end,
 }
 tick = testScene.OnTick -- just in case tick() gets called, make sure we point it to something

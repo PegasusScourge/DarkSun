@@ -25,11 +25,11 @@ void DarkSun::run() {
 	std::shared_ptr<Renderer> renderer = std::shared_ptr<Renderer>(new Renderer());
 	renderer->create();
 
-	Scene activeScene(renderer, "testScene", Scene::createNewId());
-	activeScene.init();
-	activeScene.initTest();
+	std::unique_ptr<Scene> activeScene = std::unique_ptr<Scene>(new Scene(renderer, "testScene", Scene::createNewId()));
+	activeScene->init();
+	activeScene->initTest();
 
-	if (!activeScene.isValid()) {
+	if (!activeScene->isValid()) {
 		dout.error("SCENE IS NOT VALID!");
 	}
 
@@ -79,7 +79,7 @@ void DarkSun::run() {
 						break;
 					}
 				}
-				if (activeScene.isCameraEnabled()) { // Only allow the camera to recieve input if the scene allows it
+				if (activeScene->isCameraEnabled()) { // Only allow the camera to recieve input if the scene allows it
 					renderer->getCamera()->handleEvent(event, deltaTime);
 				}
 			}
@@ -89,40 +89,81 @@ void DarkSun::run() {
 			window->setMouseCursorVisible(!(hasFocus && captureMouse));
 
 			// Pass the event to the scene
-			activeScene.handleEvent(event);
+			activeScene->handleEvent(event);
 		}
 		// Poll the keyboard checks for the mouse
-		if(hasFocus && activeScene.isCameraEnabled())
+		if(hasFocus && activeScene->isCameraEnabled())
 			renderer->getCamera()->pollKeyboard(deltaTime);
 
 		// Draw the scene entities
-		activeScene.draw(activeScene.getDefaultShader());
+		activeScene->draw(activeScene->getDefaultShader());
 		// Draw the scene UI, area to optimise
 		window->pushGLStates();
-		activeScene.drawUI();
+		activeScene->drawUI();
 		window->popGLStates();
 
-		activeScene.tick(deltaTime);
+		// Finish drawing
+		// Do the displaying
+		window->display();
+
+		// tick the scene
+		activeScene->tick(deltaTime);
 
 		// Check for scene transitions
-		if (activeScene.shouldTransition()) {
-			string target = activeScene.getNewScene();
+		if (activeScene->shouldTransition()) {
+			string target = activeScene->getNewScene();
 
 			if (target.compare("exit") == 0) {
 				// Signal an exit
 				running = false;
 			}
 			else {
-				// Assign the new scene, framework doesn't exist yet
+				// Assign the new scene
+				activeScene->close(); // Close old scene
+				activeScene = std::unique_ptr<Scene>(new Scene(renderer, target, Scene::createNewId()));
+				activeScene->init();
+				if (!activeScene->isValid()) {
+					running = false;
+					dout.error("TRIED TO SWITCH TO NEW SCENE '" + target + "' BUT SCENE WAS INVALID");
+				}
+				activeScene->initTest();
 			}
 		}
 
-		// Do the displaying
-		window->display();
+		// Catch our own GL errors, if for some reason we create them
+		GLenum error = glGetError();
+		if (error != GL_NO_ERROR) {
+			string errS;
+			switch (error) {
+			case GL_INVALID_ENUM:
+				errS = "GL_INVALID_ENUM";
+				break;
+			case GL_INVALID_VALUE:
+				errS = "GL_INVALID_VALUE";
+				break;
+			case GL_INVALID_OPERATION:
+				errS = "GL_INVALID_OPERATION";
+				break;
+			case GL_INVALID_FRAMEBUFFER_OPERATION:
+				errS = "GL_INVALID_FRAMEBUFFER_OPERATION";
+				break;
+			case GL_OUT_OF_MEMORY:
+				errS = "GL_OUT_OF_MEMORY";
+				break;
+			case GL_STACK_UNDERFLOW:
+				errS = "GL_STACK_UNDERFLOW";
+				break;
+			case GL_STACK_OVERFLOW:
+				errS = "GL_STACK_OVERFLOW";
+				break;
+			}
+
+			dout.error("Detected GL error: '" + errS + "'");
+		}
 
 		tickNo++;
 		lastElapsed = currentElapsed;
 	}
 
-	activeScene.close();
+	activeScene->close();
 }

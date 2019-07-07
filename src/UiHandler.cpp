@@ -52,6 +52,8 @@ void UIWrangler::hookUIInterface() {
 				.beginClass<UIWrangler>("GUI")
 					.addConstructor<void(*)(std::shared_ptr<Renderer> r, string uN), RefCountedPtr<UIWrangler> /* creation policy */ >()
 					.addProperty("name", &darksun::UIWrangler::uiName, false) // Read only
+					.addFunction("cameraX", &darksun::UIWrangler::getCameraX) // Read only
+					.addFunction("cameraZ", &darksun::UIWrangler::getCameraZ) // Read only
 					.addFunction("addNewChatBox", &darksun::UIWrangler::addNewChatBox)
 					.addFunction("addNewButton", &darksun::UIWrangler::addNewButton)
 					.addFunction("addNewEditBox", &darksun::UIWrangler::addNewEditBox)
@@ -111,7 +113,6 @@ void UIWrangler::handleEvent(sf::Event& ev) {
 
 UIWrangler::~UIWrangler() {
 	gui->removeAllWidgets();
-	gui.release();
 }
 
 void UIWrangler::tick(float deltaTime) {

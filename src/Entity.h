@@ -11,6 +11,7 @@ Header file for Entity.h, a game engine actual entity, marrying together all asp
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <algorithm>
 
 #include "Model.h"
 #include "LuaEngine.h"
@@ -41,6 +42,15 @@ namespace darksun {
 		glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 		glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
 
+		// Pathfinding information
+		std::vector<glm::vec3> pathfindingWaypoints;
+		int currentPathfindingWaypoint = 0;
+		bool pathfinding = false;
+		glm::vec3 targetPos = glm::vec3(0, 0, 0);
+
+		// Rotation information
+		glm::vec3 targetRot = glm::vec3(0, 0, 0);
+
 		// bools
 		bool valid = false;
 		bool hasScript = false;
@@ -48,6 +58,34 @@ namespace darksun {
 		// Does the init stuff, should only be called in the constructor
 		void init(string blueprintn, long newId);
 		void initLuaEngine();
+
+		// Set a new target to move to in the world
+		void setMoveTarget(float x, float y, float z) {
+			targetPos = glm::vec3(x,y,z);
+			float dist = glm::distance(targetPos, position);
+
+			// Replace this value with the size of the entity, as if our new position is within us there's really no point in moving?
+			if (dist >= 0.2) {
+				recalculatePathfinding();
+			}
+		}
+
+		// Calculate the pathfinding to the position we are targeting
+		void recalculatePathfinding();
+
+		// Returns if we are currently pathfinding somewhere
+		bool isPathfinding() { return pathfinding; }
+
+		// Execute pathfinding
+		void moveOnTick(glm::vec3& p, float deltaTime);
+
+		// Rotate ourselves to a orientation
+		void faceDirection(float x, float y, float z) {
+			targetRot = glm::vec3(x, y, z);;
+		}
+
+		// Execute rotation
+		void rotateOnTick(glm::vec3& r, float deltaTime);
 
 		// Static stuff
 		static long LastEntityId;

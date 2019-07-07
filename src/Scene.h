@@ -46,7 +46,7 @@ namespace darksun {
 		std::shared_ptr<Renderer> renderer;
 
 		// UIWrangler
-		std::shared_ptr<UIWrangler> ui;
+		std::unique_ptr<UIWrangler> ui;
 
 	public:
 		static long createNewId();

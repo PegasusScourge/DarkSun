@@ -109,6 +109,22 @@ void Entity::init(string blueprintn, long newId) {
 			dout.verbose("Entity::init -> Script = '" + ref.tostring() + "'");
 			engine.addFile(ref);
 			hasScript = true;
+
+			// Call on create
+			lua::State *L = engine.getState();
+			try {
+				LuaRef entityTable = getGlobal(L->getState(), internalName.c_str());
+				if (!entityTable.isTable()) // Check to see if the scene table exists
+					throw new std::exception("Entity table global not found");
+				LuaRef func = entityTable["OnCreate"];
+				if (!func.isFunction())
+					throw new std::exception("OnCreate function not found/not a function");
+				func();
+			}
+			catch (std::exception& e) {
+				string what = e.what();
+				dlua.error("Failed entity OnCreate (" + internalName + "): " + what);
+			}
 		}
 		else {
 			dout.warn("No/invalid script found for blueprint '" + bpName + "', won't attempt to run a script");
@@ -142,6 +158,9 @@ void Entity::initLuaEngine() {
 				.addProperty("internalName", &darksun::Entity::internalName, false) // Read only
 				.addProperty("bpName", &darksun::Entity::bpName, false) // Read only
 				.addProperty("id", &darksun::Entity::myId, false) // Read only
+				.addFunction("moveTo", &darksun::Entity::setMoveTarget)
+				.addFunction("rotateTo", &darksun::Entity::faceDirection)
+				.addFunction("isPathfinding", &darksun::Entity::isPathfinding)
 			.endClass()
 		.endNamespace();
 
@@ -151,22 +170,34 @@ void Entity::initLuaEngine() {
 }
 
 void Entity::tick(float deltaTime) {
-	if (!hasScript)
-		return;
-
-	lua::State *L = engine.getState();
-	try {
-		LuaRef sceneTable = getGlobal(L->getState(), internalName.c_str());
-		if (!sceneTable.isTable()) // Check to see if the scene table exists
-			throw new std::exception("Entity table global not found");
-		LuaRef onTick = sceneTable["OnTick"];
-		if (!onTick.isFunction())
-			throw new std::exception("OnTick function not found/not a function");
-		onTick(deltaTime);
+	if (hasScript) {
+		lua::State *L = engine.getState();
+		try {
+			LuaRef entityTable = getGlobal(L->getState(), internalName.c_str());
+			if (!entityTable.isTable()) // Check to see if the scene table exists
+				throw new std::exception("Entity table global not found");
+			LuaRef onTick = entityTable["OnTick"];
+			if (!onTick.isFunction())
+				throw new std::exception("OnTick function not found/not a function");
+			onTick(deltaTime);
+		}
+		catch (std::exception& e) {
+			string what = e.what();
+			dlua.error("Failed entity OnTick (" + internalName + "): " + what);
+		}
 	}
-	catch (std::exception& e) {
-		string what = e.what();
-		dlua.error("Failed entity OnTick (" + internalName + "): " + what);
+
+	// Do movement stuff
+	rotateOnTick(targetRot, deltaTime);
+
+	if (pathfinding) {
+		float dist = glm::distance(position, pathfindingWaypoints.at(currentPathfindingWaypoint));
+		if (dist > 0.001) {
+			moveOnTick(pathfindingWaypoints.at(currentPathfindingWaypoint), deltaTime);
+		}
+		else {
+			pathfinding = false;
+		}
 	}
 }
 
@@ -221,4 +252,85 @@ void Entity::draw(Shader* shader, bool drawReflection, bool reflectiveSurface) {
 
 	if (reflectiveSurface || drawReflection) // Disable the stencil buffer
 		glDisable(GL_STENCIL_TEST);
+}
+
+void Entity::rotateOnTick(glm::vec3& r, float deltaTime) {
+	float rotSpeed = 100.0f * deltaTime;
+
+	float diff;
+
+	if (r.x != rotation.x) {
+		diff = abs(r.x - rotation.x);
+		if (r.x > rotation.x) {
+			rotation.x += std::min(rotSpeed, diff);
+		}
+		else {
+			rotation.x -= std::min(rotSpeed, diff);
+		}
+	}
+	if (r.y != rotation.y) {
+		diff = abs(r.y - rotation.y);
+		if (r.y > rotation.y) {
+			rotation.y += std::min(rotSpeed, diff);
+		}
+		else {
+			rotation.y -= std::min(rotSpeed, diff);
+		}
+	}
+	if (r.z != rotation.z) {
+		diff = abs(r.z - rotation.z);
+		if (r.z > rotation.z) {
+			rotation.z += std::min(rotSpeed, diff);
+		}
+		else {
+			rotation.z -= std::min(rotSpeed, diff);
+		}
+	}
+}
+
+void Entity::moveOnTick(glm::vec3& p, float deltaTime) {
+	float speed = 1.0f * deltaTime;
+
+	float diff;
+
+	if (p.x != position.x) {
+		diff = abs(p.x - position.x);
+		if (p.x > position.x) {
+			position.x += std::min(speed, diff);
+		}
+		else {
+			position.x -= std::min(speed, diff);
+		}
+	}
+	if (p.y != position.y) {
+		diff = abs(p.y - position.y);
+		if (p.y > position.y) {
+			position.y += std::min(speed, diff);
+		}
+		else {
+			position.y -= std::min(speed, diff);
+		}
+	}
+	if (p.z != position.z) {
+		diff = abs(p.z - position.z);
+		if (p.z > position.z) {
+			position.z += std::min(speed, diff);
+		}
+		else {
+			position.z -= std::min(speed, diff);
+		}
+	}
+}
+
+void Entity::recalculatePathfinding() {
+	pathfinding = true;
+
+	// Reset the waypoints
+	pathfindingWaypoints.clear();
+
+	// TODO make this more complicated!
+	pathfindingWaypoints.push_back(targetPos);
+	currentPathfindingWaypoint = 0;
+
+	pathfindingWaypoints.shrink_to_fit();
 }

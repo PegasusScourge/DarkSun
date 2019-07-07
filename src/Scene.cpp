@@ -26,7 +26,7 @@ Scene::Scene(std::shared_ptr<Renderer> r, string n, long nid) {
 	dout.log("Scene constructor called");
 
 	// Create the ui
-	ui = std::shared_ptr<UIWrangler>(new UIWrangler(renderer, sceneName));
+	ui = std::unique_ptr<UIWrangler>(new UIWrangler(renderer, sceneName));
 }
 
 void Scene::init() {

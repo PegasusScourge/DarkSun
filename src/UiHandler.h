@@ -151,6 +151,13 @@ namespace darksun {
 			return valid;
 		}
 
+		float getCameraX() {
+			return renderer->getCamera()->groundPosition.x;
+		}
+		float getCameraZ() {
+			return renderer->getCamera()->groundPosition.z;
+		}
+
 	public:
 		UIWrangler(std::shared_ptr<Renderer> r, string uN);
 		~UIWrangler();
