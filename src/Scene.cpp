@@ -115,9 +115,15 @@ void Scene::handleEvent(sf::Event& ev) {
 	ui->handleEvent(ev);
 }
 
-void Scene::tick() {
+void Scene::tick(float deltaTime) {
 	// Move the light in a circle (for now)
 	renderer->setLightPosition(0, glm::vec3(10.0f * sinf(sinArg), 10.0f, 10.0f * cosf(sinArg)));
 	renderer->setLightColor(1, glm::vec3(sinf(sinArg), 0.0f, cosf(sinArg)));
 	sinArg += 0.05;
+
+	ui->tick(deltaTime);
+
+	for (auto& e : entities) {
+		e->tick(deltaTime);
+	}
 }

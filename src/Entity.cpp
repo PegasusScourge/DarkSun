@@ -24,7 +24,7 @@ Entity::Entity(string blueprintn, long newId) {
 }
 
 void Entity::init(string blueprintn, long newId) {
-	dout.log("Creating new entity with id '" + to_string(newId) + "'");
+	dout.log("Creating new entity with id '" + std::to_string(newId) + "'");
 	
 	myId = newId;
 	bpName = blueprintn;
@@ -108,6 +108,7 @@ void Entity::init(string blueprintn, long newId) {
 			// We have a script file, load it
 			dout.verbose("Entity::init -> Script = '" + ref.tostring() + "'");
 			engine.addFile(ref);
+			hasScript = true;
 		}
 		else {
 			dout.warn("No/invalid script found for blueprint '" + bpName + "'");
@@ -131,6 +132,42 @@ void Entity::initLuaEngine() {
 
 	// Register std lua here?
 	engine.addFilesRecursive("lua/std/", ".lua");
+
+	// Register the entity class
+	lua::State *L = engine.getState();
+	luabridge::getGlobalNamespace(L->getState())
+		.beginNamespace("darksun")
+			.beginClass<Entity>("Entity")
+				.addConstructor<void(*)(string blueprintn, long newId), RefCountedPtr<Entity> /* creation policy */ >()
+				.addProperty("internalName", &darksun::Entity::internalName, false) // Read only
+				.addProperty("bpName", &darksun::Entity::bpName, false) // Read only
+				.addProperty("id", &darksun::Entity::myId, false) // Read only
+			.endClass()
+		.endNamespace();
+
+	// Add this instance
+	push(L->getState(), this);
+	lua_setglobal(L->getState(), "myEntity");
+}
+
+void Entity::tick(float deltaTime) {
+	if (!hasScript)
+		return;
+
+	lua::State *L = engine.getState();
+	try {
+		LuaRef sceneTable = getGlobal(L->getState(), internalName.c_str());
+		if (!sceneTable.isTable()) // Check to see if the scene table exists
+			throw new std::exception("Entity table global not found");
+		LuaRef onTick = sceneTable["OnTick"];
+		if (!onTick.isFunction())
+			throw new std::exception("OnTick function not found/not a function");
+		onTick(deltaTime);
+	}
+	catch (std::exception& e) {
+		string what = e.what();
+		dlua.error("Failed entity OnTick (" + internalName + "): " + what);
+	}
 }
 
 void Entity::draw(Shader* shader, bool drawReflection, bool reflectiveSurface) {

@@ -16,8 +16,5 @@ function recursiveList(object)
 	end
 end
 
--- init the luaplug
-luaplug = darksun.LuaPlugin()
-
 blueprints = {}
 

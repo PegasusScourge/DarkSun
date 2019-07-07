@@ -22,10 +22,8 @@ Header file for LuaEngine.cpp, wrapping a Lua instace and state for running game
 
 #include "Log.h"
 
-// Classes etc to be bound
-#include "LuaPlugin.h"
-
 using namespace luabridge;
+using string = std::string;
 
 /* Log a value from lua to the dlua stream */
 void lua_log(const char * s);
@@ -67,7 +65,7 @@ namespace darksun {
 		void doString(string s);
 
 		/* Executes the tick() function of the engine (if present) for a single tick of the engine */
-		void tick();
+		void tick(float deltaTime);
 
 		lua::State* getState();
 

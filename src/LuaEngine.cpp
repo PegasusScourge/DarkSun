@@ -11,7 +11,7 @@ Wraps a Lua instace and executes code for game logic
 using namespace darksun;
 
 LuaEngine::LuaEngine() {
-	lua_log("LuaEngine init");
+	//lua_log("LuaEngine init");
 
 	// Init the bind
 	luabridge_bind();
@@ -19,10 +19,10 @@ LuaEngine::LuaEngine() {
 	// Load the init code
 	validEngine = initConnection();
 
-	dlua.log("Engine value = " + BoolToString(validEngine));
+	//dlua.log("Engine value = " + BoolToString(validEngine));
 }
 
-void LuaEngine::tick() {
+void LuaEngine::tick(float deltaTime) {
 	if (!validEngine) {// Only continue if the engine is valid
 		dlua.error("Invalid engine, destroy!");
 		return;
@@ -30,13 +30,13 @@ void LuaEngine::tick() {
 
 	try {
 		LuaRef t = getGlobal(L.getState(), "tick");
-		t();
+		t(deltaTime);
 	}
-	catch (exception& e) {
+	catch (std::exception& e) {
 		string what = e.what();
 		dlua.error("tick() error: " + what);
 		dlua.log("Did you declare tick()?");
-		validEngine = false; // Fail the engine here so execution stops
+		//validEngine = false; // Fail the engine here so execution stops
 	}
 }
 
@@ -47,7 +47,7 @@ void LuaEngine::addFile(string f) {
 	try {
 		L.doFile(f);
 	}
-	catch (exception& e) {
+	catch (std::exception& e) {
 		string what = e.what();
 		dlua.error("Attempted to add file: " + what);
 		validEngine = false; // Fail the engine here so execution stops
@@ -111,15 +111,11 @@ void LuaEngine::luabridge_bind() {
 	try {
 		luabridge::getGlobalNamespace(L.getState())
 			.beginNamespace("darksun")
-				.beginClass<LuaPlugin>("LuaPlugin")
-					.addConstructor<void(*)(), RefCountedPtr<LuaPlugin> /* creation policy */ >()
-					.addFunction("helloworld", &LuaPlugin::helloworld)
-				.endClass()
 				.addProperty("luaDir", lua_getLuaDir)
 			.endNamespace()
 			.addFunction("LOG", lua_log);
 	}
-	catch (exception& e) {
+	catch (std::exception& e) {
 		string what = e.what();
 		dlua.error("Failed binding proccess: " + what);
 		return;
@@ -132,7 +128,7 @@ bool LuaEngine::initConnection() {
 	try {
 		L.doFile(lua_getLuaDir() + initFile);
 	}
-	catch (exception& e) {
+	catch (std::exception& e) {
 		string what = e.what();
 		dlua.error("Self test file load error: " + what);
 		return false;

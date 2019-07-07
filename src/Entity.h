@@ -43,6 +43,7 @@ namespace darksun {
 
 		// bools
 		bool valid = false;
+		bool hasScript = false;
 
 		// Does the init stuff, should only be called in the constructor
 		void init(string blueprintn, long newId);
@@ -54,6 +55,9 @@ namespace darksun {
 		static long createNewId();
 
 		Entity(string blueprintn, long newId = Entity::createNewId());
+
+		// Tick the entity
+		void tick(float deltaTime);
 
 		// Draw the entity
 		void draw(Shader* shader, bool drawReflection = false, bool reflectiveSurface = false);

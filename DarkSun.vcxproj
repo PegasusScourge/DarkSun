@@ -23,7 +23,6 @@
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\LuaEngine.cpp" />
-    <ClCompile Include="src\LuaPlugin.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
@@ -36,7 +35,6 @@
     <ClInclude Include="src\Entity.h" />
     <ClInclude Include="src\Log.h" />
     <ClInclude Include="src\LuaEngine.h" />
-    <ClInclude Include="src\LuaPlugin.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\Scene.h" />

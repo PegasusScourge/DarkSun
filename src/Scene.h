@@ -60,7 +60,7 @@ namespace darksun {
 		void handleEvent(sf::Event& ev);
 
 		// Tick the scene
-		void tick();
+		void tick(float deltaTime);
 
 		// Init function called to start the scene
 		void init();

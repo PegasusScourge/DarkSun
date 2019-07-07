@@ -45,8 +45,8 @@ void DarkSun::run() {
 
 	sf::Clock clock; // starts the clock
 	sf::Time elapsedTime = clock.getElapsedTime();
-	float lastElapsedMS = 0;
-	float currentElapsedMS = 0;
+	float lastElapsed = 0;
+	float currentElapsed = 0;
 	float deltaTime = 0;
 
 	while (running) {
@@ -54,8 +54,8 @@ void DarkSun::run() {
 		
 		// We pretend as if time isn't moving forward here, and is only at the instance we take this clock reading
 		elapsedTime = clock.getElapsedTime();
-		currentElapsedMS = elapsedTime.asMilliseconds();
-		deltaTime = currentElapsedMS - lastElapsedMS;
+		currentElapsed = elapsedTime.asSeconds();
+		deltaTime = currentElapsed - lastElapsed;
 
 		sf::Event event;
 		while (window->pollEvent(event)) {
@@ -78,7 +78,7 @@ void DarkSun::run() {
 				}
 
 				if (activeScene.isCameraEnabled()) { // Only allow the camera to recieve input if the scene allows it
-					renderer->getCamera()->handleEvent(event, deltaTime / 1000.0f);
+					renderer->getCamera()->handleEvent(event, deltaTime);
 				}
 			}
 
@@ -91,16 +91,16 @@ void DarkSun::run() {
 		}
 		// Poll the keyboard checks for the mouse
 		if(hasFocus && activeScene.isCameraEnabled())
-			renderer->getCamera()->pollKeyboard(deltaTime/1000.0f);
+			renderer->getCamera()->pollKeyboard(deltaTime);
 
 		activeScene.draw(activeScene.getDefaultShader());
-		activeScene.tick();
+		activeScene.tick(deltaTime);
 
 		// Do the displaying
 		window->display();
 
 		tickNo++;
-		lastElapsedMS = currentElapsedMS;
+		lastElapsed = currentElapsed;
 	}
 
 	activeScene.close();
