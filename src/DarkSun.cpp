@@ -75,11 +75,10 @@ void DarkSun::run() {
 				if (event.type == sf::Event::KeyPressed) {
 					switch (event.key.code) {
 					case sf::Keyboard::Escape:
-						captureMouse = !captureMouse;
+						running = false;
 						break;
 					}
 				}
-
 				if (activeScene.isCameraEnabled()) { // Only allow the camera to recieve input if the scene allows it
 					renderer->getCamera()->handleEvent(event, deltaTime);
 				}
@@ -104,6 +103,19 @@ void DarkSun::run() {
 		window->popGLStates();
 
 		activeScene.tick(deltaTime);
+
+		// Check for scene transitions
+		if (activeScene.shouldTransition()) {
+			string target = activeScene.getNewScene();
+
+			if (target.compare("exit") == 0) {
+				// Signal an exit
+				running = false;
+			}
+			else {
+				// Assign the new scene, framework doesn't exist yet
+			}
+		}
 
 		// Do the displaying
 		window->display();

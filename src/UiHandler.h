@@ -14,6 +14,10 @@ Header file for UiHandler.cpp, wrangles the UI for scenes (with LuaEngine for UI
 
 namespace darksun {
 
+	struct WidgetData {
+		string widgetName;
+	};
+
 	class UIWrangler {
 
 	private:
@@ -26,11 +30,15 @@ namespace darksun {
 		string uiName = "";
 		string lua_callbackTable = "FunctionCallbacks";
 
+		bool shdTransition = false;
+
 		// Hook the UI into the lua engine
 		void hookUIInterface();
 
 		/* LUA EXPOSED FUNCTIONS FOR UI CREATION ETC */
-		
+
+		void transitionScene() { shdTransition = true; }
+
 		// Callback function
 		void callbackFunc(tgui::Widget::Ptr widget, const std::string& signalName);
 
@@ -39,7 +47,9 @@ namespace darksun {
 
 		// Add the widget to the current active parent
 		void addNewWidget(tgui::Widget::Ptr widget, string n) {
-			widget->setUserData(n);
+			WidgetData dat;
+			dat.widgetName = n;
+			widget->setUserData(dat);
 			gui->add(widget, n);
 		}
 
@@ -72,56 +82,73 @@ namespace darksun {
 		// Set the size of a widget (in percentage)
 		void setWidgetSizePercent(string n, string x, string y) {
 			auto w = gui->get(n);
-			if (w == nullptr) {// Attempted to get non-existant widget
-				dlua.error("Attempted to access non-existant widget");
-				return;
-			}
+			if (!isValidWidget(w)) { return; }
 			w->setSize(x, y);
 		}
 		// Set the size of a widget (absolute)
 		void setWidgetSize(string n, int x, int y) {
 			auto w = gui->get(n);
-			if (w == nullptr) {// Attempted to get non-existant widget
-				dlua.error("Attempted to access non-existant widget");
-				return;
-			}
+			if (!isValidWidget(w)) { return; }
 			w->setSize(x, y);
 		}
 		// Set the position of a widget (in percentage)
 		void setWidgetPositionPercent(string n, string x, string y) {
 			auto w = gui->get(n);
-			if (w == nullptr) {// Attempted to get non-existant widget
-				dlua.error("Attempted to access non-existant widget");
-				return;
-			}
+			if (!isValidWidget(w)) { return; }
 			w->setPosition(x, y);
 		}
 		// Set the position of a widget (absolute)
 		void setWidgetPosition(string n, int x, int y) {
-			auto w = gui->get(n);
-			if (w == nullptr) {// Attempted to get non-existant widget
-				dlua.error("Attempted to access non-existant widget");
-				return;
-			}
+			tgui::Widget::Ptr w = gui->get(n);
+
 			w->setPosition(x, y);
 		}
 		// Set the text of a button widget
 		void setButtonWidgetText(string n, string text) {
 			tgui::Button::Ptr w = gui->get<tgui::Button>(n);
-			if (w == nullptr) {// Attempted to get non-existant widget
-				dlua.error("Attempted to access non-existant widget");
-				return;
-			}
+			if (!isValidWidget(w)) { return; }
 			w->setText(text);
 		}
 		// Set the text of a label widget
 		void setLabelWidgetText(string n, string text) {
 			tgui::Label::Ptr w = gui->get<tgui::Label>(n);
-			if (w == nullptr) {// Attempted to get non-existant widget
-				dlua.error("Attempted to access non-existant widget");
-				return;
-			}
+			if (!isValidWidget(w)) { ; return; }
 			w->setText(text);
+		}
+		// Set the widget visible
+		void setWidgetVisible(string n, bool v) {
+			auto w = gui->get(n);
+			if (!isValidWidget(w)) { return; }
+			w->setVisible(v);
+		}
+		// Set the widget enabled
+		void setWidgetEnabled(string n, bool v) {
+			auto w = gui->get(n);
+			if (!isValidWidget(w)) { return; }
+			w->setEnabled(v);
+		}
+		// is the widget visible
+		bool isWidgetVisible(string n) {
+			auto w = gui->get(n);
+			if (!isValidWidget(w)) { return true; }
+			return w->isVisible();
+		}
+		// is the widget enabled
+		bool isWidgetEnabled(string n) {
+			auto w = gui->get(n);
+			if (!isValidWidget(w)) { return true; }
+			return w->isEnabled();
+		}
+		// Show with effect the widget
+		void showWithEffect(string n, string eff, int interval);
+		// Hide with effect
+		void hideWithEffect(string n, string eff, int interval);
+
+		bool isValidWidget(tgui::Widget::Ptr w) {
+			bool valid = (w != nullptr);
+			if (!valid)
+				dlua.error("Attempted to access non-existant widget");
+			return valid;
 		}
 
 	public:
@@ -136,6 +163,36 @@ namespace darksun {
 
 		// Handle events
 		void handleEvent(sf::Event& ev);
+
+		// Get the scene to transition to
+		string getNewScene() {
+			lua::State *L = uiEngine.getState();
+			try {
+				LuaRef sceneTable = getGlobal(L->getState(), uiName.c_str());
+				if (!sceneTable.isTable()) // Check to see if the scene table exists
+					throw new std::exception("Scene table global not found");
+
+				// Find the callback function we wantin the FunctionCallbacks table
+				LuaRef transTable = sceneTable["SceneTransition"];
+				if (!transTable.isTable())
+					throw new std::exception("SceneTransition table not found");
+
+				LuaRef v = transTable["To"];
+				if (!v.isString())
+					throw new std::exception("Couldn't find 'to' value of table");
+				return v.tostring();
+			}
+			catch (std::exception& e) {
+				string what = e.what();
+				dlua.error("Failed Scene Transition info get (" + uiName + "): " + what);
+			}
+			return "";
+		}
+
+		// Should we initiate a transition
+		bool shouldTransition() {
+			return shdTransition;
+		}
 
 	};
 

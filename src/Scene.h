@@ -82,6 +82,11 @@ namespace darksun {
 		bool isCameraEnabled() { return cameraEnabled; }
 		void setCameraEnabled(bool m) { cameraEnabled = m; };
 
+		// Should we transition to next scene
+		bool shouldTransition() { return ui->shouldTransition(); }
+		// Get transition target
+		string getNewScene() { return ui->getNewScene(); }
+
 	};
 
 }

@@ -79,6 +79,13 @@ void UIWrangler::hookUIInterface() {
 					.addFunction("setLabelWidgetText", &darksun::UIWrangler::setLabelWidgetText)
 					.addFunction("registerWidgetCallback", &darksun::UIWrangler::registerWidgetCallback)
 					.addFunction("setCallbackTable", &darksun::UIWrangler::setCallbackTable)
+					.addFunction("setWidgetVisible", &darksun::UIWrangler::setWidgetVisible)
+					.addFunction("setWidgetEnabled", &darksun::UIWrangler::setWidgetEnabled)
+					.addFunction("isWidgetEnabled", &darksun::UIWrangler::isWidgetEnabled)
+					.addFunction("isWidgetVisible", &darksun::UIWrangler::isWidgetVisible)
+					.addFunction("showWithEffect", &darksun::UIWrangler::showWithEffect)
+					.addFunction("hideWithEffect", &darksun::UIWrangler::hideWithEffect)
+					.addFunction("transitionScene", &darksun::UIWrangler::transitionScene)
 				.endClass()
 			.endNamespace()
 			.addFunction("LOG", lua_log);
@@ -147,11 +154,12 @@ void UIWrangler::callbackFunc(tgui::Widget::Ptr widget, const std::string& signa
 			throw new std::exception("Scene table global not found");
 
 		// Find the callback function we wantin the FunctionCallbacks table
-		LuaRef callbackTable = sceneTable["FunctionCallbacks"];
+		LuaRef callbackTable = sceneTable[lua_callbackTable];
 		if (!callbackTable.isTable())
 			throw new std::exception("FunctionCallbacks table not found");
 
-		string widgetName = widget->getUserData<string>();
+		WidgetData dat = widget->getUserData<WidgetData>();
+		string widgetName = dat.widgetName;
 		LuaRef func = callbackTable[widgetName.c_str()];
 
 		if (!func.isFunction())
@@ -162,5 +170,89 @@ void UIWrangler::callbackFunc(tgui::Widget::Ptr widget, const std::string& signa
 	catch (std::exception& e) {
 		string what = e.what();
 		dlua.error("Failed UI callback (" + uiName + "): " + what);
+	}
+}
+
+void UIWrangler::showWithEffect(string n, string eff, int interval) {
+	auto w = gui->get(n);
+	if (!isValidWidget(w)) { return; }
+	string effect = eff;
+	std::transform(eff.begin(), eff.end(), effect.begin(), ::tolower); // Convert string to lowercase
+
+	if (effect.compare("fade") == 0) {
+		w->showWithEffect(tgui::ShowAnimationType::Fade, sf::milliseconds(interval));
+	}
+	else if (effect.compare("scale") == 0) {
+		w->showWithEffect(tgui::ShowAnimationType::Scale, sf::milliseconds(interval));
+	}
+	else if (effect.compare("slidefrombottom") == 0) {
+		w->showWithEffect(tgui::ShowAnimationType::SlideFromBottom, sf::milliseconds(interval));
+	}
+	else if (effect.compare("slidefromleft") == 0) {
+		w->showWithEffect(tgui::ShowAnimationType::SlideFromLeft, sf::milliseconds(interval));
+	}
+	else if (effect.compare("slidefromright") == 0) {
+		w->showWithEffect(tgui::ShowAnimationType::SlideFromRight, sf::milliseconds(interval));
+	}
+	else if (effect.compare("slidefromtop") == 0) {
+		w->showWithEffect(tgui::ShowAnimationType::SlideFromTop, sf::milliseconds(interval));
+	}
+	else if (effect.compare("slidetobottom") == 0) {
+		w->showWithEffect(tgui::ShowAnimationType::SlideToBottom, sf::milliseconds(interval));
+	}
+	else if (effect.compare("slidetoleft") == 0) {
+		w->showWithEffect(tgui::ShowAnimationType::SlideToLeft, sf::milliseconds(interval));
+	}
+	else if (effect.compare("slidetoright") == 0) {
+		w->showWithEffect(tgui::ShowAnimationType::SlideToRight, sf::milliseconds(interval));
+	}
+	else if (effect.compare("slidetotop") == 0) {
+		w->showWithEffect(tgui::ShowAnimationType::SlideToTop, sf::milliseconds(interval));
+	}
+	else {
+		dlua.error("Attempted unknown showWithEffect: '" + effect + "'");
+		w->setVisible(true);
+	}
+}
+
+void UIWrangler::hideWithEffect(string n, string eff, int interval) {
+	auto w = gui->get(n);
+	if (!isValidWidget(w)) { return; }
+	string effect = eff;
+	std::transform(eff.begin(), eff.end(), effect.begin(), ::tolower); // Convert string to lowercase
+
+	if (effect.compare("fade") == 0) {
+		w->hideWithEffect(tgui::ShowAnimationType::Fade, sf::milliseconds(interval));
+	}
+	else if (effect.compare("scale") == 0) {
+		w->hideWithEffect(tgui::ShowAnimationType::Scale, sf::milliseconds(interval));
+	}
+	else if (effect.compare("slidefrombottom") == 0) {
+		w->hideWithEffect(tgui::ShowAnimationType::SlideFromBottom, sf::milliseconds(interval));
+	}
+	else if (effect.compare("slidefromleft") == 0) {
+		w->hideWithEffect(tgui::ShowAnimationType::SlideFromLeft, sf::milliseconds(interval));
+	}
+	else if (effect.compare("slidefromright") == 0) {
+		w->hideWithEffect(tgui::ShowAnimationType::SlideFromRight, sf::milliseconds(interval));
+	}
+	else if (effect.compare("slidefromtop") == 0) {
+		w->hideWithEffect(tgui::ShowAnimationType::SlideFromTop, sf::milliseconds(interval));
+	}
+	else if (effect.compare("slidetobottom") == 0) {
+		w->hideWithEffect(tgui::ShowAnimationType::SlideToBottom, sf::milliseconds(interval));
+	}
+	else if (effect.compare("slidetoleft") == 0) {
+		w->hideWithEffect(tgui::ShowAnimationType::SlideToLeft, sf::milliseconds(interval));
+	}
+	else if (effect.compare("slidetoright") == 0) {
+		w->hideWithEffect(tgui::ShowAnimationType::SlideToRight, sf::milliseconds(interval));
+	}
+	else if (effect.compare("slidetotop") == 0) {
+		w->hideWithEffect(tgui::ShowAnimationType::SlideToTop, sf::milliseconds(interval));
+	}
+	else {
+		dlua.error("Attempted unknown hideWithEffect: '" + effect + "'");
+		w->setVisible(false);
 	}
 }
