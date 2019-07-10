@@ -112,6 +112,12 @@ void LuaEngine::luabridge_bind() {
 		luabridge::getGlobalNamespace(L.getState())
 			.beginNamespace("darksun")
 				.addProperty("luaDir", lua_getLuaDir)
+				.beginClass<glm::vec3>("vec3")
+					.addConstructor<void(*)(float x, float y, float z), RefCountedPtr<glm::vec3> /* creation policy */ >()
+					.addProperty("x", &glm::vec3::x)
+					.addProperty("y", &glm::vec3::y)
+					.addProperty("z", &glm::vec3::z)
+				.endClass()
 			.endNamespace()
 			.addFunction("LOG", lua_log);
 	}

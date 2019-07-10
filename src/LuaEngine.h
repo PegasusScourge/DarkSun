@@ -11,6 +11,7 @@ Header file for LuaEngine.cpp, wrapping a Lua instace and state for running game
 #include <iostream>
 #include <filesystem>
 #include <vector>
+#include <glm/glm.hpp>
 
 #include <lua.hpp>
 

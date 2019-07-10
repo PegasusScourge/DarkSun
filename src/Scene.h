@@ -51,7 +51,7 @@ namespace darksun {
 	public:
 		static long createNewId();
 
-		Scene(std::shared_ptr<Renderer>, string, long);
+		Scene(std::shared_ptr<Renderer>, ApplicationSettings& settings, string, long);
 
 		// Draw the scene
 		void draw(Shader* shader);

@@ -11,6 +11,8 @@ Main app
 #include <filesystem>
 #include <vector>
 
+#include "ApplicationSettings.h"
+
 #include "Renderer.h"
 #include "Log.h"
 

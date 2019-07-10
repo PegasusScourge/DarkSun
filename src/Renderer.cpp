@@ -15,14 +15,15 @@ void Renderer::createWindow(sf::ContextSettings& settings) {
 	defaultWindow.create(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "DarkSun", sf::Style::Default, settings);
 }
 
-void Renderer::create() {
-	sf::ContextSettings settings;
-	settings.depthBits = 24;
-	settings.stencilBits = 8;
-	settings.antialiasingLevel = 4;
-	settings.majorVersion = 3;
-	settings.minorVersion = 2;
-	createWindow(settings);
+void Renderer::create(ApplicationSettings &settings) {
+
+	sf::ContextSettings s;
+	s.depthBits = settings.opengl_depthBits;
+	s.stencilBits = settings.opengl_stencilBits;
+	s.antialiasingLevel = settings.opengl_antialiasingLevel;
+	s.majorVersion = settings.opengl_majorVersion;
+	s.minorVersion = settings.opengl_minorVersion;
+	createWindow(s);
 
 	// Now we have a context, init glew
 	glewExperimental = GL_TRUE;

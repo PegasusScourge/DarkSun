@@ -10,7 +10,7 @@ Wrangles the UI for scenes (with LuaEngine for UI handling)
 
 using namespace darksun;
 
-UIWrangler::UIWrangler(std::shared_ptr<Renderer> r, string uN) : renderer(r), uiName(uN) {
+UIWrangler::UIWrangler(std::shared_ptr<Renderer> r, ApplicationSettings& settings, string uN) : renderer(r), uiName(uN) {
 	dout.log("[ Init UI : " + uiName + " ]");
 	dout.log("Loading the LuaEngine");
 
@@ -19,7 +19,7 @@ UIWrangler::UIWrangler(std::shared_ptr<Renderer> r, string uN) : renderer(r), ui
 
 	gui = std::unique_ptr<tgui::Gui>(new tgui::Gui(*renderer->getWindowHandle()));
 
-	hookUIInterface();
+	hookUIInterface(settings);
 
 	dout.log("[ UI DONE : " + uiName + " ]");
 
@@ -43,14 +43,14 @@ UIWrangler::UIWrangler(std::shared_ptr<Renderer> r, string uN) : renderer(r), ui
 	}
 }
 
-void UIWrangler::hookUIInterface() {
+void UIWrangler::hookUIInterface(ApplicationSettings& settings) {
 	lua::State *L = uiEngine.getState();
 
 	try {
 		luabridge::getGlobalNamespace(L->getState())
 			.beginNamespace("darksun")
 				.beginClass<UIWrangler>("GUI")
-					.addConstructor<void(*)(std::shared_ptr<Renderer> r, string uN), RefCountedPtr<UIWrangler> /* creation policy */ >()
+					//.addConstructor<void(*)(std::shared_ptr<Renderer> r, string uN), RefCountedPtr<UIWrangler> /* creation policy */ >()
 					.addProperty("name", &darksun::UIWrangler::uiName, false) // Read only
 					.addFunction("cameraX", &darksun::UIWrangler::getCameraX) // Read only
 					.addFunction("cameraZ", &darksun::UIWrangler::getCameraZ) // Read only
@@ -79,6 +79,8 @@ void UIWrangler::hookUIInterface() {
 					.addFunction("setWidgetPosition", &darksun::UIWrangler::setWidgetPosition)
 					.addFunction("setButtonWidgetText", &darksun::UIWrangler::setButtonWidgetText)
 					.addFunction("setLabelWidgetText", &darksun::UIWrangler::setLabelWidgetText)
+					.addFunction("setCheckBoxWidgetChecked", &darksun::UIWrangler::setCheckBoxWidgetChecked)
+					.addFunction("setCheckBoxWidgetText", &darksun::UIWrangler::setCheckBoxWidgetText)
 					.addFunction("registerWidgetCallback", &darksun::UIWrangler::registerWidgetCallback)
 					.addFunction("setCallbackTable", &darksun::UIWrangler::setCallbackTable)
 					.addFunction("setWidgetVisible", &darksun::UIWrangler::setWidgetVisible)
@@ -89,12 +91,26 @@ void UIWrangler::hookUIInterface() {
 					.addFunction("hideWithEffect", &darksun::UIWrangler::hideWithEffect)
 					.addFunction("transitionScene", &darksun::UIWrangler::transitionScene)
 				.endClass()
+				.beginClass<ApplicationSettings>("ApplicationSettings")
+					//.addConstructor<void(*)(), RefCountedPtr<ApplicationSettings> /* creation policy */ >()
+					.addProperty("opengl_depthBits", &darksun::ApplicationSettings::opengl_depthBits, false)
+					.addProperty("opengl_stencilBits", &darksun::ApplicationSettings::opengl_stencilBits, false)
+					.addProperty("opengl_antialiasingLevel", &darksun::ApplicationSettings::opengl_antialiasingLevel)
+					.addProperty("opengl_majorVersion", &darksun::ApplicationSettings::opengl_majorVersion, false)
+					.addProperty("opengl_minorVersion", &darksun::ApplicationSettings::opengl_minorVersion, false)
+					.addProperty("opengl_vsync", &darksun::ApplicationSettings::opengl_vsync)
+					.addProperty("opengl_framerateLimit", &darksun::ApplicationSettings::opengl_framerateLimit)
+				.endClass()
 			.endNamespace()
 			.addFunction("LOG", lua_log);
 
 		// Add this instance
 		push(L->getState(), this);
-		lua_setglobal(L->getState(), "myGui");
+		lua_setglobal(L->getState(), "Gui");
+
+		// Add the application settings
+		push(L->getState(), settings);
+		lua_setglobal(L->getState(), "Settings");
 	}
 	catch (std::exception& e) {
 		string what = e.what();
@@ -166,7 +182,7 @@ void UIWrangler::callbackFunc(tgui::Widget::Ptr widget, const std::string& signa
 		if (!func.isFunction())
 			throw new std::exception("Function not found/not a function");
 		dlua.verbose("Callback: f=" + func.tostring() + ", widget=" + widgetName);
-		func(widgetName);
+		func(signalName);
 	}
 	catch (std::exception& e) {
 		string what = e.what();

@@ -22,10 +22,12 @@ void DarkSun::processArgs(int argc, char *argv[]) {
 void DarkSun::run() {
 	dout.log("DarkSun init");
 
-	std::shared_ptr<Renderer> renderer = std::shared_ptr<Renderer>(new Renderer());
-	renderer->create();
+	ApplicationSettings mySettings;
 
-	std::unique_ptr<Scene> activeScene = std::unique_ptr<Scene>(new Scene(renderer, "testScene", Scene::createNewId()));
+	std::shared_ptr<Renderer> renderer = std::shared_ptr<Renderer>(new Renderer());
+	renderer->create(mySettings);
+
+	std::unique_ptr<Scene> activeScene = std::unique_ptr<Scene>(new Scene(renderer, mySettings, "testScene", Scene::createNewId()));
 	activeScene->init();
 	activeScene->initTest();
 
@@ -34,8 +36,8 @@ void DarkSun::run() {
 	}
 
 	sf::RenderWindow * window = renderer->getWindowHandle();
-	window->setVerticalSyncEnabled(false);
-	window->setFramerateLimit(2000);
+	window->setVerticalSyncEnabled(mySettings.opengl_vsync);
+	window->setFramerateLimit(mySettings.opengl_framerateLimit);
 
 	dout.log("Entering the main game engine loop");
 
@@ -120,7 +122,7 @@ void DarkSun::run() {
 			else {
 				// Assign the new scene
 				activeScene->close(); // Close old scene
-				activeScene = std::unique_ptr<Scene>(new Scene(renderer, target, Scene::createNewId()));
+				activeScene = std::unique_ptr<Scene>(new Scene(renderer, mySettings, target, Scene::createNewId()));
 				activeScene->init();
 				if (!activeScene->isValid()) {
 					running = false;
@@ -129,6 +131,9 @@ void DarkSun::run() {
 				activeScene->initTest();
 			}
 		}
+
+		// Update any settings we need to
+		window->setVerticalSyncEnabled(mySettings.opengl_vsync);
 
 		// Catch our own GL errors, if for some reason we create them
 		GLenum error = glGetError();

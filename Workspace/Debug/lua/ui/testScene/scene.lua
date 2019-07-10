@@ -6,45 +6,54 @@ testScene = {
 		To = nil,
 	},
 
-	FunctionCallbacks = {
-		exitButton = function(what)
+	WidgetCallbacks = {
+		exitButton = function(signal)
 			testScene.SceneTransition.To = 'exit'
-			myGui:transitionScene()
+			Gui:transitionScene()
 		end,
-		testButton = function(what)
+		testButton = function(signal)
 			testScene.SceneTransition.To = 'testScene'
-			myGui:transitionScene()
+			Gui:transitionScene()
+		end,
+		vsync_check = function(signal)
+			LOG('Detected ' .. signal .. ' on checkbox')
 		end,
 	},
 
 	OnCreate = function()
-		LOG('Create scene "' .. myGui.name .. '"')
-		myGui:setCallbackTable('FunctionCallbacks')
+		LOG('Create scene "' .. Gui.name .. '"')
+		Gui:setCallbackTable('WidgetCallbacks')
 		
-		myGui:addNewButton('exitButton')
-		myGui:setWidgetPositionPercent('exitButton', '0%', '14%')
-		myGui:setButtonWidgetText('exitButton', 'Close')
-		myGui:registerWidgetCallback('exitButton', 'pressed')
+		Gui:addNewButton('exitButton')
+		Gui:setWidgetPositionPercent('exitButton', '0%', '14%')
+		Gui:setButtonWidgetText('exitButton', 'Close')
+		Gui:registerWidgetCallback('exitButton', 'pressed')
 		
-		myGui:addNewButton('testButton')
-		myGui:setWidgetPositionPercent('testButton', '10%', '14%')
-		myGui:setButtonWidgetText('testButton', 'Switch Scene')
-		myGui:registerWidgetCallback('testButton', 'pressed')
+		Gui:addNewButton('testButton')
+		Gui:setWidgetPositionPercent('testButton', '10%', '14%')
+		Gui:setButtonWidgetText('testButton', 'Switch Scene')
+		Gui:registerWidgetCallback('testButton', 'pressed')
 		
-		myGui:addNewLabel('fpsLabel')
-		myGui:setWidgetPositionPercent('fpsLabel', '0%', '10%')
-		myGui:setLabelWidgetText('fpsLabel', 'Hello World!')
+		Gui:addNewLabel('fpsLabel')
+		Gui:setWidgetPositionPercent('fpsLabel', '0%', '10%')
+		Gui:setLabelWidgetText('fpsLabel', 'Hello World!')
 		
-		myGui:addNewLabel('cameraInfo')
-		myGui:setWidgetPositionPercent('cameraInfo', '0%', '5%')
-		myGui:setLabelWidgetText('cameraInfo', 'Hello World!')
+		Gui:addNewLabel('cameraInfo')
+		Gui:setWidgetPositionPercent('cameraInfo', '0%', '5%')
+		Gui:setLabelWidgetText('cameraInfo', 'Hello World!')
+		
+		Gui:addNewCheckBox('vsync_check')
+		Gui:setWidgetPositionPercent('vsync_check', '0%', '17%')
+		Gui:setCheckBoxWidgetText('vsync_check', 'Use Vsync')
+		Gui:registerWidgetCallback('vsync_check', 'checked')
+		Gui:registerWidgetCallback('vsync_check', 'unchecked')
 	end,
 	
 	OnTick = function(deltaTime)
 		local fps = round(1/deltaTime, 2)
-		myGui:setLabelWidgetText('fpsLabel', 'FPS=' .. tostring(fps) .. ', dt:' .. tostring(round(deltaTime, 4)) .. 's')
+		Gui:setLabelWidgetText('fpsLabel', 'FPS=' .. tostring(fps) .. ', dt:' .. tostring(round(deltaTime, 4)) .. 's')
 		
-		myGui:setLabelWidgetText('cameraInfo', 'Pos = (' .. tostring(round(myGui:cameraX())) .. ',' .. tostring(round(myGui:cameraZ())) .. ')')
+		Gui:setLabelWidgetText('cameraInfo', 'Pos = (' .. tostring(round(Gui:cameraX())) .. ',' .. tostring(round(Gui:cameraZ())) .. ')')
 	end,
 }
 tick = testScene.OnTick -- just in case tick() gets called, make sure we point it to something

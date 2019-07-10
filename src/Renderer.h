@@ -17,6 +17,7 @@ Header file for Renderer.cpp. A class that handles a window and the rendering to
 #include "Log.h"
 #include "Camera.h"
 #include "Shader.h"
+#include "ApplicationSettings.h"
 
 namespace darksun {
 
@@ -31,7 +32,7 @@ namespace darksun {
 		Creation
 		*/
 		// Used to create the necessary resources on open of the program
-		void create();
+		void create(ApplicationSettings &settings);
 		// (Re)Creates the window with the specified settings (passed by reference)
 		void createWindow(sf::ContextSettings& settings);
 

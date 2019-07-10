@@ -10,6 +10,7 @@ Header file for UiHandler.cpp, wrangles the UI for scenes (with LuaEngine for UI
 
 #include <TGUI/TGUI.hpp>
 #include "Renderer.h"
+#include "ApplicationSettings.h"
 #include "LuaEngine.h"
 
 namespace darksun {
@@ -33,7 +34,7 @@ namespace darksun {
 		bool shdTransition = false;
 
 		// Hook the UI into the lua engine
-		void hookUIInterface();
+		void hookUIInterface(ApplicationSettings& settings);
 
 		/* LUA EXPOSED FUNCTIONS FOR UI CREATION ETC */
 
@@ -109,6 +110,18 @@ namespace darksun {
 			if (!isValidWidget(w)) { return; }
 			w->setText(text);
 		}
+		// Set a checkbox widget as checked
+		void setCheckBoxWidgetChecked(string n, bool t) {
+			tgui::CheckBox::Ptr w = gui->get<tgui::CheckBox>(n);
+			if (!isValidWidget(w)) { return; }
+			w->setChecked(t);
+		}
+		// Set a checkbox widget text
+		void setCheckBoxWidgetText(string n, string text) {
+			tgui::CheckBox::Ptr w = gui->get<tgui::CheckBox>(n);
+			if (!isValidWidget(w)) { ; return; }
+			w->setText(text);
+		}
 		// Set the text of a label widget
 		void setLabelWidgetText(string n, string text) {
 			tgui::Label::Ptr w = gui->get<tgui::Label>(n);
@@ -159,7 +172,7 @@ namespace darksun {
 		}
 
 	public:
-		UIWrangler(std::shared_ptr<Renderer> r, string uN);
+		UIWrangler(std::shared_ptr<Renderer> r, ApplicationSettings& settings, string uN);
 		~UIWrangler();
 
 		// Tick the engine and the ui for events etc

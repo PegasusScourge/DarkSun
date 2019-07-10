@@ -18,7 +18,7 @@ long Scene::createNewId() {
 	return ++LastSceneId;
 }
 
-Scene::Scene(std::shared_ptr<Renderer> r, string n, long nid) {
+Scene::Scene(std::shared_ptr<Renderer> r, ApplicationSettings& settings, string n, long nid) {
 	renderer = r;
 	sceneName = n;
 	myId = nid;
@@ -26,7 +26,7 @@ Scene::Scene(std::shared_ptr<Renderer> r, string n, long nid) {
 	dout.log("Scene constructor called");
 
 	// Create the ui
-	ui = std::unique_ptr<UIWrangler>(new UIWrangler(renderer, sceneName));
+	ui = std::unique_ptr<UIWrangler>(new UIWrangler(renderer, settings, sceneName));
 }
 
 void Scene::init() {
