@@ -24,7 +24,7 @@ Entity::Entity(string blueprintn, long newId) {
 }
 
 void Entity::init(string blueprintn, long newId) {
-	dout.log("Creating new entity with id '" + std::to_string(newId) + "'");
+	dout.log("Creating new entity with id '" + to_str(newId) + "'");
 	
 	myId = newId;
 	bpName = blueprintn;
@@ -102,6 +102,37 @@ void Entity::init(string blueprintn, long newId) {
 			dout.warn("No/invalid scale information for blueprint '" + bpName + "'");
 		}
 
+		// Physics
+		ref = myBp["Physics"];
+		if (ref.isTable()) {
+			// We have physics defs!
+			LuaRef subRef = ref["maxSpeed"];
+			if (subRef.isNumber()) {
+				moveSpeed = (float)subRef;
+				dout.verbose("Entity::init -> Physics.maxSpeed = '" + subRef.tostring() + "'");
+			}
+			subRef = ref["acceleration"];
+			if (subRef.isNumber()) {
+				acceleration = (float)subRef;
+				dout.verbose("Entity::init -> Physics.acceleration = '" + subRef.tostring() + "'");
+			}
+			subRef = ref["hasGravity"];
+			if (subRef.isBool()) {
+				hasGravity = (bool)subRef;
+				dout.verbose("Entity::init -> Physics.hasGravity = '" + subRef.tostring() + "'");
+			}
+			subRef = ref["size"];
+			if (subRef.isTable()) {
+				if(subRef["x"].isNumber() && subRef["y"].isNumber() && subRef["z"].isNumber()){
+					size = glm::vec3((float)subRef["x"], (float)subRef["y"], (float)subRef["z"]);
+					dout.verbose("Entity::init -> Physics.size = '(" + subRef["x"].tostring()  + "," + subRef["y"].tostring() + "," + subRef["z"].tostring() + ")'");
+				}
+				else {
+					dout.warn("Entity::init -> Found size table in blueprint '" + bpName + "' but it has invalid values");
+				}
+			}
+		}
+
 		// Script
 		ref = myBp["Script"];
 		if (ref.isString()) {
@@ -169,6 +200,59 @@ void Entity::initLuaEngine() {
 	lua_setglobal(L->getState(), "myEntity");
 }
 
+void Entity::draw(Shader* shader, bool drawReflection, bool reflectiveSurface) {
+	if (!valid) {
+		dout.error("ATTEMPTED TO DRAW INVALID ENTITY?!");
+		return;
+	}
+
+	// render the loaded model
+	glm::mat4 modelm = glm::mat4(1.0f);
+	modelm = glm::translate(modelm, position); // translate it down so it's at the center of the scene
+	modelm = glm::scale(modelm, scale);	// it's a bit too big for our scene, so scale it down
+	modelm = glm::rotate(modelm, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)); //X
+	modelm = glm::rotate(modelm, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)); //Y
+	modelm = glm::rotate(modelm, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f)); //Z
+	shader->setMat4("model", modelm);
+
+	if (reflectiveSurface) {
+		glEnable(GL_STENCIL_TEST);
+
+		glStencilFunc(GL_ALWAYS, 1, 0xFF); // Set any stencil to 1
+		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+		glStencilMask(0xFF); // Write to stencil buffer
+		glDepthMask(GL_FALSE); // Don't write to depth buffer
+		glClear(GL_STENCIL_BUFFER_BIT); // Clear stencil buffer (0 by default)
+	}
+
+	model->draw(shader);
+
+	if (drawReflection) {
+		if (!reflectiveSurface) // If we are a reflective surface, stencil buffer is already enabled
+			glEnable(GL_STENCIL_TEST);
+
+		glClear(GL_STENCIL_BUFFER_BIT); // Clear stencil buffer (0 by default)
+
+		// Reflection
+		glStencilFunc(GL_EQUAL, 1, 0xFF); // Pass test if stencil value is 1
+		glStencilMask(0x00); // Don't write anything to stencil buffer
+		glDepthMask(GL_TRUE); // Write to depth buffer
+
+		modelm = glm::mat4(1.0f);
+		modelm = glm::scale(glm::translate(modelm, glm::vec3(position.x, position.y * -1.0f, position.z)), scale * -1.0f);
+		modelm = glm::rotate(modelm, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)); //X
+		modelm = glm::rotate(modelm, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)); //Y
+		modelm = glm::rotate(modelm, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f)); //Z
+		shader->setMat4("model", modelm);
+
+		// Draw the reflection
+		model->draw(shader);
+	}
+
+	if (reflectiveSurface || drawReflection) // Disable the stencil buffer
+		glDisable(GL_STENCIL_TEST);
+}
+
 void Entity::tick(float deltaTime) {
 	if (hasScript) {
 		lua::State *L = engine.getState();
@@ -188,10 +272,11 @@ void Entity::tick(float deltaTime) {
 	}
 
 	// Do movement stuff
-	rotateOnTick(targetRot, deltaTime);
 
 	if (pathfinding) {
 		float dist = glm::distance(position, pathfindingWaypoints.at(currentPathfindingWaypoint));
+
+		rotateToward(pathfindingWaypoints.at(currentPathfindingWaypoint), deltaTime);
 		if (dist > 0.001) {
 			moveOnTick(pathfindingWaypoints.at(currentPathfindingWaypoint), deltaTime);
 		}
@@ -201,124 +286,51 @@ void Entity::tick(float deltaTime) {
 	}
 }
 
-void Entity::draw(Shader* shader, bool drawReflection, bool reflectiveSurface) {
-	if (!valid) {
-		dout.error("ATTEMPTED TO DRAW INVALID ENTITY?!");
+void Entity::moveOnTick(glm::vec3& p, float deltaTime) {
+	if (!readyToMove) {
+		if (currentSpeed > 0.0f) {
+			currentSpeed -= std::min(acceleration * deltaTime, currentSpeed); // Come to a stop
+		}
+		else {
+			currentSpeed -= acceleration * deltaTime; // Back up slowly
+			if (currentSpeed < moveSpeed * -0.33f) {
+				currentSpeed = moveSpeed * -0.33f;
+			}
+		}
 		return;
 	}
 	
-	// render the loaded model
-	glm::mat4 modelm = glm::mat4(1.0f);
-	modelm = glm::translate(modelm, position); // translate it down so it's at the center of the scene
-	modelm = glm::scale(modelm, scale);	// it's a bit too big for our scene, so scale it down
-	modelm = glm::rotate(modelm, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)); //X
-	modelm = glm::rotate(modelm, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)); //Y
-	modelm = glm::rotate(modelm, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f)); //Z
-	shader->setMat4("model", modelm);
-	
-	if (reflectiveSurface) {
-		glEnable(GL_STENCIL_TEST);
+	float diff = glm::distance(p, position);
+	glm::vec3 v = glm::normalize(p - position);
 
-		glStencilFunc(GL_ALWAYS, 1, 0xFF); // Set any stencil to 1
-		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-		glStencilMask(0xFF); // Write to stencil buffer
-		glDepthMask(GL_FALSE); // Don't write to depth buffer
-		glClear(GL_STENCIL_BUFFER_BIT); // Clear stencil buffer (0 by default)
+	// Made possible with the help of DaShoup
+	float s = pow(currentSpeed, 2) / (acceleration * 2);
+
+	if (diff < s) {
+		// decelerate
+		currentSpeed -= acceleration * deltaTime;
+	}
+	else {
+		// accelerate
+		currentSpeed += acceleration * deltaTime;
 	}
 
-	model->draw(shader);
+	if (currentSpeed < 0.0f)
+		currentSpeed = 0.0f;
+	if (currentSpeed > moveSpeed)
+		currentSpeed = moveSpeed;
 
-	if (drawReflection) {
-		if(!reflectiveSurface) // If we are a reflective surface, stencil buffer is already enabled
-			glEnable(GL_STENCIL_TEST);
+	float speed = currentSpeed * deltaTime;
+	//dout.verbose("Current speed: " + std::to_string(currentSpeed) + ", stopping distance: " + std::to_string(s) + ", dist: " + std::to_string(diff));
 
-		glClear(GL_STENCIL_BUFFER_BIT); // Clear stencil buffer (0 by default)
-
-		// Reflection
-		glStencilFunc(GL_EQUAL, 1, 0xFF); // Pass test if stencil value is 1
-		glStencilMask(0x00); // Don't write anything to stencil buffer
-		glDepthMask(GL_TRUE); // Write to depth buffer
-
-		modelm = glm::mat4(1.0f);
-		modelm = glm::scale(glm::translate(modelm, glm::vec3(position.x, position.y * -1.0f, position.z)),scale * -1.0f);
-		modelm = glm::rotate(modelm, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)); //X
-		modelm = glm::rotate(modelm, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)); //Y
-		modelm = glm::rotate(modelm, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f)); //Z
-		shader->setMat4("model", modelm);
-		
-		// Draw the reflection
-		model->draw(shader);
+	if (diff < speed) {
+		position = p;
+		currentSpeed = 0;
 	}
-
-	if (reflectiveSurface || drawReflection) // Disable the stencil buffer
-		glDisable(GL_STENCIL_TEST);
-}
-
-void Entity::rotateOnTick(glm::vec3& r, float deltaTime) {
-	float rotSpeed = 100.0f * deltaTime;
-
-	float diff;
-
-	if (r.x != rotation.x) {
-		diff = abs(r.x - rotation.x);
-		if (r.x > rotation.x) {
-			rotation.x += std::min(rotSpeed, diff);
-		}
-		else {
-			rotation.x -= std::min(rotSpeed, diff);
-		}
-	}
-	if (r.y != rotation.y) {
-		diff = abs(r.y - rotation.y);
-		if (r.y > rotation.y) {
-			rotation.y += std::min(rotSpeed, diff);
-		}
-		else {
-			rotation.y -= std::min(rotSpeed, diff);
-		}
-	}
-	if (r.z != rotation.z) {
-		diff = abs(r.z - rotation.z);
-		if (r.z > rotation.z) {
-			rotation.z += std::min(rotSpeed, diff);
-		}
-		else {
-			rotation.z -= std::min(rotSpeed, diff);
-		}
-	}
-}
-
-void Entity::moveOnTick(glm::vec3& p, float deltaTime) {
-	float speed = 1.0f * deltaTime;
-
-	float diff;
-
-	if (p.x != position.x) {
-		diff = abs(p.x - position.x);
-		if (p.x > position.x) {
-			position.x += std::min(speed, diff);
-		}
-		else {
-			position.x -= std::min(speed, diff);
-		}
-	}
-	if (p.y != position.y) {
-		diff = abs(p.y - position.y);
-		if (p.y > position.y) {
-			position.y += std::min(speed, diff);
-		}
-		else {
-			position.y -= std::min(speed, diff);
-		}
-	}
-	if (p.z != position.z) {
-		diff = abs(p.z - position.z);
-		if (p.z > position.z) {
-			position.z += std::min(speed, diff);
-		}
-		else {
-			position.z -= std::min(speed, diff);
-		}
+	else {
+		//position += FORWARD * speed;
+		position.x -= speed * cosf(rotation.y * (3.14f / 180.0f));
+		position.z += speed * sinf(rotation.y * (3.14f / 180.0f));
 	}
 }
 
@@ -333,4 +345,68 @@ void Entity::recalculatePathfinding() {
 	currentPathfindingWaypoint = 0;
 
 	pathfindingWaypoints.shrink_to_fit();
+}
+
+void Entity::rotateToward(glm::vec3& p, float deltaTime) {
+	double dx = abs(position.x - p.x);
+	double dz = abs(position.z - p.z);
+
+	float theta = atan(dz / dx) * (180.0f/3.14159f);
+	float angle = 0.0f;
+	int quadrant = 0;
+	if (p.z < position.z) {
+		if (p.x < position.x) {
+			// -z +x
+			angle = 360.0f - angle;
+			quadrant = 4;
+		}
+		else {
+			// -z -x
+			angle = 180.0f + theta;
+			quadrant = 3;
+		}
+	}
+	else {
+		if (p.x < position.x) {
+			// +z +x
+			angle = theta;
+			quadrant = 1;
+		}
+		else {
+			// +z -x
+			angle = 180.0f - theta;
+			quadrant = 2;
+		}
+	}
+
+	//dout.verbose("Angle: " + to_str(angle) + " Quadrant: " + to_str(quadrant));
+
+	targetRot.y = angle;
+
+	if(rotation.y == targetRot.y)
+		return;
+
+	float speed = maxRotSpeed * deltaTime;
+	float rotDiff = targetRot.y - rotation.y;
+	float rotMag = abs(rotDiff);
+
+	if (rotMag > 90.0f) {
+		currentSpeed = 0;
+		readyToMove = false;
+	} 
+	else {
+		readyToMove = true;
+	}
+
+	if (rotDiff > 0.0f) {
+		rotation.y += std::min(speed, rotMag);
+	}
+	else {
+		rotation.y -= std::min(speed, rotMag);
+	}
+
+	if (rotation.y < 0.0f)
+		rotation.y += 360.0f;
+	if (rotation.y >= 360.0f)
+		rotation.y -= 360.0f;
 }

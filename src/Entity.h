@@ -11,6 +11,8 @@ Header file for Entity.h, a game engine actual entity, marrying together all asp
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtx/vector_angle.hpp>
 #include <algorithm>
 
 #include "Model.h"
@@ -19,6 +21,7 @@ Header file for Entity.h, a game engine actual entity, marrying together all asp
 #include "Log.h"
 
 using string = std::string;
+#define to_str std::to_string
 
 namespace darksun {
 
@@ -41,6 +44,7 @@ namespace darksun {
 		glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
 		glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 		glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
+		glm::vec3 size = glm::vec3(0.5f, 0.5f, 0.5f);
 
 		// Pathfinding information
 		std::vector<glm::vec3> pathfindingWaypoints;
@@ -48,8 +52,16 @@ namespace darksun {
 		bool pathfinding = false;
 		glm::vec3 targetPos = glm::vec3(0, 0, 0);
 
+		// Movement info
+		float moveSpeed = 2.5f;
+		float currentSpeed = 0.0f;
+		float acceleration = 1.0f;
+		bool hasGravity = false;
+		bool readyToMove = false;
+
 		// Rotation information
 		glm::vec3 targetRot = glm::vec3(0, 0, 0);
+		float maxRotSpeed = 80.0f;
 
 		// bools
 		bool valid = false;
@@ -61,13 +73,9 @@ namespace darksun {
 
 		// Set a new target to move to in the world
 		void setMoveTarget(float x, float y, float z) {
-			targetPos = glm::vec3(x,y,z);
+			targetPos = glm::vec3(x, y, z);
 			float dist = glm::distance(targetPos, position);
-
-			// Replace this value with the size of the entity, as if our new position is within us there's really no point in moving?
-			if (dist >= 0.2) {
-				recalculatePathfinding();
-			}
+			recalculatePathfinding();
 		}
 
 		// Calculate the pathfinding to the position we are targeting
@@ -79,13 +87,13 @@ namespace darksun {
 		// Execute pathfinding
 		void moveOnTick(glm::vec3& p, float deltaTime);
 
+		// Execute rotation
+		void rotateToward(glm::vec3& p, float deltaTime);
+
 		// Rotate ourselves to a orientation
 		void faceDirection(float x, float y, float z) {
-			targetRot = glm::vec3(x, y, z);;
+			targetRot = glm::vec3(x, y, z);
 		}
-
-		// Execute rotation
-		void rotateOnTick(glm::vec3& r, float deltaTime);
 
 		// Static stuff
 		static long LastEntityId;

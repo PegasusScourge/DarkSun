@@ -5,4 +5,14 @@ blueprints.test = {
 		lod_0 = 'units/test/spider.obj',
 		UniformScale = 0.06,
 	},
+	Physics = {
+		maxSpeed = 8.0,
+		acceleration = 5.0,
+		hasGravity = false,
+		size = {
+			x = 0,
+			y = 0,
+			z = 0,
+		},
+	},
 }
