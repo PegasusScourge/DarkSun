@@ -12,6 +12,7 @@ Header file for Log.cpp, provides standard logging functionality for the program
 #include <sstream>
 #include <iostream>
 #include <ctime>
+#include <mutex>
 
 #define VERBOSE_LOGGING_DARKSUN true
 
@@ -35,6 +36,8 @@ namespace darksun {
 		std::string outf;
 
 		bool isVerbose = false;
+
+		std::mutex myMutex;
 
 	public:
 		Log(std::string file, bool verbose = false) : outs(file), outf(file), isVerbose(verbose) {};

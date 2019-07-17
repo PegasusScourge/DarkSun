@@ -28,6 +28,8 @@ namespace darksun {
 		const int SCREEN_HEIGHT = 600;
 		const static int NUMBER_OF_LIGHTS = 4; // WARNING: You must update the number of lights the shader can take if you update this value!!!!!
 
+		bool hasVsyncControl = false;
+
 		/*
 		Creation
 		*/

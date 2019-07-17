@@ -70,6 +70,8 @@ namespace darksun {
 
 		lua::State* getState();
 
+		bool isValid() { return validEngine; }
+
 	};
 
 }

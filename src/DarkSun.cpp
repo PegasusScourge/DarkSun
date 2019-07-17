@@ -22,12 +22,18 @@ void DarkSun::processArgs(int argc, char *argv[]) {
 void DarkSun::run() {
 	dout.log("DarkSun init");
 
-	ApplicationSettings mySettings;
+	ApplicationSettings appSettings;
 
 	std::shared_ptr<Renderer> renderer = std::shared_ptr<Renderer>(new Renderer());
-	renderer->create(mySettings);
+	renderer->create(appSettings);
 
-	std::unique_ptr<Scene> activeScene = std::unique_ptr<Scene>(new Scene(renderer, mySettings, "testScene", Scene::createNewId()));
+	// we use this info for recreating scenes too, nice way of passing information
+	SceneInformation sceneInfo;
+	sceneInfo.n = "testScene";
+	sceneInfo.id = Scene::createNewId();
+	sceneInfo.hasTerrain = true;
+
+	std::unique_ptr<Scene> activeScene = std::unique_ptr<Scene>(new Scene(renderer, appSettings, sceneInfo));
 	activeScene->init();
 	activeScene->initTest();
 
@@ -36,8 +42,8 @@ void DarkSun::run() {
 	}
 
 	sf::RenderWindow * window = renderer->getWindowHandle();
-	window->setVerticalSyncEnabled(mySettings.opengl_vsync);
-	window->setFramerateLimit(mySettings.opengl_framerateLimit);
+	window->setVerticalSyncEnabled(appSettings.opengl_vsync);
+	window->setFramerateLimit(appSettings.opengl_framerateLimit);
 
 	dout.log("Entering the main game engine loop");
 
@@ -122,7 +128,10 @@ void DarkSun::run() {
 			else {
 				// Assign the new scene
 				activeScene->close(); // Close old scene
-				activeScene = std::unique_ptr<Scene>(new Scene(renderer, mySettings, target, Scene::createNewId()));
+				sceneInfo.n = target;
+				sceneInfo.id = Scene::createNewId();
+				sceneInfo.hasTerrain = true;
+				activeScene = std::unique_ptr<Scene>(new Scene(renderer, appSettings, sceneInfo));
 				activeScene->init();
 				if (!activeScene->isValid()) {
 					running = false;
@@ -133,42 +142,47 @@ void DarkSun::run() {
 		}
 
 		// Update any settings we need to
-		window->setVerticalSyncEnabled(mySettings.opengl_vsync);
-
-		// Catch our own GL errors, if for some reason we create them
-		GLenum error = glGetError();
-		if (error != GL_NO_ERROR) {
-			string errS;
-			switch (error) {
-			case GL_INVALID_ENUM:
-				errS = "GL_INVALID_ENUM";
-				break;
-			case GL_INVALID_VALUE:
-				errS = "GL_INVALID_VALUE";
-				break;
-			case GL_INVALID_OPERATION:
-				errS = "GL_INVALID_OPERATION";
-				break;
-			case GL_INVALID_FRAMEBUFFER_OPERATION:
-				errS = "GL_INVALID_FRAMEBUFFER_OPERATION";
-				break;
-			case GL_OUT_OF_MEMORY:
-				errS = "GL_OUT_OF_MEMORY";
-				break;
-			case GL_STACK_UNDERFLOW:
-				errS = "GL_STACK_UNDERFLOW";
-				break;
-			case GL_STACK_OVERFLOW:
-				errS = "GL_STACK_OVERFLOW";
-				break;
-			}
-
-			dout.error("Detected GL error: '" + errS + "'");
-		}
+		window->setVerticalSyncEnabled(appSettings.opengl_vsync);
+		window->setFramerateLimit(appSettings.opengl_framerateLimit);
+		
+		catchOpenGLErrors();
 
 		tickNo++;
 		lastElapsed = currentElapsed;
 	}
 
 	activeScene->close();
+}
+
+void DarkSun::catchOpenGLErrors() {
+	// Catch our own GL errors, if for some reason we create them
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR) {
+		string errS = "Unknown";
+		switch (error) {
+		case GL_INVALID_ENUM:
+			errS = "GL_INVALID_ENUM";
+			break;
+		case GL_INVALID_VALUE:
+			errS = "GL_INVALID_VALUE";
+			break;
+		case GL_INVALID_OPERATION:
+			errS = "GL_INVALID_OPERATION";
+			break;
+		case GL_INVALID_FRAMEBUFFER_OPERATION:
+			errS = "GL_INVALID_FRAMEBUFFER_OPERATION";
+			break;
+		case GL_OUT_OF_MEMORY:
+			errS = "GL_OUT_OF_MEMORY";
+			break;
+		case GL_STACK_UNDERFLOW:
+			errS = "GL_STACK_UNDERFLOW";
+			break;
+		case GL_STACK_OVERFLOW:
+			errS = "GL_STACK_OVERFLOW";
+			break;
+		}
+
+		dout.error("Detected GL error: '" + errS + "'");
+	}
 }

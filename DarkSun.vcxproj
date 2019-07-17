@@ -28,6 +28,7 @@
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\Terrain.cpp" />
     <ClCompile Include="src\UiHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -42,6 +43,7 @@
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\stb_image.h" />
+    <ClInclude Include="src\Terrain.h" />
     <ClInclude Include="src\UiHandler.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

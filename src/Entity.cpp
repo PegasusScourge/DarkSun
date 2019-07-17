@@ -12,18 +12,38 @@ A game engine actual entity, marrying together all aspects
 using namespace darksun;
 using namespace luabridge;
 
-long Entity::LastEntityId = 0;
+void EntityOrders::hookClass(lua::State *L) {
+	try {
+		luabridge::getGlobalNamespace(L->getState())
+			.beginNamespace("darksun")
+				.beginClass<EntityOrders>("EntityOrders")
+					.addStaticFunction("ORDER_STOP", &darksun::EntityOrders::getORDER_STOP)
+					.addStaticFunction("ORDER_ASSIST", &darksun::EntityOrders::getORDER_ASSIST)
+					.addStaticFunction("ORDER_ATTACK", &darksun::EntityOrders::getORDER_ATTACK)
+					.addStaticFunction("ORDER_MOVE", &darksun::EntityOrders::getORDER_MOVE)
+					.addStaticFunction("ORDER_REPAIR", &darksun::EntityOrders::getORDER_REPAIR)
+				.endClass()
+			.endNamespace();
+	}
+	catch (std::exception& e) {
+		string what = e.what();
+		dlua.error("Failed EntityOrders exposure proccess: " + what);
+		return;
+	}
+}
 
-long Entity::createNewId() {
+int Entity::LastEntityId = 0;
+
+int Entity::createNewId() {
 	// Return a new numerical Id
 	return ++LastEntityId;
 }
 
-Entity::Entity(string blueprintn, long newId) {
+Entity::Entity(string blueprintn, int newId) {
 	init(blueprintn, newId);
 }
 
-void Entity::init(string blueprintn, long newId) {
+void Entity::init(string blueprintn, int newId) {
 	dout.log("Creating new entity with id '" + to_str(newId) + "'");
 	
 	myId = newId;
@@ -185,7 +205,7 @@ void Entity::initLuaEngine() {
 	luabridge::getGlobalNamespace(L->getState())
 		.beginNamespace("darksun")
 			.beginClass<Entity>("Entity")
-				.addConstructor<void(*)(string blueprintn, long newId), RefCountedPtr<Entity> /* creation policy */ >()
+				//.addConstructor<void(*)(string blueprintn, int newId), RefCountedPtr<Entity> /* creation policy */ >()
 				.addProperty("internalName", &darksun::Entity::internalName, false) // Read only
 				.addProperty("bpName", &darksun::Entity::bpName, false) // Read only
 				.addProperty("id", &darksun::Entity::myId, false) // Read only
@@ -194,6 +214,9 @@ void Entity::initLuaEngine() {
 				.addFunction("isPathfinding", &darksun::Entity::isPathfinding)
 			.endClass()
 		.endNamespace();
+
+	// Hook classes
+	EntityOrders::hookClass(engine.getState());
 
 	// Add this instance
 	push(L->getState(), this);

@@ -14,6 +14,12 @@ UIWrangler::UIWrangler(std::shared_ptr<Renderer> r, ApplicationSettings& setting
 	dout.log("[ Init UI : " + uiName + " ]");
 	dout.log("Loading the LuaEngine");
 
+	if (uN.compare("loading") == 0) {
+		// Loading scene, add the special loading bar
+		dout.verbose("Detected loading scene, creating loadingBar");
+		addNewProgressBar("loadingBar");
+	}
+
 	uiEngine.addFilesRecursive("lua/ui/" + uiName + "/", ".lua");
 	dout.log("Added ui files to the engine");
 
@@ -50,7 +56,7 @@ void UIWrangler::hookUIInterface(ApplicationSettings& settings) {
 		luabridge::getGlobalNamespace(L->getState())
 			.beginNamespace("darksun")
 				.beginClass<UIWrangler>("GUI")
-					//.addConstructor<void(*)(std::shared_ptr<Renderer> r, string uN), RefCountedPtr<UIWrangler> /* creation policy */ >()
+					//.addConstructor<void(*)(std::shared_ptr<Renderer> r, ApplicationSettings& settings, string uN), RefCountedPtr<UIWrangler> /* creation policy */ >()
 					.addProperty("name", &darksun::UIWrangler::uiName, false) // Read only
 					.addFunction("cameraX", &darksun::UIWrangler::getCameraX) // Read only
 					.addFunction("cameraZ", &darksun::UIWrangler::getCameraZ) // Read only
@@ -101,8 +107,7 @@ void UIWrangler::hookUIInterface(ApplicationSettings& settings) {
 					.addProperty("opengl_vsync", &darksun::ApplicationSettings::opengl_vsync)
 					.addProperty("opengl_framerateLimit", &darksun::ApplicationSettings::opengl_framerateLimit)
 				.endClass()
-			.endNamespace()
-			.addFunction("LOG", lua_log);
+			.endNamespace();
 
 		// Add this instance
 		push(L->getState(), this);

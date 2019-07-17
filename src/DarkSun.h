@@ -30,7 +30,7 @@ namespace darksun {
 	class DarkSun {
 
 	private:
-
+		void catchOpenGLErrors();
 
 	public:
 		/* Default constructor */

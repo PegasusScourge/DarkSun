@@ -25,6 +25,26 @@ using string = std::string;
 
 namespace darksun {
 
+	class EntityOrders {
+
+	public:
+		static const int ORDER_NONE = 0; static int getORDER_NONE() { return ORDER_NONE; }
+		static const int ORDER_STOP = 1; static int getORDER_STOP() { return ORDER_STOP; }
+		static const int ORDER_MOVE = 2; static int getORDER_MOVE() { return ORDER_MOVE; }
+		static const int ORDER_ATTACK = 3; static int getORDER_ATTACK() { return ORDER_ATTACK; }
+		static const int ORDER_ASSIST = 4; static int getORDER_ASSIST() { return ORDER_ASSIST; }
+		static const int ORDER_REPAIR = 5; static int getORDER_REPAIR() { return ORDER_REPAIR; }
+		
+		static void hookClass(lua::State *L);
+	};
+
+	struct EntityOrder {
+		EntityOrder() {}
+		int type = EntityOrders::ORDER_NONE;
+		glm::vec3 position;
+		int targetId;
+	};
+
 	class Entity {
 
 	private:
@@ -35,7 +55,7 @@ namespace darksun {
 		string bpName;
 
 		// My id
-		long myId;
+		int myId;
 
 		// Internal name
 		string internalName;
@@ -68,7 +88,7 @@ namespace darksun {
 		bool hasScript = false;
 
 		// Does the init stuff, should only be called in the constructor
-		void init(string blueprintn, long newId);
+		void init(string blueprintn, int newId);
 		void initLuaEngine();
 
 		// Set a new target to move to in the world
@@ -96,11 +116,11 @@ namespace darksun {
 		}
 
 		// Static stuff
-		static long LastEntityId;
+		static int LastEntityId;
 	public:
-		static long createNewId();
+		static int createNewId();
 
-		Entity(string blueprintn, long newId = Entity::createNewId());
+		Entity(string blueprintn, int newId = Entity::createNewId());
 
 		// Tick the entity
 		void tick(float deltaTime);
@@ -112,13 +132,16 @@ namespace darksun {
 		bool isValid() { return valid; }
 
 		// Returns the entity id
-		long getId() { return myId; }
+		int getId() { return myId; }
 
 		// Returns the position vector
 		glm::vec3 getPosition() { return position; }
 
 		// Sets the position of the entity
 		void setPosition(glm::vec3 newp) { position = newp; }
+
+		// Kills the entity, needs more expansion
+		void kill() { valid = false; }
 
 	};
 

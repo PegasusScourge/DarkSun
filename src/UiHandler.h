@@ -36,7 +36,7 @@ namespace darksun {
 		// Hook the UI into the lua engine
 		void hookUIInterface(ApplicationSettings& settings);
 
-		/* LUA EXPOSED FUNCTIONS FOR UI CREATION ETC */
+		/* LUA Functions */
 
 		void transitionScene() { shdTransition = true; }
 
@@ -45,6 +45,68 @@ namespace darksun {
 
 		// Add a callback
 		void registerWidgetCallback(string n, string t);
+
+		bool isValidWidget(tgui::Widget::Ptr w) {
+			bool valid = (w != nullptr);
+			if (!valid)
+				dlua.error("Attempted to access non-existant widget");
+			return valid;
+		}
+
+		float getCameraX() {
+			return renderer->getCamera()->groundPosition.x;
+		}
+		float getCameraZ() {
+			return renderer->getCamera()->groundPosition.z;
+		}
+
+	public:
+		UIWrangler(std::shared_ptr<Renderer> r, ApplicationSettings& settings, string uN);
+		~UIWrangler();
+
+		// Tick the engine and the ui for events etc
+		void tick(float deltaTime);
+
+		// Draw the UI
+		void draw();
+
+		// Handle events
+		void handleEvent(sf::Event& ev);
+
+		// Expose the engine
+		LuaEngine* getUiEngine() { return &uiEngine; }
+
+		// Get the scene to transition to
+		string getNewScene() {
+			lua::State *L = uiEngine.getState();
+			try {
+				LuaRef sceneTable = getGlobal(L->getState(), uiName.c_str());
+				if (!sceneTable.isTable()) // Check to see if the scene table exists
+					throw new std::exception("Scene table global not found");
+
+				// Find the callback function we wantin the FunctionCallbacks table
+				LuaRef transTable = sceneTable["SceneTransition"];
+				if (!transTable.isTable())
+					throw new std::exception("SceneTransition table not found");
+
+				LuaRef v = transTable["To"];
+				if (!v.isString())
+					throw new std::exception("Couldn't find 'to' value of table");
+				return v.tostring();
+			}
+			catch (std::exception& e) {
+				string what = e.what();
+				dlua.error("Failed Scene Transition info get (" + uiName + "): " + what);
+			}
+			return "";
+		}
+
+		// Should we initiate a transition
+		bool shouldTransition() {
+			return shdTransition;
+		}
+
+		/* LUA FUNCTIONS */
 
 		// Add the widget to the current active parent
 		void addNewWidget(tgui::Widget::Ptr widget, string n) {
@@ -157,61 +219,10 @@ namespace darksun {
 		// Hide with effect
 		void hideWithEffect(string n, string eff, int interval);
 
-		bool isValidWidget(tgui::Widget::Ptr w) {
-			bool valid = (w != nullptr);
-			if (!valid)
-				dlua.error("Attempted to access non-existant widget");
-			return valid;
-		}
-
-		float getCameraX() {
-			return renderer->getCamera()->groundPosition.x;
-		}
-		float getCameraZ() {
-			return renderer->getCamera()->groundPosition.z;
-		}
-
-	public:
-		UIWrangler(std::shared_ptr<Renderer> r, ApplicationSettings& settings, string uN);
-		~UIWrangler();
-
-		// Tick the engine and the ui for events etc
-		void tick(float deltaTime);
-
-		// Draw the UI
-		void draw();
-
-		// Handle events
-		void handleEvent(sf::Event& ev);
-
-		// Get the scene to transition to
-		string getNewScene() {
-			lua::State *L = uiEngine.getState();
-			try {
-				LuaRef sceneTable = getGlobal(L->getState(), uiName.c_str());
-				if (!sceneTable.isTable()) // Check to see if the scene table exists
-					throw new std::exception("Scene table global not found");
-
-				// Find the callback function we wantin the FunctionCallbacks table
-				LuaRef transTable = sceneTable["SceneTransition"];
-				if (!transTable.isTable())
-					throw new std::exception("SceneTransition table not found");
-
-				LuaRef v = transTable["To"];
-				if (!v.isString())
-					throw new std::exception("Couldn't find 'to' value of table");
-				return v.tostring();
-			}
-			catch (std::exception& e) {
-				string what = e.what();
-				dlua.error("Failed Scene Transition info get (" + uiName + "): " + what);
-			}
-			return "";
-		}
-
-		// Should we initiate a transition
-		bool shouldTransition() {
-			return shdTransition;
+		tgui::Widget::Ptr getWidgetByName(string n) {
+			auto w = gui->get(n);
+			if (!isValidWidget(w)) { return NULL; }
+			return w;
 		}
 
 	};

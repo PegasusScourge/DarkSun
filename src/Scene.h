@@ -15,29 +15,40 @@ Header file for Scene.cpp, defines all scenes
 #include "Renderer.h"
 #include "Log.h"
 #include "UiHandler.h"
+#include "Terrain.h"
+
+#include <TGUI/TGUI.hpp>
 
 namespace darksun {
 
+	struct SceneInformation {
+		string n = "testScene";
+		int id = 0;
+		string mapName = "";
+		bool hasTerrain = false;
+	};
+	
 	/* The base scene class, with standard things */
 	class Scene {
 
 	private:
 		// Static stuff
-		static long LastSceneId;
+		static int LastSceneId;
 
 		// Entities in this scene
 		std::vector<std::shared_ptr<Entity>> entities;
 		//UIOfSomeKind ui;
 
 		// Naming stuff
-		long myId;
+		int myId;
 		string sceneName = "";
 		bool valid = false;
 
 		// Tick variables
 		float sinArg = 0.0f;
 
-		bool cameraEnabled = false;
+		bool cameraEnabled = false; // Marks if the camera input should be processed
+		bool hasTerrain = true; // Marks if we should create or care about terrain
 
 		// Default shader
 		Shader defaultShader;
@@ -48,10 +59,19 @@ namespace darksun {
 		// UIWrangler
 		std::unique_ptr<UIWrangler> ui;
 
-	public:
-		static long createNewId();
+		// UIWrangler
+		std::unique_ptr<UIWrangler> loadingUi;
 
-		Scene(std::shared_ptr<Renderer>, ApplicationSettings& settings, string, long);
+		// Terrain
+		std::unique_ptr<Terrain> terrain;
+
+		// Hook the Ui with scene functions
+		void hookClass(lua::State *L);
+
+	public:
+		static int createNewId();
+
+		Scene(std::shared_ptr<Renderer>, ApplicationSettings& appSettings, SceneInformation sceneInfo);
 
 		// Draw the scene
 		void draw(Shader* shader);
@@ -86,6 +106,15 @@ namespace darksun {
 		bool shouldTransition() { return ui->shouldTransition(); }
 		// Get transition target
 		string getNewScene() { return ui->getNewScene(); }
+
+		// Entity spawning
+		int spawnEntity(string bpN, glm::vec3 pos = glm::vec3(0, 0, 0));
+
+		// Entity removal
+		void killEntity(int id);
+
+		// entity order issuing
+		void issueEntityOrder(int id, LuaRef order);
 
 	};
 

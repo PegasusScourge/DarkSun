@@ -41,8 +41,10 @@ Log::~Log() {
 }
 
 void Log::log(std::string v) {
+	myMutex.lock();
 	std::cout << "[" << outf << "][" << timestamp() << "] " << v << std::endl;
 	outs << "[" << timestamp() << "] " << v << std::endl;
+	myMutex.unlock();
 }
 
 void Log::error(std::string v) {
