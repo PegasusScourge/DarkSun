@@ -113,6 +113,7 @@ namespace darksun {
 			WidgetData dat;
 			dat.widgetName = n;
 			widget->setUserData(dat);
+			//widget->setSize("2%", "2%");
 			gui->add(widget, n);
 		}
 

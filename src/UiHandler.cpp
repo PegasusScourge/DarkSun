@@ -14,11 +14,11 @@ UIWrangler::UIWrangler(std::shared_ptr<Renderer> r, ApplicationSettings& setting
 	dout.log("[ Init UI : " + uiName + " ]");
 	dout.log("Loading the LuaEngine");
 
-	if (uN.compare("loading") == 0) {
-		// Loading scene, add the special loading bar
-		dout.verbose("Detected loading scene, creating loadingBar");
-		addNewProgressBar("loadingBar");
-	}
+	//if (uN.compare("loading") == 0) {
+	//	// Loading scene, add the special loading bar
+	//	dout.verbose("Detected loading scene, creating loadingBar");
+	//	addNewProgressBar("loadingBar");
+	//}
 
 	uiEngine.addFilesRecursive("lua/ui/" + uiName + "/", ".lua");
 	dout.log("Added ui files to the engine");

@@ -32,16 +32,16 @@ Scene::Scene(std::shared_ptr<Renderer> r, ApplicationSettings& appSettings, Scen
 	EntityOrders::hookClass(ui->getUiEngine()->getState());
 
 	// Create our loading UI
-	loadingUi = std::unique_ptr<UIWrangler>(new UIWrangler(renderer, appSettings, "loading"));
-	tgui::ProgressBar::Ptr bar = loadingUi->getWidgetByName("loadingBar")->cast<tgui::ProgressBar>();
-	bar->setPosition("20%", "48%");
-	bar->setSize("60%", "4%");
-	bar->setMaximum(1000);
-	bar->setMinimum(0);
+	initLoadingUi(appSettings);
 
 	// Create the Terrain
 	if (hasTerrain) {
 		terrain = std::unique_ptr<Terrain>(new Terrain("maps/testMap"));
+
+		if (!terrain->isValid()) {
+			dout.error("Terrain is invalid, switching off terrain to prevent issues");
+			hasTerrain = false;
+		}
 	}
 }
 
@@ -89,6 +89,18 @@ void Scene::initTest() {
 	dout.log("initTest() complete");
 }
 
+void Scene::initLoadingUi(ApplicationSettings& appSettings) {
+	loadingUi = std::unique_ptr<UIWrangler>(new UIWrangler(renderer, appSettings, "loading"));
+	tgui::ProgressBar::Ptr bar = loadingUi->getWidgetByName("loadingBar")->cast<tgui::ProgressBar>();
+	bar->setPosition("20%", "48%");
+	bar->setSize("60%", "4%");
+	bar->setMaximum(1000);
+	bar->setMinimum(0);
+
+	// Hook the loading percentage into the lua engine
+	hookClass(loadingUi->getUiEngine()->getState());
+}
+
 void Scene::hookClass(lua::State *L) {
 	try {
 		luabridge::getGlobalNamespace(L->getState())
@@ -97,6 +109,7 @@ void Scene::hookClass(lua::State *L) {
 					//.addConstructor<void(*)(std::shared_ptr<Renderer>, ApplicationSettings& settings, string, int), RefCountedPtr<Scene> /* creation policy */ >()
 					.addFunction("spawnEntity", &darksun::Scene::spawnEntity)
 					.addFunction("killEntity", &darksun::Scene::killEntity)
+					.addFunction("getPercentLoaded", &Scene::getTerrainPercentLoaded)
 				.endClass()
 			.endNamespace();
 
@@ -179,9 +192,12 @@ void Scene::tick(float deltaTime) {
 	if(hasTerrain)
 		terrain->tick(deltaTime);
 
+	// check to see if we care about terrain and if it has loaded. If it hasn't do the code
 	if (!terrain->isLoaded() && hasTerrain) {
+		// Update the progress bar and tick the loading ui
 		tgui::ProgressBar::Ptr bar = loadingUi->getWidgetByName("loadingBar")->cast<tgui::ProgressBar>();
 		bar->setValue(terrain->getLoadedPercent() * 10);
+		loadingUi->tick(deltaTime);
 		return;
 	}
 	
@@ -207,12 +223,12 @@ void Scene::tick(float deltaTime) {
 	}
 }
 
-int Scene::spawnEntity(string bpN, glm::vec3 pos) {
+int Scene::spawnEntity(string bpN, float x, float y, float z) {
 	std::shared_ptr<Entity> ent = std::shared_ptr<Entity>(new Entity(bpN));
 	
 	// Put the entity on the terrain - TODO
 	
-	ent->setPosition(pos);
+	ent->setPosition(glm::vec3(x,y,z));
 
 	int entId = ent->getId();
 	entities.push_back(ent);

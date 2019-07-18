@@ -52,7 +52,6 @@ namespace darksun {
 
 		Texture terrainText;
 
-		std::mutex terrainMutex;
 		std::shared_ptr<Mesh> terrainMesh;
 
 		bool valid = false;
@@ -68,6 +67,7 @@ namespace darksun {
 
 		// Loading thread info
 		std::future<LoadingResult> loadingThreadResult;
+		LoadingResult result;
 
 		std::atomic<int> sizeX = 0;
 		std::atomic<int> sizeY = 0;

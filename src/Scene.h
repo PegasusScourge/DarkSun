@@ -89,6 +89,9 @@ namespace darksun {
 		// Test function that inits some test objects
 		void initTest();
 
+		// Inits the loading UI
+		void initLoadingUi(ApplicationSettings& appSettings);
+
 		// Close function used to shut down the scene
 		void close();
 
@@ -108,13 +111,18 @@ namespace darksun {
 		string getNewScene() { return ui->getNewScene(); }
 
 		// Entity spawning
-		int spawnEntity(string bpN, glm::vec3 pos = glm::vec3(0, 0, 0));
+		int spawnEntity(string bpN, float x, float y, float z);
 
 		// Entity removal
 		void killEntity(int id);
 
 		// entity order issuing
 		void issueEntityOrder(int id, LuaRef order);
+
+		// Expose the loaded percent of the terrain
+		float getTerrainPercentLoaded() {
+			return terrain->getLoadedPercent();
+		}
 
 	};
 

@@ -5,7 +5,8 @@ map = {
 		-- define resource points here
 	},
 	physics = {
-		sizeX = 1024,
-		sizeY = 1024,
+		sizeX = 200,
+		sizeY = 200,
 	},
+	texture_gammaCorrection = true,
 }

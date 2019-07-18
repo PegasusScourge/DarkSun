@@ -37,6 +37,10 @@ void Renderer::create(ApplicationSettings &settings) {
 	// For gamma correction
 	glEnable(GL_FRAMEBUFFER_SRGB);
 
+	// Enable culling
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+
 	// Do a glew test:
 	GLuint vertexBuffer;
 	glGenBuffers(1, &vertexBuffer);

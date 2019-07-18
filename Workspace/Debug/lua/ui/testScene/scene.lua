@@ -12,11 +12,19 @@ testScene = {
 			Gui:transitionScene()
 		end,
 		testButton = function(signal)
-			testScene.SceneTransition.To = 'testScene'
-			Gui:transitionScene()
+			LOG('Spawning 10 entities')
+			for i=0,9,1 do
+				Scene:spawnEntity('test', 0, 0, i)
+			end
 		end,
 		vsync_check = function(signal)
-			LOG('Detected ' .. signal .. ' on checkbox')
+			if signal == 'Checked' then
+				LOG('Vsync on')
+				Settings.opengl_vsync = true
+			else
+				LOG('Vsync off')
+				Settings.opengl_vsync = false
+			end
 		end,
 	},
 
@@ -31,7 +39,7 @@ testScene = {
 		
 		Gui:addNewButton('testButton')
 		Gui:setWidgetPositionPercent('testButton', '10%', '14%')
-		Gui:setButtonWidgetText('testButton', 'Switch Scene')
+		Gui:setButtonWidgetText('testButton', 'Spawn 10 entities')
 		Gui:registerWidgetCallback('testButton', 'pressed')
 		
 		Gui:addNewLabel('fpsLabel')

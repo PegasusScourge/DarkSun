@@ -231,8 +231,8 @@ void Entity::draw(Shader* shader, bool drawReflection, bool reflectiveSurface) {
 
 	// render the loaded model
 	glm::mat4 modelm = glm::mat4(1.0f);
-	modelm = glm::translate(modelm, position); // translate it down so it's at the center of the scene
-	modelm = glm::scale(modelm, scale);	// it's a bit too big for our scene, so scale it down
+	modelm = glm::translate(modelm, position);
+	modelm = glm::scale(modelm, scale);
 	modelm = glm::rotate(modelm, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)); //X
 	modelm = glm::rotate(modelm, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)); //Y
 	modelm = glm::rotate(modelm, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f)); //Z

@@ -85,14 +85,11 @@ void Terrain::tick(float deltaTime) {
 		// Check to see if the result is ready
 		if (loadingThreadResult._Is_ready()) {
 			dout.log("Terrain loading finished, creating terrain");
-			auto result = loadingThreadResult.get();
+			result = loadingThreadResult.get();
 
 			if (result.exitValue == 0) {
 				// Create the mesh
-				terrainMutex.lock();
 				terrainMesh = std::shared_ptr<Mesh>(new Mesh(result.vertexBuff, result.indiciesBuff, result.texts));
-				terrainMutex.unlock();
-
 				loaded = true;
 			}
 			else {
@@ -120,9 +117,10 @@ void Terrain::draw(Shader* shader) {
 	}
 	//dout.verbose("Passed loading check");
 
-	terrainMutex.lock();
+	glm::mat4 modelm = glm::mat4(1.0f); // Move the terrain to the normal position
+	shader->setMat4("model", modelm);
+
 	terrainMesh->draw(shader);
-	terrainMutex.unlock();
 }
 
 Terrain::LoadingResult Terrain::loadTerrain() {
@@ -172,9 +170,12 @@ Terrain::LoadingResult Terrain::loadTerrain() {
 		for (int x = 0; x < heightmapBuffer_width; x++) {
 			// data is in unsigned char, 0 - 255
 			float value = (float)data[(y*heightmapBuffer_width) + x] * std::min(convX, convY);
+			float textX = (float)x / (float)(heightmapBuffer_width-1);
+			float textY = (float)y / (float)(heightmapBuffer_height-1);
+			//dout.verbose("Coords:(" + std::to_string(x) + "," + std::to_string(y) + "), textCoords:(" + std::to_string(textX) + "," + std::to_string(textY) + ")");
 			Vertex temp;
 			temp.Position = glm::vec3(x*convX, value, y*convY);
-			temp.TexCoords = glm::vec2((float)x / (float)heightmapBuffer_width, (float)y / (float)heightmapBuffer_height);
+			temp.TexCoords = glm::vec2(textX, textY);
 			temp.Normal = glm::vec3(0, 1, 0);
 			temp.Tangent = glm::vec3(0, 0, 1);
 			temp.Bitangent = glm::vec3(1, 0, 0);
@@ -200,10 +201,10 @@ Terrain::LoadingResult Terrain::loadTerrain() {
 			unsigned int botR = botL + 1;
 
 			// Do first triangle
-			indiciesBuff.push_back(topL); indiciesBuff.push_back(topR); indiciesBuff.push_back(botL);
+			indiciesBuff.push_back(botL); indiciesBuff.push_back(topR); indiciesBuff.push_back(topL);
 
 			// Do second triangle
-			indiciesBuff.push_back(topR); indiciesBuff.push_back(botR); indiciesBuff.push_back(botL);
+			indiciesBuff.push_back(botL); indiciesBuff.push_back(botR); indiciesBuff.push_back(topR);
 
 			loadedPercent = loadedPercent + percentPerIteration; // Keep the user updated with a loaded percent value
 		}
@@ -251,8 +252,14 @@ Terrain::LoadingResult Terrain::loadTerrain() {
 	diffuse.id = TextureFromFile(textureLoc.c_str(), gammaCorrection);
 	diffuse.type = "texture_diffuse"; // Set to the diffuse texture
 	diffuse.path = textureLoc.c_str();
+	Texture specular; // Create a specular map from the height map
+	specular.id = TextureFromFile(heightMapLoc.c_str(), gammaCorrection);
+	specular.type = "texture_specular"; // Set to the specular
+	specular.path = textureLoc.c_str();
+
 	std::vector<Texture> texts;
 	texts.push_back(diffuse);
+	texts.push_back(specular);
 
 	// Put it all together
 	//terrainMutex.lock();
