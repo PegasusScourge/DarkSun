@@ -194,11 +194,8 @@ void Entity::init(string blueprintn, int newId) {
 }
 
 void Entity::initLuaEngine() {
-	// Register the blueprints for our entity
-	engine.addFilesRecursive("units/", ".bp");
-
-	// Register std lua here?
-	engine.addFilesRecursive("lua/std/", ".lua");
+	// Register the blueprint for our entity
+	engine.addFile("units/" + bpName + "/" + bpName + ".bp");
 
 	// Register the entity class
 	lua::State *L = engine.getState();

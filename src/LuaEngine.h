@@ -53,6 +53,9 @@ namespace darksun {
 		/* Recursive list files and return */
 		void recursiveListFiles(std::string path, std::vector<std::string> *list);
 
+		/* Import a file into the lua engine */
+		void lua_import(string f);
+
 	public:
 		LuaEngine();
 

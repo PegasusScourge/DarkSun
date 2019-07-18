@@ -23,3 +23,7 @@ end
 
 blueprints = {}
 
+-- Setup the access to importing
+function import(file)
+	myEngine:import(file)
+end

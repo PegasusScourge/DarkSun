@@ -118,8 +118,15 @@ void LuaEngine::luabridge_bind() {
 					.addProperty("y", &glm::vec3::y)
 					.addProperty("z", &glm::vec3::z)
 				.endClass()
+				.beginClass<LuaEngine>("LuaEngine")
+					.addFunction("import", &darksun::LuaEngine::lua_import)
+				.endClass()
 			.endNamespace()
 			.addFunction("LOG", lua_log);
+
+		// Add this instance
+		push(L.getState(), this);
+		lua_setglobal(L.getState(), "myEngine");
 	}
 	catch (std::exception& e) {
 		string what = e.what();
@@ -144,6 +151,16 @@ bool LuaEngine::initConnection() {
 
 lua::State* LuaEngine::getState() {
 	return &L;
+}
+
+void LuaEngine::lua_import(string f) {
+	try {
+		L.doFile(f);
+	}
+	catch (std::exception& e) {
+		string what = e.what();
+		dlua.error("Attempted to import " + f + " at request of engine: " + what);
+	}
 }
 
 void lua_log(const char * s) {

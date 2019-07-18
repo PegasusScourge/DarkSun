@@ -1,5 +1,7 @@
 -- entity script file
 
+import('lua/ui/testScene/scene.lua')
+
 testSpider = {
 	OnCreate = function()
 		-- Nothing
