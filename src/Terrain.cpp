@@ -89,7 +89,23 @@ void Terrain::tick(float deltaTime) {
 
 			if (result.exitValue == 0) {
 				// Create the mesh
-				terrainMesh = std::shared_ptr<Mesh>(new Mesh(result.vertexBuff, result.indiciesBuff, result.texts));
+				dout.verbose("MESH CREATION (Terrain): Got " + std::to_string(result.vertexBuff.size()) + " verticies, " + 
+					std::to_string(result.indiciesBuff.size()) + " indicies");
+
+				/*
+				
+				WE ARE FORCED TO LOAD THE TEXTURE IN THE MAIN THREAD TO PREVENT ANY CRAPSTORMS WITH MULTI-THREADING OPENGL
+				
+				*/
+
+				std::vector<Texture> texts;
+				Texture diffuse; // Create a specular map from the height map
+				diffuse.id = TextureFromFile(result.textInfo.diffuseSrc.c_str(), result.textInfo.diffuseGammaCorrection);
+				diffuse.type = "texture_diffuse"; // Set to the diffuse
+				diffuse.path = textureLoc.c_str();
+				texts.push_back(diffuse);
+				
+				terrainMesh = std::unique_ptr<Mesh>(new Mesh(result.vertexBuff, result.indiciesBuff, texts));
 				loaded = true;
 			}
 			else {
@@ -118,11 +134,19 @@ void Terrain::draw(Shader* shader) {
 	//dout.verbose("Passed loading check");
 
 	glm::mat4 modelm = glm::mat4(1.0f); // Move the terrain to the normal position
+	modelm = glm::translate(modelm, glm::vec3(0, 0, 0));
+	modelm = glm::scale(modelm, glm::vec3(1, 1, 1));
+	modelm = glm::rotate(modelm, glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f)); //X
+	modelm = glm::rotate(modelm, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f)); //Y
+	modelm = glm::rotate(modelm, glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f)); //Z
 	shader->setMat4("model", modelm);
+
+	shader->setVec3("objectColor", glm::vec3(1, 1, 1));
 
 	terrainMesh->draw(shader);
 }
 
+// MULTI-THREADED FUNCTION
 Terrain::LoadingResult Terrain::loadTerrain() {
 	dout.log("Terrain loading thread launched OK");
 	
@@ -169,7 +193,7 @@ Terrain::LoadingResult Terrain::loadTerrain() {
 	for (int y = 0; y < heightmapBuffer_height; y++) {
 		for (int x = 0; x < heightmapBuffer_width; x++) {
 			// data is in unsigned char, 0 - 255
-			float value = (float)data[(y*heightmapBuffer_width) + x] * std::min(convX, convY);
+			float value = (float)data[(y*heightmapBuffer_width) + x] * glm::clamp(std::min(convX * 2, convY * 2), 0.1f, 1.0f);
 			float textX = (float)x / (float)(heightmapBuffer_width-1);
 			float textY = (float)y / (float)(heightmapBuffer_height-1);
 			//dout.verbose("Coords:(" + std::to_string(x) + "," + std::to_string(y) + "), textCoords:(" + std::to_string(textX) + "," + std::to_string(textY) + ")");
@@ -201,10 +225,12 @@ Terrain::LoadingResult Terrain::loadTerrain() {
 			unsigned int botR = botL + 1;
 
 			// Do first triangle
-			indiciesBuff.push_back(botL); indiciesBuff.push_back(topR); indiciesBuff.push_back(topL);
+			indiciesBuff.push_back(botL); indiciesBuff.push_back(topR); indiciesBuff.push_back(topL); // Correct
+			//indiciesBuff.push_back(topL); indiciesBuff.push_back(topR); indiciesBuff.push_back(botL); // Old way
 
 			// Do second triangle
-			indiciesBuff.push_back(botL); indiciesBuff.push_back(botR); indiciesBuff.push_back(topR);
+			indiciesBuff.push_back(botL); indiciesBuff.push_back(botR); indiciesBuff.push_back(topR); // Correct
+			//indiciesBuff.push_back(topR); indiciesBuff.push_back(botR); indiciesBuff.push_back(botL); // Old way
 
 			loadedPercent = loadedPercent + percentPerIteration; // Keep the user updated with a loaded percent value
 		}
@@ -218,6 +244,7 @@ Terrain::LoadingResult Terrain::loadTerrain() {
 	glm::vec3 v0;
 	glm::vec3 v12; glm::vec3 v23;
 	glm::vec3 v34; glm::vec3 v41;
+	int normalsProcessed = 0;
 	for (int y = 0; y < heightmapBuffer_height; y++) {
 		for (int x = 0; x < heightmapBuffer_width; x++) {
 			if (x > 0 && x < heightmapBuffer_width - 1 && y > 0 && y < heightmapBuffer_height - 1) {
@@ -236,6 +263,8 @@ Terrain::LoadingResult Terrain::loadTerrain() {
 
 				vert->Normal = glm::normalize(v12 + v23 + v34 + v41);
 				vert->Bitangent = glm::normalize(glm::cross(vert->Normal, vert->Tangent));
+
+				normalsProcessed++;
 			}
 			// The normals are initialised fine already so we can just ignore if we don't meet the above conditions
 
@@ -243,28 +272,14 @@ Terrain::LoadingResult Terrain::loadTerrain() {
 		}
 	}
 
-	dout.verbose("Terrain::loadTerrain() --> Perfected vertex normals");
+	dout.verbose("Terrain::loadTerrain() --> Perfected vertex normals (" + std::to_string(normalsProcessed) + " processed)");
 
-	loadedPercent = 90.0f; // 90%
+	loadedPercent = 85.0f; // 85%
 
 	// Load the texture
-	Texture diffuse;
-	diffuse.id = TextureFromFile(textureLoc.c_str(), gammaCorrection);
-	diffuse.type = "texture_diffuse"; // Set to the diffuse texture
-	diffuse.path = textureLoc.c_str();
-	Texture specular; // Create a specular map from the height map
-	specular.id = TextureFromFile(heightMapLoc.c_str(), gammaCorrection);
-	specular.type = "texture_specular"; // Set to the specular
-	specular.path = textureLoc.c_str();
-
-	std::vector<Texture> texts;
-	texts.push_back(diffuse);
-	texts.push_back(specular);
-
-	// Put it all together
-	//terrainMutex.lock();
-	//terrainMesh = std::shared_ptr<Mesh>(new Mesh(vertexBuff, indiciesBuff, texts));
-	//terrainMutex.unlock();
+	ProtoTextureInfo textInfo;
+	textInfo.diffuseSrc = textureLoc;
+	textInfo.diffuseGammaCorrection = gammaCorrection;
 
 	dout.verbose("Terrain::loadTerrain() --> Texture(s) assembled");
 
@@ -274,7 +289,7 @@ Terrain::LoadingResult Terrain::loadTerrain() {
 	dout.log("Terrain loading thread complete, exiting...");
 
 	// Return the result
-	result.texts = texts;
+	result.textInfo = textInfo;
 	result.indiciesBuff = indiciesBuff;
 	result.vertexBuff = vertexBuff;
 	result.exitValue = 0; // Valid exit

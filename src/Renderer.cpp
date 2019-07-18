@@ -31,6 +31,10 @@ void Renderer::create(ApplicationSettings &settings) {
 
 	// Do state init for opengl
 	glEnable(GL_DEPTH_TEST);
+	glDepthMask(true);
+	glDepthFunc(GL_LEQUAL);
+	glDepthRange(0, 1);
+
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

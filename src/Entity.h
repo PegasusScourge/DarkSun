@@ -126,7 +126,7 @@ namespace darksun {
 		void tick(float deltaTime);
 
 		// Draw the entity
-		void draw(Shader* shader, bool drawReflection = false, bool reflectiveSurface = false);
+		void draw(Shader* shader);
 
 		// Returns if the entity init correctly
 		bool isValid() { return valid; }

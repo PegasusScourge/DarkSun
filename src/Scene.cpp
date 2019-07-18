@@ -72,6 +72,11 @@ void Scene::initTest() {
 	renderer->setLightColor(2, glm::vec3(1, 1, 1));
 	renderer->setLightAttenuation(2, true);
 
+	// Put a light under the terrain
+	renderer->setLightPosition(3, glm::vec3(10.0f, 3.0f, 10.0f));
+	renderer->setLightColor(3, glm::vec3(0, 1, 0));
+	renderer->setLightAttenuation(3, false);
+
 	dout.log(" - Camera and lighting setup as required");
 
 	std::shared_ptr<Entity> testEntity = std::shared_ptr<Entity>(new Entity("test"));
@@ -79,12 +84,6 @@ void Scene::initTest() {
 	entities.push_back(testEntity);
 
 	dout.log(" - Added test entity");
-
-	std::shared_ptr<Entity> floorEntity = std::shared_ptr<Entity>(new Entity("floor"));
-	entities.push_back(floorEntity);
-
-	dout.log(" - Added floor entity");
-	dout.log("test isValid = " + std::to_string(testEntity->isValid()) + ", floor isValid = " + std::to_string(floorEntity->isValid()));
 
 	dout.log("initTest() complete");
 }
@@ -158,7 +157,7 @@ void Scene::draw(Shader* shader) {
 	}
 
 	// Draw the terrain
-	if(hasTerrain)
+	if(hasTerrain && terrain->isValid())
 		terrain->draw(shader);
 
 	// Draw the entities

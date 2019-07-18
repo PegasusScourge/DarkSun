@@ -11,6 +11,9 @@ Header for Terrain.cpp
 #include <future>
 #include <atomic>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "Model.h"
 #include "LuaEngine.h"
 
@@ -42,17 +45,23 @@ namespace darksun {
 
 	private:
 
+		struct ProtoTextureInfo {
+			string diffuseSrc;
+			bool diffuseGammaCorrection;
+		};
+
 		struct LoadingResult {
-			std::vector<Texture> texts;
 			std::vector<unsigned int> indiciesBuff;
 			std::vector<Vertex> vertexBuff;
+
+			ProtoTextureInfo textInfo;
 
 			int exitValue = -1;
 		};
 
 		Texture terrainText;
 
-		std::shared_ptr<Mesh> terrainMesh;
+		std::unique_ptr<Mesh> terrainMesh;
 
 		bool valid = false;
 		bool loaded = false;

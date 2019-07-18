@@ -223,7 +223,7 @@ void Entity::initLuaEngine() {
 	lua_setglobal(L->getState(), "myEntity");
 }
 
-void Entity::draw(Shader* shader, bool drawReflection, bool reflectiveSurface) {
+void Entity::draw(Shader* shader) {
 	if (!valid) {
 		dout.error("ATTEMPTED TO DRAW INVALID ENTITY?!");
 		return;
@@ -238,42 +238,7 @@ void Entity::draw(Shader* shader, bool drawReflection, bool reflectiveSurface) {
 	modelm = glm::rotate(modelm, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f)); //Z
 	shader->setMat4("model", modelm);
 
-	if (reflectiveSurface) {
-		glEnable(GL_STENCIL_TEST);
-
-		glStencilFunc(GL_ALWAYS, 1, 0xFF); // Set any stencil to 1
-		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-		glStencilMask(0xFF); // Write to stencil buffer
-		glDepthMask(GL_FALSE); // Don't write to depth buffer
-		glClear(GL_STENCIL_BUFFER_BIT); // Clear stencil buffer (0 by default)
-	}
-
 	model->draw(shader);
-
-	if (drawReflection) {
-		if (!reflectiveSurface) // If we are a reflective surface, stencil buffer is already enabled
-			glEnable(GL_STENCIL_TEST);
-
-		glClear(GL_STENCIL_BUFFER_BIT); // Clear stencil buffer (0 by default)
-
-		// Reflection
-		glStencilFunc(GL_EQUAL, 1, 0xFF); // Pass test if stencil value is 1
-		glStencilMask(0x00); // Don't write anything to stencil buffer
-		glDepthMask(GL_TRUE); // Write to depth buffer
-
-		modelm = glm::mat4(1.0f);
-		modelm = glm::scale(glm::translate(modelm, glm::vec3(position.x, position.y * -1.0f, position.z)), scale * -1.0f);
-		modelm = glm::rotate(modelm, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)); //X
-		modelm = glm::rotate(modelm, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)); //Y
-		modelm = glm::rotate(modelm, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f)); //Z
-		shader->setMat4("model", modelm);
-
-		// Draw the reflection
-		model->draw(shader);
-	}
-
-	if (reflectiveSurface || drawReflection) // Disable the stencil buffer
-		glDisable(GL_STENCIL_TEST);
 }
 
 void Entity::tick(float deltaTime) {
