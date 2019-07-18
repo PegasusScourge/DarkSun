@@ -31,11 +31,11 @@ void DarkSun::run() {
 	SceneInformation sceneInfo;
 	sceneInfo.n = "testScene";
 	sceneInfo.id = Scene::createNewId();
-	sceneInfo.hasTerrain = true;
+	sceneInfo.hasMap = true;
 
 	std::unique_ptr<Scene> activeScene = std::unique_ptr<Scene>(new Scene(renderer, appSettings, sceneInfo));
-	activeScene->init();
-	activeScene->initTest();
+	//activeScene->init();
+	//activeScene->initTest();
 
 	if (!activeScene->isValid()) {
 		dout.error("SCENE IS NOT VALID!");
@@ -130,14 +130,14 @@ void DarkSun::run() {
 				activeScene->close(); // Close old scene
 				sceneInfo.n = target;
 				sceneInfo.id = Scene::createNewId();
-				sceneInfo.hasTerrain = true;
+				sceneInfo.hasMap = true;
 				activeScene = std::unique_ptr<Scene>(new Scene(renderer, appSettings, sceneInfo));
-				activeScene->init();
+				//activeScene->init();
 				if (!activeScene->isValid()) {
 					running = false;
 					dout.error("TRIED TO SWITCH TO NEW SCENE '" + target + "' BUT SCENE WAS INVALID");
 				}
-				activeScene->initTest();
+				//activeScene->initTest();
 			}
 		}
 

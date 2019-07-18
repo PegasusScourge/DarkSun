@@ -22,7 +22,7 @@ Scene::Scene(std::shared_ptr<Renderer> r, ApplicationSettings& appSettings, Scen
 	renderer = r;
 	sceneName = sceneInfo.n;
 	myId = sceneInfo.id;
-	hasTerrain = sceneInfo.hasTerrain;
+	hasMap = sceneInfo.hasMap;
 	
 	dout.log("Scene constructor called");
 
@@ -35,14 +35,16 @@ Scene::Scene(std::shared_ptr<Renderer> r, ApplicationSettings& appSettings, Scen
 	initLoadingUi(appSettings);
 
 	// Create the Terrain
-	if (hasTerrain) {
-		terrain = std::unique_ptr<Terrain>(new Terrain("maps/testMap"));
+	if (hasMap) {
+		map = std::unique_ptr<Map>(new Map("maps/testMap"));
 
-		if (!terrain->isValid()) {
+		if (!map->isValid()) {
 			dout.error("Terrain is invalid, switching off terrain to prevent issues");
-			hasTerrain = false;
+			hasMap = false;
 		}
 	}
+
+	init();
 }
 
 void Scene::init() {
@@ -51,41 +53,18 @@ void Scene::init() {
 	// Start with gamma correction set off
 	renderer->setGammaCorrection(defaultShader, false);
 
-	dout.log("Scene creation complete");
-	valid = true;
-}
+	// Create the camera light
+	renderer->setLightPosition(0, renderer->getCamera()->position);
+	renderer->setLightColor(0, glm::vec3(0.5f, 0.5f, 0.5f));
+	renderer->setLightAttenuation(0, true);
 
-void Scene::initTest() {
-	dout.log("initTest() called on scene '" + sceneName + "'");
 	renderer->getCamera()->setTacticalZoomParams(14.0f, 1500.0f, 15.0f);
 	renderer->getCamera()->update(glm::vec3(0.0f, 0.0f, 0.0f), 0.5f);
 
 	setCameraEnabled(true);
-	
-	// Put a light under the spider at 0,0,0
-	renderer->setLightPosition(1, glm::vec3(0, 5.5f, 0)); // Make sure it is above the floor
-	renderer->setLightColor(1, glm::vec3(0, 0, 0));
-	renderer->setLightAttenuation(1, true);
 
-	// Create the camera light
-	renderer->setLightPosition(2, renderer->getCamera()->position);
-	renderer->setLightColor(2, glm::vec3(1, 1, 1));
-	renderer->setLightAttenuation(2, true);
-
-	// Put a light under the terrain
-	renderer->setLightPosition(3, glm::vec3(10.0f, 3.0f, 10.0f));
-	renderer->setLightColor(3, glm::vec3(0, 1, 0));
-	renderer->setLightAttenuation(3, false);
-
-	dout.log(" - Camera and lighting setup as required");
-
-	std::shared_ptr<Entity> testEntity = std::shared_ptr<Entity>(new Entity("test"));
-	testEntity->setPosition(glm::vec3(0.0f, 6.0f, 0.0f));
-	entities.push_back(testEntity);
-
-	dout.log(" - Added test entity");
-
-	dout.log("initTest() complete");
+	dout.log("Scene creation complete");
+	valid = true;
 }
 
 void Scene::initLoadingUi(ApplicationSettings& appSettings) {
@@ -108,7 +87,10 @@ void Scene::hookClass(lua::State *L) {
 					//.addConstructor<void(*)(std::shared_ptr<Renderer>, ApplicationSettings& settings, string, int), RefCountedPtr<Scene> /* creation policy */ >()
 					.addFunction("spawnEntity", &darksun::Scene::spawnEntity)
 					.addFunction("killEntity", &darksun::Scene::killEntity)
-					.addFunction("getPercentLoaded", &Scene::getTerrainPercentLoaded)
+					.addFunction("getPercentLoaded", &darksun::Scene::getTerrainPercentLoaded)
+					.addFunction("setLightPosition", &darksun::Scene::lua_setLightPosition)
+					.addFunction("setLightColor", &darksun::Scene::lua_setLightColor)
+					.addFunction("setLightAttenuation", &darksun::Scene::lua_setLightAttenuation)
 				.endClass()
 			.endNamespace();
 
@@ -152,13 +134,13 @@ void Scene::draw(Shader* shader) {
 	shader->setMat4("projection", projection);
 	shader->setMat4("view", view);
 
-	if (!terrain->isLoaded() && hasTerrain) {
+	if (!map->isLoaded() && hasMap) {
 		return;
 	}
 
 	// Draw the terrain
-	if(hasTerrain && terrain->isValid())
-		terrain->draw(shader);
+	if(hasMap && map->isValid())
+		map->draw(shader);
 
 	// Draw the entities
 	for (auto &e : entities) {
@@ -172,7 +154,7 @@ void Scene::draw(Shader* shader) {
 }
 
 void Scene::drawUI() {
-	if (!terrain->isLoaded() && hasTerrain) {
+	if (!map->isLoaded() && hasMap) {
 		loadingUi->draw();
 		return;
 	}
@@ -188,24 +170,20 @@ void Scene::handleEvent(sf::Event& ev) {
 void Scene::tick(float deltaTime) {
 
 	// Tick the terrain
-	if(hasTerrain)
-		terrain->tick(deltaTime);
+	if(hasMap)
+		map->tick(deltaTime);
 
 	// check to see if we care about terrain and if it has loaded. If it hasn't do the code
-	if (!terrain->isLoaded() && hasTerrain) {
+	if (!map->isLoaded() && hasMap) {
 		// Update the progress bar and tick the loading ui
 		tgui::ProgressBar::Ptr bar = loadingUi->getWidgetByName("loadingBar")->cast<tgui::ProgressBar>();
-		bar->setValue(terrain->getLoadedPercent() * 10);
+		bar->setValue(map->getLoadedPercent() * 10);
 		loadingUi->tick(deltaTime);
 		return;
 	}
-	
-	// Move the light in a circle (for now)
-	renderer->setLightPosition(0, glm::vec3(10.0f * sinf(sinArg), 10.0f, 10.0f * cosf(sinArg)));
-	renderer->setLightColor(1, glm::vec3(sinf(sinArg), 0.0f, cosf(sinArg)));
 
 	// Move the camera light to below the camera
-	renderer->setLightPosition(2, renderer->getCamera()->position);
+	renderer->setLightPosition(0, renderer->getCamera()->position);
 
 	sinArg += 0.05;
 

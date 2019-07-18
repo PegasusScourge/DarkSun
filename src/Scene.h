@@ -15,7 +15,7 @@ Header file for Scene.cpp, defines all scenes
 #include "Renderer.h"
 #include "Log.h"
 #include "UiHandler.h"
-#include "Terrain.h"
+#include "Map.h"
 
 #include <TGUI/TGUI.hpp>
 
@@ -25,7 +25,7 @@ namespace darksun {
 		string n = "testScene";
 		int id = 0;
 		string mapName = "";
-		bool hasTerrain = false;
+		bool hasMap = false;
 	};
 	
 	/* The base scene class, with standard things */
@@ -48,7 +48,7 @@ namespace darksun {
 		float sinArg = 0.0f;
 
 		bool cameraEnabled = false; // Marks if the camera input should be processed
-		bool hasTerrain = true; // Marks if we should create or care about terrain
+		bool hasMap = true; // Marks if we should create or care about terrain
 
 		// Default shader
 		Shader defaultShader;
@@ -63,10 +63,15 @@ namespace darksun {
 		std::unique_ptr<UIWrangler> loadingUi;
 
 		// Terrain
-		std::unique_ptr<Terrain> terrain;
+		std::unique_ptr<Map> map;
 
 		// Hook the Ui with scene functions
 		void hookClass(lua::State *L);
+
+		// Lua exposed things
+		void lua_setLightPosition(int l, float x, float y, float z) { renderer->setLightPosition(l, glm::vec3(x, y, z)); }
+		void lua_setLightColor(int l, float r, float g, float b) { renderer->setLightColor(l, glm::vec3(r, g, b)); }
+		void lua_setLightAttenuation(int l, bool a) { renderer->setLightAttenuation(l, a); }
 
 	public:
 		static int createNewId();
@@ -85,9 +90,6 @@ namespace darksun {
 
 		// Init function called to start the scene
 		void init();
-
-		// Test function that inits some test objects
-		void initTest();
 
 		// Inits the loading UI
 		void initLoadingUi(ApplicationSettings& appSettings);
@@ -121,7 +123,7 @@ namespace darksun {
 
 		// Expose the loaded percent of the terrain
 		float getTerrainPercentLoaded() {
-			return terrain->getLoadedPercent();
+			return map->getLoadedPercent();
 		}
 
 	};
