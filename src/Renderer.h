@@ -55,9 +55,18 @@ namespace darksun {
 		void setLightColor(int index, glm::vec3 p) { 
 			if (index < 0 || index >= NUMBER_OF_LIGHTS) { return; } lightColors[index] = p; 
 		}
+		// Returns the color of a light
+		glm::vec3 getLightColor(int index) {
+			glm::vec3 p(0, 0, 0);
+			if (index < 0 || index >= NUMBER_OF_LIGHTS) { return p; } p = lightColors[index]; return p;
+		}
 		// sets attenuation on a light
 		void setLightAttenuation(int index, bool a) {
 			if (index < 0 || index >= NUMBER_OF_LIGHTS) { return; } lightAttenuates[index] = a;
+		}
+		// Returns the attenutation of a light
+		bool getLightAttenuation(int index) {
+			if (index < 0 || index >= NUMBER_OF_LIGHTS) { return false; } return lightAttenuates[index];
 		}
 		// sets if gamma correction is enabled in the shaders
 		void setGammaCorrection(std::shared_ptr<Shader> shader, bool g);
@@ -116,7 +125,7 @@ namespace darksun {
 
 		// Shadows
 		
-		const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+		const unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
 		unsigned int depthMapFBO;
 		unsigned int depthMap;
 		float depthBorderColor[4] = { 1.0, 1.0, 1.0, 1.0 };

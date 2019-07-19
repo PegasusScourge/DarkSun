@@ -74,9 +74,12 @@ namespace darksun {
 		void hookClass(lua::State *L);
 
 		// Lua exposed things
-		void lua_setLightPosition(int l, float x, float y, float z) { renderer->setLightPosition(l, glm::vec3(x, y, z)); dlua.log("Set light " + std::to_string(l) + " position"); }
-		void lua_setLightColor(int l, float r, float g, float b) { renderer->setLightColor(l, glm::vec3(r, g, b)); dlua.log("Set light " + std::to_string(l) + " color"); }
-		void lua_setLightAttenuation(int l, bool a) { renderer->setLightAttenuation(l, a); dlua.log("Set light " + std::to_string(l) + " attenutation"); }
+		void lua_setLightPosition(int l, float x, float y, float z) { renderer->setLightPosition(l, glm::vec3(x, y, z)); }
+		void lua_setLightColor(int l, float r, float g, float b) { renderer->setLightColor(l, glm::vec3(r, g, b)); }
+		void lua_setLightAttenuation(int l, bool a) { renderer->setLightAttenuation(l, a); }
+		glm::vec3 lua_getLightPosition(int l) { return renderer->getLightPosition(l); }
+		glm::vec3 lua_getLightColor(int l) { return renderer->getLightColor(l); }
+		bool lua_getLightAttenuation(int l) { return renderer->getLightAttenuation(l); }
 
 	public:
 		static int createNewId();

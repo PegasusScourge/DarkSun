@@ -106,6 +106,9 @@ void Scene::hookClass(lua::State *L) {
 					.addFunction("setLightPosition", &darksun::Scene::lua_setLightPosition)
 					.addFunction("setLightColor", &darksun::Scene::lua_setLightColor)
 					.addFunction("setLightAttenuation", &darksun::Scene::lua_setLightAttenuation)
+					.addFunction("getLightPosition", &darksun::Scene::lua_getLightPosition)
+					.addFunction("getLightColor", &darksun::Scene::lua_getLightColor)
+					.addFunction("getLightAttenuation", &darksun::Scene::lua_getLightAttenuation)
 				.endClass()
 			.endNamespace();
 
@@ -141,13 +144,13 @@ void Scene::draw(std::shared_ptr<Shader> shader) {
 		// We render shadows
 		shadowShader->use();
 
-		float near_plane = 1.0f, far_plane = 7.5f;
-		glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, appSettings.opengl_nearZ, appSettings.opengl_farZ);
+		float near_plane = 0.1f, far_plane = 2.0f;
+		glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
 
 		glViewport(0, 0, renderer->getShadowWidth(), renderer->getShadowHeight());
 
 		// Set the light view to LIGHT 1, only light 1 casts shadows
-		glm::mat4 lightView = glm::lookAt(renderer->getLightPosition(1), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::mat4 lightView = glm::lookAt(renderer->getLightPosition(1), glm::vec3(renderer->getLightPosition(1).x, 0.0f, renderer->getLightPosition(1).y), glm::vec3(0.0f, 0.0f, 1.0f));
 		// Create the light space matrix
 		glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 

@@ -10,8 +10,8 @@ testSpider = {
 	
 	OnTick = function()
 		if not myEntity:isPathfinding() then
-			local xNew = math.random(-10, 10)
-			local zNew = math.random(-10, 10)
+			local xNew = math.random(10, 100)
+			local zNew = math.random(10, 100)
 			myEntity:moveTo(xNew, 6.0, zNew)
 			LOG('Navigating to X=' .. tostring(xNew) .. ', Z=' .. tostring(zNew))
 		end
