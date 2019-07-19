@@ -142,7 +142,7 @@ void Scene::draw(std::shared_ptr<Shader> shader) {
 		shadowShader->use();
 
 		float near_plane = 1.0f, far_plane = 7.5f;
-		glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+		glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, appSettings.opengl_nearZ, appSettings.opengl_farZ);
 
 		glViewport(0, 0, renderer->getShadowWidth(), renderer->getShadowHeight());
 
@@ -157,7 +157,7 @@ void Scene::draw(std::shared_ptr<Shader> shader) {
 		glBindFramebuffer(GL_FRAMEBUFFER, renderer->getDepthMapFBO());
 		glClear(GL_DEPTH_BUFFER_BIT);
 			
-		// Render scene
+		// Render scene to shadow buffer
 
 		// Draw the terrain
 		if (hasMap && map->isValid())
@@ -197,7 +197,7 @@ void Scene::draw(std::shared_ptr<Shader> shader) {
 
 	// view/projection matricies input
 
-	glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), (float)renderer->SCREEN_WIDTH / (float)renderer->SCREEN_HEIGHT, 0.1f, 2000.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), (float)renderer->SCREEN_WIDTH / (float)renderer->SCREEN_HEIGHT, appSettings.opengl_nearZ, appSettings.opengl_farZ);
 	glm::mat4 view = camera->GetViewMatrix();
 	//glm::mat4 view = glm::lookAt(camera->Position, glm::vec3(camera->Position.x, 0, camera->Position.z), camera->WorldUp);
 	shader->setMat4("projection", projection);

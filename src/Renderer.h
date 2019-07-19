@@ -64,8 +64,12 @@ namespace darksun {
 
 		unsigned int getShadowWidth() { return SHADOW_WIDTH; }
 		unsigned int getShadowHeight() { return SHADOW_HEIGHT; }
-		unsigned int getDepthMapFBO() { return depthMapFBO; }
-		unsigned int getDepthMap() { return depthMap; }
+		unsigned int getDepthMapFBO() { 
+			return depthMapFBO;
+		}
+		unsigned int getDepthMap() {
+			return depthMap;
+		}
 
 		/*
 		Destruction
@@ -80,9 +84,14 @@ namespace darksun {
 		Camera* getCamera();
 
 	private:
+
+		void initShadows();
+
 		sf::RenderWindow defaultWindow;
 
 		Camera camera;
+
+		ApplicationSettings appSettings;
 
 		// lighting
 		glm::vec3 lightPositions[NUMBER_OF_LIGHTS] = {
@@ -106,6 +115,7 @@ namespace darksun {
 		};
 
 		// Shadows
+		
 		const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 		unsigned int depthMapFBO;
 		unsigned int depthMap;
