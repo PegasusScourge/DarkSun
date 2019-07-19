@@ -55,7 +55,7 @@ void Scene::init() {
 	dout.log("Creating scene '" + sceneName + "'");
 
 	// Create the shader
-	defaultShader = std::shared_ptr<Shader>(new Shader("core/shader/lighting_vertex.shader", "core/shader/lighting_fragment.shader"));
+	defaultShader = std::shared_ptr<Shader>(new Shader("core/shader/lighting_vertex.shader",  "core/shader/lighting_geometry.shader", "core/shader/lighting_fragment.shader"));
 	dout.log("Created basic lighting shader");
 
 	// Create the shadow shader
@@ -150,7 +150,7 @@ void Scene::draw(std::shared_ptr<Shader> shader) {
 		glViewport(0, 0, renderer->getShadowWidth(), renderer->getShadowHeight());
 
 		// Set the light view to LIGHT 1, only light 1 casts shadows
-		glm::mat4 lightView = glm::lookAt(renderer->getLightPosition(1), glm::vec3(renderer->getLightPosition(1).x, 0.0f, renderer->getLightPosition(1).y), glm::vec3(0.0f, 0.0f, 1.0f));
+		glm::mat4 lightView = glm::lookAt(renderer->getLightPosition(1), glm::vec3(0, 0.0f, 0), glm::vec3(0.0f, 1.0f, 0.0f));
 		// Create the light space matrix
 		glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 

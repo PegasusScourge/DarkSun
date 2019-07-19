@@ -79,7 +79,7 @@ void main()
 		if( i == 1)
 		{
 			float shadow = ShadowCalculation(FragPosLightSpace);
-			lighting += bph * shadow;
+			lighting += bph * (1.0 - shadow);
 		}
 		else
 		{
