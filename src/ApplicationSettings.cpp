@@ -18,7 +18,7 @@ ApplicationSettings::ApplicationSettings() {
 	opengl_stencilBits = 8;
 	opengl_antialiasingLevel = 4;
 	opengl_majorVersion = 3;
-	opengl_minorVersion = 2;
+	opengl_minorVersion = 3;
 	opengl_vsync = false;
 
 }

@@ -127,6 +127,7 @@ void Map::draw(std::shared_ptr<Shader> shader) {
 	}
 	
 	shader->setInt("gamma", gammaCorrection);
+	catchOpenGLErrors("Map::draw(1)");
 
 	if (!isLoaded()) {
 		dout.error("ATTEMPTED TO DRAW Map BEFORE IT IS LOADED");
@@ -140,10 +141,13 @@ void Map::draw(std::shared_ptr<Shader> shader) {
 	modelm = glm::rotate(modelm, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f)); //Y
 	modelm = glm::rotate(modelm, glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f)); //Z
 	shader->setMat4("model", modelm);
+	catchOpenGLErrors("Map::draw(2)");
 
 	shader->setVec3("objectColor", glm::vec3(1, 1, 1));
+	catchOpenGLErrors("Map::draw(3)");
 
 	MapMesh->draw(shader);
+	catchOpenGLErrors("Map::draw(4)");
 }
 
 // MULTI-THREADED FUNCTION
@@ -330,4 +334,37 @@ unsigned int Map::TextureFromFile(const string filename, bool gamma) {
 	}
 
 	return textureID;
+}
+
+void Map::catchOpenGLErrors(string ref) {
+	// Catch our own GL errors, if for some reason we create them
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR) {
+		string errS = "Unknown";
+		switch (error) {
+		case GL_INVALID_ENUM:
+			errS = "GL_INVALID_ENUM";
+			break;
+		case GL_INVALID_VALUE:
+			errS = "GL_INVALID_VALUE";
+			break;
+		case GL_INVALID_OPERATION:
+			errS = "GL_INVALID_OPERATION";
+			break;
+		case GL_INVALID_FRAMEBUFFER_OPERATION:
+			errS = "GL_INVALID_FRAMEBUFFER_OPERATION";
+			break;
+		case GL_OUT_OF_MEMORY:
+			errS = "GL_OUT_OF_MEMORY";
+			break;
+		case GL_STACK_UNDERFLOW:
+			errS = "GL_STACK_UNDERFLOW";
+			break;
+		case GL_STACK_OVERFLOW:
+			errS = "GL_STACK_OVERFLOW";
+			break;
+		}
+
+		dout.error("Detected GL error: '" + errS + "' with ref " + ref);
+	}
 }

@@ -53,7 +53,13 @@ namespace darksun {
 		// Default shader
 		std::shared_ptr<Shader> defaultShader;
 		// Shadow shader
-		std::shared_ptr<Shader> shadowShader;
+		std::shared_ptr<Shader> defaultShadowShader;
+		// Default shader
+		std::shared_ptr<Shader> defaultPointShader;
+		// Point shadow shader
+		std::shared_ptr<Shader> pointShadowShader;
+
+		void catchOpenGLErrors(string ref);
 
 		// Renderer
 		std::shared_ptr<Renderer> renderer;
@@ -87,7 +93,7 @@ namespace darksun {
 		Scene(std::shared_ptr<Renderer>, ApplicationSettings& appSettings, SceneInformation sceneInfo);
 
 		// Draw the scene
-		void draw(std::shared_ptr<Shader> shader);
+		void draw();
 		void drawUI();
 
 		// Pass events
@@ -104,9 +110,6 @@ namespace darksun {
 
 		// Close function used to shut down the scene
 		void close();
-
-		// Returns the default shader for this scene
-		std::shared_ptr<Shader> getDefaultShader() { return defaultShader; }
 
 		// Returns if we are valid
 		bool isValid() { return valid; }

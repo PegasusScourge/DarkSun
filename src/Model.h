@@ -58,6 +58,8 @@ namespace darksun {
 
 		/*  Functions    */
 		void setupMesh();
+
+		void catchOpenGLErrors(string ref);
 	};
 
 	class Model {

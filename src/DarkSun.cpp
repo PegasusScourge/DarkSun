@@ -104,7 +104,7 @@ void DarkSun::run() {
 			renderer->getCamera()->pollKeyboard(deltaTime);
 
 		// Draw the scene entities
-		activeScene->draw(activeScene->getDefaultShader());
+		activeScene->draw();
 		// Draw the scene UI, area to optimise
 		window->pushGLStates();
 		activeScene->drawUI();

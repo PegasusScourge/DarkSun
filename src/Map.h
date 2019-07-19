@@ -45,6 +45,8 @@ namespace darksun {
 
 	private:
 
+		void catchOpenGLErrors(string ref);
+
 		struct ProtoTextureInfo {
 			string diffuseSrc;
 			bool diffuseGammaCorrection;

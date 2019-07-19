@@ -76,6 +76,13 @@ void Renderer::initShadows() {
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	if (depthMap == 0) {
+		dout.error("depthMap object is null!");
+	}
+	if (depthMapFBO == 0) {
+		dout.error("depthMapFBO object is null!");
+	}
 }
 
 void Renderer::clearscreen() {

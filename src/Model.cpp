@@ -55,9 +55,12 @@ void Mesh::setupMesh() {
 void Mesh::draw(std::shared_ptr<Shader> shader) {
 	unsigned int diffuseNr = 1;
 	unsigned int specularNr = 1;
-	for (unsigned int i = 0; i < textures.size(); i++) {
+	for (unsigned int i = 0; i < std::min((int)textures.size(),9); i++) {
+		//dout.verbose("Binding texture " + std::to_string(i));
 		glActiveTexture(GL_TEXTURE0 + i); // activate proper texture unit before binding
 		// retrieve texture number (the N in diffuse_textureN)
+		catchOpenGLErrors("Mesh::draw(1)");
+
 		string number;
 		string name = textures[i].type;
 		if (name == "texture_diffuse")
@@ -66,14 +69,53 @@ void Mesh::draw(std::shared_ptr<Shader> shader) {
 			number = std::to_string(specularNr++);
 
 		shader->setFloat(("material." + name + number).c_str(), i);
+		catchOpenGLErrors("Mesh::draw(2)");
 		glBindTexture(GL_TEXTURE_2D, textures[i].id);
+		catchOpenGLErrors("Mesh::draw(3)");
 	}
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE10);
 
 	// draw mesh
 	glBindVertexArray(VAO);
+	catchOpenGLErrors("Mesh::draw(4)");
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+	//glDrawArrays(GL_TRIANGLES, 0, indices.size());
+	catchOpenGLErrors("Mesh::draw(5)");
 	glBindVertexArray(0);
+	catchOpenGLErrors("Mesh::draw(6)");
+}
+
+void Mesh::catchOpenGLErrors(string ref) {
+	// Catch our own GL errors, if for some reason we create them
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR) {
+		string errS = "Unknown";
+		switch (error) {
+		case GL_INVALID_ENUM:
+			errS = "GL_INVALID_ENUM";
+			break;
+		case GL_INVALID_VALUE:
+			errS = "GL_INVALID_VALUE";
+			break;
+		case GL_INVALID_OPERATION:
+			errS = "GL_INVALID_OPERATION";
+			break;
+		case GL_INVALID_FRAMEBUFFER_OPERATION:
+			errS = "GL_INVALID_FRAMEBUFFER_OPERATION";
+			break;
+		case GL_OUT_OF_MEMORY:
+			errS = "GL_OUT_OF_MEMORY";
+			break;
+		case GL_STACK_UNDERFLOW:
+			errS = "GL_STACK_UNDERFLOW";
+			break;
+		case GL_STACK_OVERFLOW:
+			errS = "GL_STACK_OVERFLOW";
+			break;
+		}
+
+		dout.error("Detected GL error: '" + errS + "' with ref " + ref);
+	}
 }
 
 /*
