@@ -55,6 +55,12 @@ testScene = {
 		Gui:setCheckBoxWidgetText('vsync_check', 'Use Vsync')
 		Gui:registerWidgetCallback('vsync_check', 'checked')
 		Gui:registerWidgetCallback('vsync_check', 'unchecked')
+		
+		-- create lighting
+		Scene:setLightPosition(1, 0.0, 5.0, 0.0)
+		Scene:setLightColor(1, 0.0, 4.0, 0.0)
+		Scene:setLightAttenuation(1, true)
+		LOG('Lighting set')
 	end,
 	
 	OnTick = function(deltaTime)

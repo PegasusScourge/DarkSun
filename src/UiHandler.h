@@ -76,6 +76,9 @@ namespace darksun {
 		// Expose the engine
 		LuaEngine* getUiEngine() { return &uiEngine; }
 
+		// On create function needs to be called to init the lua!
+		void OnCreate();
+
 		// Get the scene to transition to
 		string getNewScene() {
 			lua::State *L = uiEngine.getState();

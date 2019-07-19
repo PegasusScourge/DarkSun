@@ -27,7 +27,7 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     // get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
     // check whether current frag pos is in shadow
-    float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
+    float shadow = currentDepth > closestDepth  ? 1.0 : -0.01;
 
     return shadow;
 }
@@ -49,6 +49,10 @@ vec3 BlinnPhong(vec3 normal, vec3 fragPos, vec3 lightPos, vec3 lightColor, bool 
 	float max_distance = 1.5;
 	float distance = length(lightPos - fragPos);
 	float attenuation = 1.0 / (gamma ? distance * distance : distance);
+	// if(distance > max_distance)
+	// {
+	//	attenuation = 0.0;
+	// }
 
 	if(attenuate) 
 	{
@@ -56,8 +60,8 @@ vec3 BlinnPhong(vec3 normal, vec3 fragPos, vec3 lightPos, vec3 lightColor, bool 
 		specular *= attenuation;
 	}
 	
-	float shadow = ShadowCalculation(FragPosLightSpace);
-	return shadow * (diffuse + specular);
+	
+	return diffuse + specular;
 }
 
 void main()
@@ -65,7 +69,18 @@ void main()
 	vec3 color = texture(texture_diffuse1, TexCoords).rgb;
 	vec3 lighting = vec3(0.0);
 	for(int i = 0; i < 4; ++i)
-		lighting += BlinnPhong(normalize(Normal), FragPos, lightPositions[i], lightColors[i], lightAttenuates[i]);
+	{
+		vec3 bph = BlinnPhong(normalize(Normal), FragPos, lightPositions[i], lightColors[i], lightAttenuates[i]);
+		if( i == 1)
+		{
+			float shadow = ShadowCalculation(FragPosLightSpace);
+			lighting += bph * shadow;
+		}
+		else
+		{
+			lighting += bph;
+		}
+	}
 	color *= lighting;
 	if(gamma)
 		color = pow(color, vec3(1.0/2.2));

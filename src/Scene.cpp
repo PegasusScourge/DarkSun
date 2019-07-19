@@ -33,6 +33,8 @@ Scene::Scene(std::shared_ptr<Renderer> r, ApplicationSettings& appSettings, Scen
 	hookClass(ui->getUiEngine()->getState());
 	EntityOrders::hookClass(ui->getUiEngine()->getState());
 
+	ui->OnCreate();
+
 	// Create our loading UI
 	initLoadingUi(appSettings);
 
@@ -79,14 +81,17 @@ void Scene::init() {
 
 void Scene::initLoadingUi(ApplicationSettings& appSettings) {
 	loadingUi = std::unique_ptr<UIWrangler>(new UIWrangler(renderer, appSettings, "loading"));
+
+	// Hook the loading percentage into the lua engine
+	hookClass(loadingUi->getUiEngine()->getState());
+
+	loadingUi->OnCreate();
+
 	tgui::ProgressBar::Ptr bar = loadingUi->getWidgetByName("loadingBar")->cast<tgui::ProgressBar>();
 	bar->setPosition("20%", "48%");
 	bar->setSize("60%", "4%");
 	bar->setMaximum(1000);
 	bar->setMinimum(0);
-
-	// Hook the loading percentage into the lua engine
-	hookClass(loadingUi->getUiEngine()->getState());
 }
 
 void Scene::hookClass(lua::State *L) {
@@ -138,41 +143,38 @@ void Scene::draw(std::shared_ptr<Shader> shader) {
 
 		float near_plane = 1.0f, far_plane = 7.5f;
 		glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-		glm::mat4 lightView;
-		glm::mat4 lightSpaceMatrix;
 
 		glViewport(0, 0, renderer->getShadowWidth(), renderer->getShadowHeight());
 
-		for (int i = 0; i < renderer->NUMBER_OF_LIGHTS; i++) {
-			// Set the light view to the current light
-			lightView = glm::lookAt(renderer->getLightPosition(i), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-			// Create the light space matrix
-			lightSpaceMatrix = lightProjection * lightView;
+		// Set the light view to LIGHT 1, only light 1 casts shadows
+		glm::mat4 lightView = glm::lookAt(renderer->getLightPosition(1), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		// Create the light space matrix
+		glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
-			// Pass the space matrix to the shadow shader
-			shadowShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+		// Pass the space matrix to the shadow shader
+		shadowShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
 			
-			glBindFramebuffer(GL_FRAMEBUFFER, renderer->getDepthMapFBO());
-			glClear(GL_DEPTH_BUFFER_BIT);
+		glBindFramebuffer(GL_FRAMEBUFFER, renderer->getDepthMapFBO());
+		glClear(GL_DEPTH_BUFFER_BIT);
 			
-			// Render scene
+		// Render scene
 
-			// Draw the terrain
-			if (hasMap && map->isValid())
-				map->draw(shadowShader);
+		// Draw the terrain
+		if (hasMap && map->isValid())
+			map->draw(shadowShader);
 
-			// Draw the entities
-			for (auto &e : entities) {
-				if (e->isValid()) {
-					e->draw(shadowShader);
-				}
-				else {
-					dout.warn("Invalid entity detected in scene '" + sceneName + "', attempted to draw depth FBO. Probably hasn't been collected for garbage yet (entityId = '" + std::to_string(e->getId()) + "')");
-				}
+		// Draw the entities
+		for (auto &e : entities) {
+			if (e->isValid()) {
+				e->draw(shadowShader);
 			}
-
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			else {
+				dout.warn("Invalid entity detected in scene '" + sceneName + "', attempted to draw depth FBO. Probably hasn't been collected for garbage yet (entityId = '" + std::to_string(e->getId()) + "')");
+			}
 		}
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 		// Return the viewport to its original
 		glViewport(0, 0, renderer->SCREEN_WIDTH, renderer->SCREEN_HEIGHT);
 

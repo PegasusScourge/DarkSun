@@ -22,7 +22,9 @@ UIWrangler::UIWrangler(std::shared_ptr<Renderer> r, ApplicationSettings& setting
 	hookUIInterface(settings);
 
 	dout.log("[ UI DONE : " + uiName + " ]");
+}
 
+void UIWrangler::OnCreate() {
 	// Init the scene
 	lua::State *L = uiEngine.getState();
 	try {
