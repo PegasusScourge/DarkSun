@@ -24,6 +24,8 @@ Scene::Scene(std::shared_ptr<Renderer> r, ApplicationSettings& appSettings, Scen
 	myId = sceneInfo.id;
 	hasMap = sceneInfo.hasMap;
 	
+	this->appSettings = appSettings;
+
 	dout.log("Scene constructor called");
 
 	// Create the ui
@@ -49,6 +51,14 @@ Scene::Scene(std::shared_ptr<Renderer> r, ApplicationSettings& appSettings, Scen
 
 void Scene::init() {
 	dout.log("Creating scene '" + sceneName + "'");
+
+	// Create the shader
+	defaultShader = std::shared_ptr<Shader>(new Shader("core/shader/lighting_vertex.shader", "core/shader/lighting_fragment.shader"));
+	dout.log("Created basic lighting shader");
+
+	// Create the shadow shader
+	shadowShader = std::shared_ptr<Shader>(new Shader("core/shader/shadowDepth_vertex.shader", "core/shader/shadowDepth_fragment.shader"));
+	shadowShader->setFloat("shadowMap", 0);
 
 	// Start with gamma correction set off
 	renderer->setGammaCorrection(defaultShader, false);
@@ -109,21 +119,78 @@ void Scene::close() {
 	// Do something?
 }
 
-void Scene::draw(Shader* shader) {
+void Scene::draw(std::shared_ptr<Shader> shader) {
 	if (!valid) {
 		dout.error("ATTEMPTED TO DRAW INVALID SCENE!");
 		return;
 	}
 
-	// Clear the screen to black
-	renderer->clearscreen();
+	// Check for terrain loading
+	if (!map->isLoaded() && hasMap) {
+		return;
+	}
 
 	Camera *camera = renderer->getCamera();
 
-	shader->use();
+	if (appSettings.opengl_shadows) {
+		// We render shadows
+		shadowShader->use();
 
+		float near_plane = 1.0f, far_plane = 7.5f;
+		glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+		glm::mat4 lightView;
+		glm::mat4 lightSpaceMatrix;
+
+		glViewport(0, 0, renderer->getShadowWidth(), renderer->getShadowHeight());
+
+		for (int i = 0; i < renderer->NUMBER_OF_LIGHTS; i++) {
+			// Set the light view to the current light
+			lightView = glm::lookAt(renderer->getLightPosition(i), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			// Create the light space matrix
+			lightSpaceMatrix = lightProjection * lightView;
+
+			// Pass the space matrix to the shadow shader
+			shadowShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+			
+			glBindFramebuffer(GL_FRAMEBUFFER, renderer->getDepthMapFBO());
+			glClear(GL_DEPTH_BUFFER_BIT);
+			
+			// Render scene
+
+			// Draw the terrain
+			if (hasMap && map->isValid())
+				map->draw(shadowShader);
+
+			// Draw the entities
+			for (auto &e : entities) {
+				if (e->isValid()) {
+					e->draw(shadowShader);
+				}
+				else {
+					dout.warn("Invalid entity detected in scene '" + sceneName + "', attempted to draw depth FBO. Probably hasn't been collected for garbage yet (entityId = '" + std::to_string(e->getId()) + "')");
+				}
+			}
+
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		}
+		// Return the viewport to its original
+		glViewport(0, 0, renderer->SCREEN_WIDTH, renderer->SCREEN_HEIGHT);
+
+		// Pass the space matrix to the drawing shader
+		shader->use();
+		shader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+		// Bind the shadow map
+		glActiveTexture(GL_TEXTURE20);
+		glBindTexture(GL_TEXTURE_2D, renderer->getDepthMap());
+	}
+
+	// Clear the screen to black
+	renderer->clearscreen();
+
+	if(!appSettings.opengl_shadows) // If we did shadows, we reactivated the shader
+		shader->use();
 	// Put in the lighting info
-
 	renderer->prepLights(shader);
 
 	// view/projection matricies input
@@ -133,10 +200,6 @@ void Scene::draw(Shader* shader) {
 	//glm::mat4 view = glm::lookAt(camera->Position, glm::vec3(camera->Position.x, 0, camera->Position.z), camera->WorldUp);
 	shader->setMat4("projection", projection);
 	shader->setMat4("view", view);
-
-	if (!map->isLoaded() && hasMap) {
-		return;
-	}
 
 	// Draw the terrain
 	if(hasMap && map->isValid())
@@ -155,6 +218,8 @@ void Scene::draw(Shader* shader) {
 
 void Scene::drawUI() {
 	if (!map->isLoaded() && hasMap) {
+		// Clear the screen to black
+		renderer->clearscreen();
 		loadingUi->draw();
 		return;
 	}

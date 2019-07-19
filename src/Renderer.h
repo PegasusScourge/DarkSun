@@ -28,8 +28,6 @@ namespace darksun {
 		const int SCREEN_HEIGHT = 992;
 		const static int NUMBER_OF_LIGHTS = 4; // WARNING: You must update the number of lights the shader can take if you update this value!!!!!
 
-		bool hasVsyncControl = false;
-
 		/*
 		Creation
 		*/
@@ -42,11 +40,16 @@ namespace darksun {
 		void clearscreen();
 
 		// Applies the current lighting effects
-		void prepLights(Shader* shader);
+		void prepLights(std::shared_ptr<Shader> shader);
 
 		// sets the position of the light
 		void setLightPosition(int index, glm::vec3 p) { 
 			if (index < 0 || index >= NUMBER_OF_LIGHTS) { return; } lightPositions[index] = p;
+		}
+		// Returns the position of a light
+		glm::vec3 getLightPosition(int index) {
+			glm::vec3 p(0,0,0);
+			if (index < 0 || index >= NUMBER_OF_LIGHTS) { return p; } p = lightPositions[index]; return p;
 		}
 		// sets the color of a light
 		void setLightColor(int index, glm::vec3 p) { 
@@ -57,7 +60,12 @@ namespace darksun {
 			if (index < 0 || index >= NUMBER_OF_LIGHTS) { return; } lightAttenuates[index] = a;
 		}
 		// sets if gamma correction is enabled in the shaders
-		void setGammaCorrection(Shader& shader, bool g);
+		void setGammaCorrection(std::shared_ptr<Shader> shader, bool g);
+
+		unsigned int getShadowWidth() { return SHADOW_WIDTH; }
+		unsigned int getShadowHeight() { return SHADOW_HEIGHT; }
+		unsigned int getDepthMapFBO() { return depthMapFBO; }
+		unsigned int getDepthMap() { return depthMap; }
 
 		/*
 		Destruction
@@ -96,6 +104,12 @@ namespace darksun {
 			true,
 			true
 		};
+
+		// Shadows
+		const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+		unsigned int depthMapFBO;
+		unsigned int depthMap;
+		float depthBorderColor[4] = { 1.0, 1.0, 1.0, 1.0 };
 
 	};
 

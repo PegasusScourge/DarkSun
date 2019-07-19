@@ -52,7 +52,7 @@ void Mesh::setupMesh() {
 	glBindVertexArray(0);
 }
 
-void Mesh::draw(Shader* shader) {
+void Mesh::draw(std::shared_ptr<Shader> shader) {
 	unsigned int diffuseNr = 1;
 	unsigned int specularNr = 1;
 	for (unsigned int i = 0; i < textures.size(); i++) {
@@ -141,7 +141,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
 	return textures;
 }
 
-void Model::draw(Shader* shader) {
+void Model::draw(std::shared_ptr<Shader> shader) {
 	// Set gamma correction on before we start
 	shader->setInt("gamma", gammaCorrection);
 	

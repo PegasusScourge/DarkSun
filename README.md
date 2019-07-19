@@ -42,3 +42,5 @@ Assimp loading tutorial: https://learnopengl.com/Model-Loading/Assimp
 
 Terrain and heightmaps tutorial (Java but is portable): https://lwjglgamedev.gitbooks.io/3d-game-development-with-lwjgl/content/chapter14/chapter14.html
 
+Extra shadow tutorial: http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/
+

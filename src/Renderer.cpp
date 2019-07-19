@@ -45,6 +45,26 @@ void Renderer::create(ApplicationSettings &settings) {
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
+	// Create the shadow stuffs
+		// configure depth map FBO
+		// -----------------------
+		glGenFramebuffers(1, &depthMapFBO);
+		// create depth texture
+		glGenTextures(1, &depthMap);
+		glBindTexture(GL_TEXTURE_2D, depthMap);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, depthBorderColor);
+		// attach depth texture as FBO's depth buffer
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 	// Do a glew test:
 	GLuint vertexBuffer;
 	glGenBuffers(1, &vertexBuffer);
@@ -57,7 +77,7 @@ void Renderer::clearscreen() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Renderer::prepLights(Shader* shader) {
+void Renderer::prepLights(std::shared_ptr<Shader> shader) {
 	shader->setVec3("objectColor", 1.0f, 1.0f, 1.0f);
 	// set light uniforms
 	glUniform3fv(glGetUniformLocation(shader->ID, "lightPositions"), NUMBER_OF_LIGHTS, &lightPositions[0][0]);
@@ -66,8 +86,8 @@ void Renderer::prepLights(Shader* shader) {
 	shader->setVec3("viewPos", camera.position);
 }
 
-void Renderer::setGammaCorrection(Shader& shader, bool g) {
-	shader.setInt("gamma", g);
+void Renderer::setGammaCorrection(std::shared_ptr<Shader> shader, bool g) {
+	shader->setInt("gamma", g);
 }
 
 sf::RenderWindow* Renderer::getWindowHandle() {

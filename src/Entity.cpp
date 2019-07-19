@@ -220,7 +220,7 @@ void Entity::initLuaEngine() {
 	lua_setglobal(L->getState(), "myEntity");
 }
 
-void Entity::draw(Shader* shader) {
+void Entity::draw(std::shared_ptr<Shader> shader) {
 	if (!valid) {
 		dout.error("ATTEMPTED TO DRAW INVALID ENTITY?!");
 		return;

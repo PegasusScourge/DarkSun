@@ -51,7 +51,9 @@ namespace darksun {
 		bool hasMap = true; // Marks if we should create or care about terrain
 
 		// Default shader
-		Shader defaultShader;
+		std::shared_ptr<Shader> defaultShader;
+		// Shadow shader
+		std::shared_ptr<Shader> shadowShader;
 
 		// Renderer
 		std::shared_ptr<Renderer> renderer;
@@ -64,6 +66,9 @@ namespace darksun {
 
 		// Terrain
 		std::unique_ptr<Map> map;
+
+		// app settings
+		ApplicationSettings appSettings;
 
 		// Hook the Ui with scene functions
 		void hookClass(lua::State *L);
@@ -79,7 +84,7 @@ namespace darksun {
 		Scene(std::shared_ptr<Renderer>, ApplicationSettings& appSettings, SceneInformation sceneInfo);
 
 		// Draw the scene
-		void draw(Shader* shader);
+		void draw(std::shared_ptr<Shader> shader);
 		void drawUI();
 
 		// Pass events
@@ -98,7 +103,7 @@ namespace darksun {
 		void close();
 
 		// Returns the default shader for this scene
-		Shader* getDefaultShader() { return &defaultShader; }
+		std::shared_ptr<Shader> getDefaultShader() { return defaultShader; }
 
 		// Returns if we are valid
 		bool isValid() { return valid; }

@@ -126,7 +126,7 @@ namespace darksun {
 		void tick(float deltaTime);
 
 		// Draw the entity
-		void draw(Shader* shader);
+		void draw(std::shared_ptr<Shader> shader);
 
 		// Returns if the entity init correctly
 		bool isValid() { return valid; }
