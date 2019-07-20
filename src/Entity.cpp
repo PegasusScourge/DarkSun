@@ -219,7 +219,9 @@ void Entity::initLuaEngine() {
 }
 
 void Entity::tick(float deltaTime) {
+	profiler::ScopeProfiler tickProfiler("Entity.cpp::Entity::tick()");
 	if (hasScript) {
+		profiler::ScopeProfiler scriptProfiler("Entity.cpp::Entity::tick()script");
 		lua::State *L = engine.getState();
 		try {
 			LuaRef entityTable = getGlobal(L->getState(), internalName.c_str());
@@ -239,6 +241,7 @@ void Entity::tick(float deltaTime) {
 	// Do movement stuff
 
 	if (pathfinding) {
+		profiler::ScopeProfiler pathingProfiler("Entity.cpp::Entity::tick()pathfinding");
 		float dist = glm::distance(model->getPosition(), pathfindingWaypoints.at(currentPathfindingWaypoint));
 
 		rotateToward(pathfindingWaypoints.at(currentPathfindingWaypoint), deltaTime);
@@ -252,6 +255,7 @@ void Entity::tick(float deltaTime) {
 }
 
 void Entity::moveOnTick(glm::vec3& p, float deltaTime) {
+	profiler::ScopeProfiler pathingProfiler("Entity.cpp::Entity::moveOnTick()");
 	if (!readyToMove) {
 		if (currentSpeed > 0.0f) {
 			currentSpeed -= std::min(acceleration * deltaTime, currentSpeed); // Come to a stop
@@ -301,6 +305,7 @@ void Entity::moveOnTick(glm::vec3& p, float deltaTime) {
 }
 
 void Entity::recalculatePathfinding() {
+	profiler::ScopeProfiler pathingProfiler("Entity.cpp::Entity::recalculatePathfinding()");
 	pathfinding = true;
 
 	// Reset the waypoints
@@ -314,6 +319,7 @@ void Entity::recalculatePathfinding() {
 }
 
 void Entity::rotateToward(glm::vec3& p, float deltaTime) {
+	profiler::ScopeProfiler pathingProfiler("Entity.cpp::Entity::rotateToward()");
 	double dx = abs(model->getPosition().x - p.x);
 	double dz = abs(model->getPosition().z - p.z);
 

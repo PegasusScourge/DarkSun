@@ -20,6 +20,8 @@ Header file for Entity.h, a game engine actual entity, marrying together all asp
 #include "Shader.h"
 #include "Log.h"
 
+#include "DarkSunProfiler.h"
+
 using string = std::string;
 #define to_str std::to_string
 

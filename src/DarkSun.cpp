@@ -61,6 +61,9 @@ void DarkSun::run() {
 	float deltaTime = 0;
 
 	while (running) {
+		profiler::newFrame();
+		//profiler::ScopeProfiler myProfiler("DarkSun.cpp::DarkSun::run()whileLoop");
+		
 		//dout.log("Starting tick '" + to_string(tickNo) + "'");
 		
 		// We pretend as if time isn't moving forward here, and is only at the instance we take this clock reading
@@ -70,6 +73,8 @@ void DarkSun::run() {
 
 		sf::Event event;
 		while (window->pollEvent(event)) {
+			profiler::ScopeProfiler eventPollingProfiler("DarkSun.cpp::DarkSun::run()eventPolling");
+			
 			// Check for window focus
 			hasFocus = window->hasFocus();
 
@@ -152,6 +157,10 @@ void DarkSun::run() {
 	}
 
 	activeScene->close();
+
+	// Output the profiling stuff
+	dout.log("DUMPING PROFILING INFO, this may take a moment....");
+	profiler::dumpFrames("DarkSun.profile");
 }
 
 void DarkSun::catchOpenGLErrors() {

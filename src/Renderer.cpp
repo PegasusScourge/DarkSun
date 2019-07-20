@@ -166,6 +166,8 @@ void Renderer::initShaders() {
 }
 
 void Renderer::draw(std::shared_ptr<Shader> shader) {
+	profiler::ScopeProfiler drawProfiler("Renderer.cpp::Renderer::draw()");
+	
 	int numRenderables = renderables.size();
 	int numMeshes = 0;
 	for (auto const& r : renderables) {
@@ -223,6 +225,8 @@ void Renderer::draw(std::shared_ptr<Shader> shader) {
 }
 
 void Renderer::render() {
+	profiler::ScopeProfiler renderProfiler("Renderer.cpp::Renderer::render()");
+
 	// We render shadows
 	defaultShadowShader->use();
 

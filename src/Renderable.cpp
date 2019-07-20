@@ -29,11 +29,13 @@ void Renderable::addMesh(Mesh m) {
 //}
 
 int Renderable::getNumberOfMeshes() {
+	profiler::ScopeProfiler myProfiler("Renderable.cpp::Renderable::getNumberOfMeshes()");
 	std::lock_guard<std::mutex> lock(meshesMutex);
 	return meshes.size();
 }
 
-Mesh Renderable::getMeshAt(int index) {
+Mesh& Renderable::getMeshAt(int index) {
+	profiler::ScopeProfiler myProfiler("Renderable.cpp::Renderable::getMeshAt()");
 	std::lock_guard<std::mutex> lock(meshesMutex);
 	return meshes[index];
 }
@@ -43,6 +45,7 @@ void Renderable::setPosition(float x, float y, float z) {
 }
 
 void Renderable::setPosition(glm::vec3 n) {
+	profiler::ScopeProfiler myProfiler("Renderable.cpp::Renderable::setPosition()");
 	position.store(n);
 }
 
@@ -51,6 +54,7 @@ void Renderable::setRotation(float x, float y, float z) {
 }
 
 void Renderable::setRotation(glm::vec3 n) {
+	profiler::ScopeProfiler myProfiler("Renderable.cpp::Renderable::setRotation()");
 	rotation.store(n);
 }
 
@@ -63,5 +67,6 @@ void Renderable::setScale(float s) {
 }
 
 void Renderable::setScale(glm::vec3 n) {
+	profiler::ScopeProfiler myProfiler("Renderable.cpp::Renderable::setScale()");
 	scale.store(n);
 }

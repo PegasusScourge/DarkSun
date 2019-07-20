@@ -20,6 +20,8 @@ Header file for Renderer.cpp. A class that handles a window and the rendering to
 #include "ApplicationSettings.h"
 #include "Renderable.h"
 
+#include "DarkSunProfiler.h"
+
 namespace darksun {
 
 	class Renderer {

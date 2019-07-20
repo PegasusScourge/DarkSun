@@ -16,6 +16,8 @@ Main app
 #include "Renderer.h"
 #include "Log.h"
 
+#include "DarkSunProfiler.h"
+
 #include "Scene.h"
 
 #include <SFML/Graphics.hpp>

@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="src\ApplicationSettings.cpp" />
     <ClCompile Include="src\DarkSun.cpp" />
+    <ClCompile Include="src\DarkSunProfiler.cpp" />
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\LuaEngine.cpp" />
@@ -37,6 +38,7 @@
     <ClInclude Include="src\ApplicationSettings.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\DarkSun.h" />
+    <ClInclude Include="src\DarkSunProfiler.h" />
     <ClInclude Include="src\Entity.h" />
     <ClInclude Include="src\Log.h" />
     <ClInclude Include="src\LuaEngine.h" />
@@ -119,7 +121,8 @@
       <AdditionalIncludeDirectories>C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\TGUI-0.8.5\include;C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\GLM\glm-0.9.9.5\glm\include;C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\Assimp\4.1.0\include;C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\GLEW\glew-2.1.0\include;C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\LUA\lua-5.3.5_Win64_dll15_lib\include;C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\LUA\lua-5.3.5\src;C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\LuaBridge-2.3.2\Source;C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\LuaState-2.1\include;C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\LuaBridge-2.3.2\Source\LuaBridge;C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\SFML\SFML-2.5.1-windows-vc15-64-bit\SFML-2.5.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;LUA_COMPAT_APIINTCASTS;LUA_COMPAT_ALL;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions> </AdditionalOptions>
+      <AdditionalOptions>
+      </AdditionalOptions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\TGUI-0.8.5\lib;C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\Assimp\4.1.0\lib\x64;C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\GLEW\glew-2.1.0\lib\Release\x64;C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\LUA\lua-5.3.5_Win64_dll15_lib;C:\Users\Matt\OneDrive\Dropbox-Overflow\Programming\C++\LIBRARIES ETC\SFML\SFML-2.5.1-windows-vc15-64-bit\SFML-2.5.1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
