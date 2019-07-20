@@ -31,27 +31,41 @@ void Renderer::create(ApplicationSettings &settings) {
 	glewExperimental = GL_TRUE;
 	glewInit();
 
+	catchOpenGLErrors("GLEW_INIT");
+
 	// Do state init for opengl
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(true);
 	glDepthFunc(GL_LEQUAL);
 	glDepthRange(0, 1);
 
+	catchOpenGLErrors("DEPTH_TEST setup");
+
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	catchOpenGLErrors("BLEND setup");
+
 	// For gamma correction
 	glEnable(GL_FRAMEBUFFER_SRGB);
+
+	catchOpenGLErrors("FRAMEBUFFER_SRGB setup");
 
 	// Enable culling
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
+	catchOpenGLErrors("CULL_FACE setup");
+
 	// Init the shaders
 	initShaders();
 
+	catchOpenGLErrors("SHADERS setup");
+
 	// Create the shadow stuffs
 	initShadows();
+
+	catchOpenGLErrors("SHADOWS setup");
 
 	// Do a glew test:
 	GLuint vertexBuffer;
@@ -195,7 +209,7 @@ void Renderer::draw(std::shared_ptr<Shader> shader) {
 				//dout.verbose("Binding texture " + std::to_string(i));
 				glActiveTexture(GL_TEXTURE0 + i); // activate proper texture unit before binding
 				// retrieve texture number (the N in diffuse_textureN)
-				catchOpenGLErrors("Mesh::draw(1)");
+				catchOpenGLErrors("Texture select on mesh " + std::to_string(i));
 
 				string number;
 				string name = textures[i].type;
@@ -205,9 +219,8 @@ void Renderer::draw(std::shared_ptr<Shader> shader) {
 					number = std::to_string(specularNr++);
 
 				shader->setInt(("material." + name + number).c_str(), i);
-				catchOpenGLErrors("Mesh::draw(2)");
 				glBindTexture(GL_TEXTURE_2D, textures[i].id);
-				catchOpenGLErrors("Mesh::draw(3)");
+				catchOpenGLErrors("Texture bind on mesh " + std::to_string(i));
 			}
 			// Bind the shadow map
 			glActiveTexture(GL_TEXTURE10);
@@ -215,11 +228,10 @@ void Renderer::draw(std::shared_ptr<Shader> shader) {
 
 			// draw mesh
 			r.second->getMeshAt(i).GL_bindVertexArray();
-			catchOpenGLErrors("Mesh::draw(4)");
+			catchOpenGLErrors("VBO bind on mesh " + std::to_string(i));
 			glDrawElements(GL_TRIANGLES, numIndicies, GL_UNSIGNED_INT, 0);
-			catchOpenGLErrors("Mesh::draw(5)");
+			catchOpenGLErrors("Draw on mesh " + std::to_string(i));
 			glBindVertexArray(0);
-			catchOpenGLErrors("Mesh::draw(6)");
 		}
 	}
 }
@@ -246,6 +258,8 @@ void Renderer::render() {
 	glBindFramebuffer(GL_FRAMEBUFFER, getDepthMapFBO());
 	glClear(GL_DEPTH_BUFFER_BIT);
 
+	catchOpenGLErrors("DepthMapFBO bind");
+
 	// Render scene to shadow buffer
 
 	draw(defaultShadowShader);
@@ -258,12 +272,15 @@ void Renderer::render() {
 	// Pass the space matrix to the drawing shader
 	defaultShader->use();
 	defaultShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+	catchOpenGLErrors("lightSpaceMatrix bind");
 
 	// Clear the screen to black
 	clearscreen();
 
 	// Put in the lighting info
 	prepLights(defaultShader);
+
+	catchOpenGLErrors("Light bind");
 
 	// view/projection matricies input
 
@@ -272,11 +289,8 @@ void Renderer::render() {
 	//glm::mat4 view = glm::lookAt(camera->Position, glm::vec3(camera->Position.x, 0, camera->Position.z), camera->WorldUp);
 	defaultShader->setMat4("projection", projection);
 	defaultShader->setMat4("view", view);
-
-	catchOpenGLErrors("a");
+	catchOpenGLErrors("Mat4s bind");
 
 	// Draw again
 	draw(defaultShader);
-
-	catchOpenGLErrors("c");
 }
