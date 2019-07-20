@@ -15,13 +15,14 @@ Header for Map.cpp
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "Model.h"
+#include "Renderable.h"
 #include "LuaEngine.h"
 
 using namespace darksun;
 
 namespace darksun {
 
-	class Map {
+	class Map : public Renderable {
 
 	public:
 		Map(string mapfolder);
@@ -31,13 +32,7 @@ namespace darksun {
 
 		bool isValid() { return valid; }
 
-		void draw(std::shared_ptr<Shader> shader);
-
 		void tick(float deltaTime);
-
-		bool isLoaded() {
-			return loaded;
-		}
 
 		float getLoadedPercent() {
 			return loadedPercent;
@@ -63,13 +58,8 @@ namespace darksun {
 
 		Texture MapText;
 
-		std::unique_ptr<Mesh> MapMesh;
-
 		bool valid = false;
-		bool loaded = false;
 		std::atomic<float> loadedPercent = 0.0f;
-
-		bool gammaCorrection = false;
 
 		string heightMapLoc;
 		string textureLoc;

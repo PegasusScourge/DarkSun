@@ -114,9 +114,7 @@ void Entity::init(string blueprintn, int newId) {
 			// We have the field UniformScale, extract
 			// Set the scale uniformly
 			dout.verbose("Entity::init -> Model.UniformScale = '" + ref.tostring() + "'");
-			scale.x = (float)ref;
-			scale.y = (float)ref;
-			scale.z = (float)ref;
+			model->setScale((float)ref);
 		}
 		else {
 			dout.warn("No/invalid scale information for blueprint '" + bpName + "'");
@@ -220,24 +218,6 @@ void Entity::initLuaEngine() {
 	lua_setglobal(L->getState(), "myEntity");
 }
 
-void Entity::draw(std::shared_ptr<Shader> shader) {
-	if (!valid) {
-		dout.error("ATTEMPTED TO DRAW INVALID ENTITY?!");
-		return;
-	}
-
-	// render the loaded model
-	glm::mat4 modelm = glm::mat4(1.0f);
-	modelm = glm::translate(modelm, position);
-	modelm = glm::scale(modelm, scale);
-	modelm = glm::rotate(modelm, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)); //X
-	modelm = glm::rotate(modelm, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)); //Y
-	modelm = glm::rotate(modelm, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f)); //Z
-	shader->setMat4("model", modelm);
-
-	model->draw(shader);
-}
-
 void Entity::tick(float deltaTime) {
 	if (hasScript) {
 		lua::State *L = engine.getState();
@@ -259,7 +239,7 @@ void Entity::tick(float deltaTime) {
 	// Do movement stuff
 
 	if (pathfinding) {
-		float dist = glm::distance(position, pathfindingWaypoints.at(currentPathfindingWaypoint));
+		float dist = glm::distance(model->getPosition(), pathfindingWaypoints.at(currentPathfindingWaypoint));
 
 		rotateToward(pathfindingWaypoints.at(currentPathfindingWaypoint), deltaTime);
 		if (dist > 0.001) {
@@ -285,8 +265,8 @@ void Entity::moveOnTick(glm::vec3& p, float deltaTime) {
 		return;
 	}
 	
-	float diff = glm::distance(p, position);
-	glm::vec3 v = glm::normalize(p - position);
+	float diff = glm::distance(p, model->getPosition());
+	glm::vec3 v = glm::normalize(p - model->getPosition());
 
 	// Made possible with the help of DaShoup
 	float s = pow(currentSpeed, 2) / (acceleration * 2);
@@ -309,13 +289,14 @@ void Entity::moveOnTick(glm::vec3& p, float deltaTime) {
 	//dout.verbose("Current speed: " + std::to_string(currentSpeed) + ", stopping distance: " + std::to_string(s) + ", dist: " + std::to_string(diff));
 
 	if (diff < speed) {
-		position = p;
+		model->setPosition(p);
 		currentSpeed = 0;
 	}
 	else {
 		//position += FORWARD * speed;
-		position.x -= speed * cosf(rotation.y * (3.14f / 180.0f));
-		position.z += speed * sinf(rotation.y * (3.14f / 180.0f));
+		float positionx = -(speed * cosf(model->getRotation().y * (3.14f / 180.0f)));
+		float positionz = speed * sinf(model->getRotation().y * (3.14f / 180.0f));
+		model->setPosition(positionx, model->getPosition().y, positionz);
 	}
 }
 
@@ -333,14 +314,14 @@ void Entity::recalculatePathfinding() {
 }
 
 void Entity::rotateToward(glm::vec3& p, float deltaTime) {
-	double dx = abs(position.x - p.x);
-	double dz = abs(position.z - p.z);
+	double dx = abs(model->getPosition().x - p.x);
+	double dz = abs(model->getPosition().z - p.z);
 
 	float theta = atan(dz / dx) * (180.0f/3.14159f);
 	float angle = 0.0f;
 	int quadrant = 0;
-	if (p.z < position.z) {
-		if (p.x < position.x) {
+	if (p.z < model->getPosition().z) {
+		if (p.x < model->getPosition().x) {
 			// -z +x
 			angle = 360.0f - angle;
 			quadrant = 4;
@@ -352,7 +333,7 @@ void Entity::rotateToward(glm::vec3& p, float deltaTime) {
 		}
 	}
 	else {
-		if (p.x < position.x) {
+		if (p.x < model->getPosition().x) {
 			// +z +x
 			angle = theta;
 			quadrant = 1;
@@ -368,11 +349,11 @@ void Entity::rotateToward(glm::vec3& p, float deltaTime) {
 
 	targetRot.y = angle;
 
-	if(rotation.y == targetRot.y)
+	if(model->getRotation().y == targetRot.y)
 		return;
 
 	float speed = maxRotSpeed * deltaTime;
-	float rotDiff = targetRot.y - rotation.y;
+	float rotDiff = targetRot.y - model->getRotation().y;
 	float rotMag = abs(rotDiff);
 
 	if (rotMag > 90.0f) {
@@ -383,15 +364,19 @@ void Entity::rotateToward(glm::vec3& p, float deltaTime) {
 		readyToMove = true;
 	}
 
+	glm::vec3 newRot = model->getRotation();
+
 	if (rotDiff > 0.0f) {
-		rotation.y += std::min(speed, rotMag);
+		newRot.y += std::min(speed, rotMag);
 	}
 	else {
-		rotation.y -= std::min(speed, rotMag);
+		newRot.y -= std::min(speed, rotMag);
 	}
 
-	if (rotation.y < 0.0f)
-		rotation.y += 360.0f;
-	if (rotation.y >= 360.0f)
-		rotation.y -= 360.0f;
+	if (newRot.y < 0.0f)
+		newRot.y += 360.0f;
+	if (newRot.y >= 360.0f)
+		newRot.y -= 360.0f;
+
+	model->setRotation(newRot);
 }

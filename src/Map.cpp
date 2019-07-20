@@ -60,11 +60,11 @@ Map::Map(string mapfolder) {
 
 	// Try to load gammaCorrection info
 	if (mapTable["texture_gammaCorrection"].isBool()) {
-		gammaCorrection = (bool)mapTable["texture_gammaCorrection"];
+		setGammaCorrection((bool)mapTable["texture_gammaCorrection"]);
 	}
 
 	// Make sure we aren't marked as loaded
-	loaded = false;
+	setLoaded(false);
 
 	dout.log("Spawning thread to load map....");
 	loadingThreadResult = std::async(std::launch::async, &Map::loadMap, this);
@@ -105,8 +105,10 @@ void Map::tick(float deltaTime) {
 				diffuse.path = textureLoc.c_str();
 				texts.push_back(diffuse);
 				
-				MapMesh = std::unique_ptr<Mesh>(new Mesh(result.vertexBuff, result.indiciesBuff, texts));
-				loaded = true;
+				Mesh mapMesh(result.vertexBuff, result.indiciesBuff, texts);
+				addMesh(mapMesh);
+
+				setLoaded(true);
 			}
 			else {
 				dout.error("Map loading failed!");
@@ -118,36 +120,6 @@ void Map::tick(float deltaTime) {
 		// Do anything?
 	}
 
-}
-
-void Map::draw(std::shared_ptr<Shader> shader) {
-	if (!valid) {
-		dout.error("INVALID Map ERROR");
-		throw new std::exception("Invalid Map");
-	}
-	
-	shader->setInt("gamma", gammaCorrection);
-	catchOpenGLErrors("Map::draw(1)");
-
-	if (!isLoaded()) {
-		dout.error("ATTEMPTED TO DRAW Map BEFORE IT IS LOADED");
-	}
-	//dout.verbose("Passed loading check");
-
-	glm::mat4 modelm = glm::mat4(1.0f); // Move the Map to the normal position
-	modelm = glm::translate(modelm, glm::vec3(0, 0, 0));
-	modelm = glm::scale(modelm, glm::vec3(1, 1, 1));
-	modelm = glm::rotate(modelm, glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f)); //X
-	modelm = glm::rotate(modelm, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f)); //Y
-	modelm = glm::rotate(modelm, glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f)); //Z
-	shader->setMat4("model", modelm);
-	catchOpenGLErrors("Map::draw(2)");
-
-	shader->setVec3("objectColor", glm::vec3(1, 1, 1));
-	catchOpenGLErrors("Map::draw(3)");
-
-	MapMesh->draw(shader);
-	catchOpenGLErrors("Map::draw(4)");
 }
 
 // MULTI-THREADED FUNCTION
@@ -283,7 +255,7 @@ Map::LoadingResult Map::loadMap() {
 	// Load the texture
 	ProtoTextureInfo textInfo;
 	textInfo.diffuseSrc = textureLoc;
-	textInfo.diffuseGammaCorrection = gammaCorrection;
+	textInfo.diffuseGammaCorrection = getGammaCorrection();
 
 	dout.verbose("Map::loadMap() --> Texture(s) assembled");
 

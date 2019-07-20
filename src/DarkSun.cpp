@@ -103,8 +103,8 @@ void DarkSun::run() {
 		if(hasFocus && activeScene->isCameraEnabled())
 			renderer->getCamera()->pollKeyboard(deltaTime);
 
-		// Draw the scene entities
-		activeScene->draw();
+		// Draw the scene
+		renderer->render();
 		// Draw the scene UI, area to optimise
 		window->pushGLStates();
 		activeScene->drawUI();

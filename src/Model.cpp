@@ -13,113 +13,6 @@ using namespace darksun;
 
 /*
 
-**** MESH ****
-
-*/
-
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures) {
-	this->vertices = vertices;
-	this->indices = indices;
-	this->textures = textures;
-
-	setupMesh();
-}
-
-void Mesh::setupMesh() {
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
-
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int),
-		&indices[0], GL_STATIC_DRAW);
-
-	// vertex positions
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-	// vertex normals
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
-	// vertex texture coords
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
-
-	glBindVertexArray(0);
-}
-
-void Mesh::draw(std::shared_ptr<Shader> shader) {
-	unsigned int diffuseNr = 1;
-	unsigned int specularNr = 1;
-	for (unsigned int i = 0; i < std::min((int)textures.size(),9); i++) {
-		//dout.verbose("Binding texture " + std::to_string(i));
-		glActiveTexture(GL_TEXTURE0 + i); // activate proper texture unit before binding
-		// retrieve texture number (the N in diffuse_textureN)
-		catchOpenGLErrors("Mesh::draw(1)");
-
-		string number;
-		string name = textures[i].type;
-		if (name == "texture_diffuse")
-			number = std::to_string(diffuseNr++);
-		else if (name == "texture_specular")
-			number = std::to_string(specularNr++);
-
-		shader->setFloat(("material." + name + number).c_str(), i);
-		catchOpenGLErrors("Mesh::draw(2)");
-		glBindTexture(GL_TEXTURE_2D, textures[i].id);
-		catchOpenGLErrors("Mesh::draw(3)");
-	}
-	glActiveTexture(GL_TEXTURE10);
-
-	// draw mesh
-	glBindVertexArray(VAO);
-	catchOpenGLErrors("Mesh::draw(4)");
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-	//glDrawArrays(GL_TRIANGLES, 0, indices.size());
-	catchOpenGLErrors("Mesh::draw(5)");
-	glBindVertexArray(0);
-	catchOpenGLErrors("Mesh::draw(6)");
-}
-
-void Mesh::catchOpenGLErrors(string ref) {
-	// Catch our own GL errors, if for some reason we create them
-	GLenum error = glGetError();
-	if (error != GL_NO_ERROR) {
-		string errS = "Unknown";
-		switch (error) {
-		case GL_INVALID_ENUM:
-			errS = "GL_INVALID_ENUM";
-			break;
-		case GL_INVALID_VALUE:
-			errS = "GL_INVALID_VALUE";
-			break;
-		case GL_INVALID_OPERATION:
-			errS = "GL_INVALID_OPERATION";
-			break;
-		case GL_INVALID_FRAMEBUFFER_OPERATION:
-			errS = "GL_INVALID_FRAMEBUFFER_OPERATION";
-			break;
-		case GL_OUT_OF_MEMORY:
-			errS = "GL_OUT_OF_MEMORY";
-			break;
-		case GL_STACK_UNDERFLOW:
-			errS = "GL_STACK_UNDERFLOW";
-			break;
-		case GL_STACK_OVERFLOW:
-			errS = "GL_STACK_OVERFLOW";
-			break;
-		}
-
-		dout.error("Detected GL error: '" + errS + "' with ref " + ref);
-	}
-}
-
-/*
-
 **** MODEL ****
 
 */
@@ -155,6 +48,8 @@ void Model::loadModel(string const &path = "") {
 	dout.verbose("Model::loadModel -> Found directory = '" + directory + "'");
 	// process ASSIMP's root node recursively
 	processNode(scene->mRootNode, scene);
+
+	setLoaded(true);
 }
 
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName) {
@@ -173,7 +68,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
 		}
 		if (!skip) {   // if texture hasn't been loaded already, load it
 			Texture texture;
-			texture.id = TextureFromFile(str.C_Str(), this->directory, gammaCorrection);
+			texture.id = TextureFromFile(str.C_Str(), this->directory, getGammaCorrection());
 			texture.type = typeName;
 			texture.path = str.C_Str();
 			textures.push_back(texture);
@@ -181,14 +76,6 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
 		}
 	}
 	return textures;
-}
-
-void Model::draw(std::shared_ptr<Shader> shader) {
-	// Set gamma correction on before we start
-	shader->setInt("gamma", gammaCorrection);
-	
-	for (unsigned int i = 0; i < meshes.size(); i++)
-		meshes[i].draw(shader);
 }
 
 unsigned int Model::TextureFromFile(const char *path, const string &directory, bool gamma) {
@@ -234,7 +121,7 @@ void Model::processNode(aiNode *node, const aiScene *scene) {
 		// the node object only contains indices to index the actual objects in the scene. 
 		// the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-		meshes.push_back(processMesh(mesh, scene));
+		addMesh(processMesh(mesh, scene));
 	}
 	// after we've processed all of the meshes (if any) we then recursively process each of the children nodes
 	for (unsigned int i = 0; i < node->mNumChildren; i++) {

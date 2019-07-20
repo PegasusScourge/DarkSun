@@ -20,6 +20,7 @@ Header file for Model.cpp
 
 #include "Log.h"
 #include "Shader.h"
+#include "Renderable.h"
 
 #include "stb_image.h"
 
@@ -28,59 +29,21 @@ using namespace darksun;
 
 namespace darksun {
 
-	struct Vertex {
-		glm::vec3 Position;
-		glm::vec3 Normal;
-		glm::vec2 TexCoords;
-		glm::vec3 Tangent;
-		glm::vec3 Bitangent;
-	};
-
-	struct Texture {
-		unsigned int id;
-		string type;
-		string path;
-	};
-
-	class Mesh {
-	public:
-		/*  Mesh Data  */
-		std::vector<Vertex> vertices;
-		std::vector<unsigned int> indices;
-		std::vector<Texture> textures;
-
-		/*  Functions  */
-		Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
-		void draw(std::shared_ptr<Shader> shader);
-	private:
-		/*  Render data  */
-		unsigned int VAO, VBO, EBO;
-
-		/*  Functions    */
-		void setupMesh();
-
-		void catchOpenGLErrors(string ref);
-	};
-
-	class Model {
+	class Model : public Renderable {
 	public:
 		/*  Model Data */
 		std::vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
-		std::vector<Mesh> meshes;
 		string directory = "";
-		bool gammaCorrection;
 
 		/*  Functions   */
 		// constructor
-		Model(string const &path, bool gamma = false) : gammaCorrection(gamma) {
+		Model(string const &path, bool gamma = false) {
+			this->setGammaCorrection(gamma);
 			std::filesystem::path p2 = std::filesystem::absolute(path);
 			string p = p2.u8string();
 			//dout.log("Load model: " + p);
 			loadModel(p);
 		}
-
-		// draws the model, and thus all its meshes
-		void draw(std::shared_ptr<Shader> shader);
 
 		// MUST HAVE A GENERIC FORWARD SLASHED PATH! Loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
 		void loadModel(string const &path);

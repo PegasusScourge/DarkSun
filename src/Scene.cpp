@@ -40,12 +40,14 @@ Scene::Scene(std::shared_ptr<Renderer> r, ApplicationSettings& appSettings, Scen
 
 	// Create the Terrain
 	if (hasMap) {
-		map = std::unique_ptr<Map>(new Map("maps/testMap"));
+		map = std::shared_ptr<Map>(new Map("maps/testMap"));
 
 		if (!map->isValid()) {
 			dout.error("Terrain is invalid, switching off terrain to prevent issues");
 			hasMap = false;
 		}
+		// Register the map with the renderer
+		r->registerRenderable("map", std::dynamic_pointer_cast<Renderable>(map));
 	}
 
 	init();
@@ -54,14 +56,8 @@ Scene::Scene(std::shared_ptr<Renderer> r, ApplicationSettings& appSettings, Scen
 void Scene::init() {
 	dout.log("Creating scene '" + sceneName + "'");
 
-	// Create the shader for directional lights
-	defaultShader = std::shared_ptr<Shader>(new Shader("core/shader/lighting_vertex.shader",  "core/shader/lighting_geometry.shader", "core/shader/lighting_fragment.shader"));
-	defaultShader->setInt("shadowMap", 10);
-	// Create the shadow shader for directional lights
-	defaultShadowShader = std::shared_ptr<Shader>(new Shader("core/shader/shadowDepth_vertex.shader", "core/shader/shadowDepth_fragment.shader"));
-
 	// Start with gamma correction set off
-	renderer->setGammaCorrection(defaultShader, false);
+	renderer->setGammaCorrection(false);
 
 	// Create the camera light
 	renderer->setLightPosition(0, renderer->getCamera()->position);
@@ -125,105 +121,6 @@ void Scene::close() {
 	// Do something?
 }
 
-void Scene::draw() {
-	if (!valid) {
-		dout.error("ATTEMPTED TO DRAW INVALID SCENE!");
-		return;
-	}
-
-	// Check for terrain loading
-	if (!map->isLoaded() && hasMap) {
-		return;
-	}
-
-	Camera *camera = renderer->getCamera();
-
-	if (appSettings.opengl_shadows) {
-
-		// We render shadows
-		defaultShadowShader->use();
-
-		float near_plane = 0.1f, far_plane = 2.0f;
-		glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-
-		glViewport(0, 0, renderer->getShadowWidth(), renderer->getShadowHeight());
-
-		// Set the light view to LIGHT 1, only light 1 casts shadows
-		glm::mat4 lightView = glm::lookAt(renderer->getLightPosition(1), glm::vec3(0, 0.0f, 0), glm::vec3(0.0f, 1.0f, 0.0f));
-		// Create the light space matrix
-		glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-
-		// Pass the space matrix to the shadow shader
-		defaultShadowShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
-
-		glBindFramebuffer(GL_FRAMEBUFFER, renderer->getDepthMapFBO());
-		glClear(GL_DEPTH_BUFFER_BIT);
-
-		// Render scene to shadow buffer
-
-		// Draw the terrain
-		if (hasMap && map->isValid())
-			map->draw(defaultShadowShader);
-
-		// Draw the entities
-		for (auto &e : entities) {
-			if (e->isValid()) {
-				e->draw(defaultShadowShader);
-			}
-			else {
-				dout.warn("Invalid entity detected in scene '" + sceneName + "', attempted to draw depth FBO. Probably hasn't been collected for garbage yet (entityId = '" + std::to_string(e->getId()) + "')");
-			}
-		}
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		// Return the viewport to its original
-		glViewport(0, 0, renderer->SCREEN_WIDTH, renderer->SCREEN_HEIGHT);
-
-		// Pass the space matrix to the drawing shader
-		defaultShader->use();
-		defaultShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
-
-		// Bind the shadow map
-		glActiveTexture(GL_TEXTURE10);
-		glBindTexture(GL_TEXTURE_2D, renderer->getDepthMap());
-
-		// Clear the screen to black
-		renderer->clearscreen();
-
-		// Put in the lighting info
-		renderer->prepLights(defaultShader);
-
-		// view/projection matricies input
-
-		glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), (float)renderer->SCREEN_WIDTH / (float)renderer->SCREEN_HEIGHT, appSettings.opengl_nearZ, appSettings.opengl_farZ);
-		glm::mat4 view = camera->GetViewMatrix();
-		//glm::mat4 view = glm::lookAt(camera->Position, glm::vec3(camera->Position.x, 0, camera->Position.z), camera->WorldUp);
-		defaultShader->setMat4("projection", projection);
-		defaultShader->setMat4("view", view);
-
-		catchOpenGLErrors("a");
-
-		// Draw the terrain
-		if (hasMap && map->isValid())
-			map->draw(defaultShader);
-
-		catchOpenGLErrors("b");
-
-		// Draw the entities
-		for (auto &e : entities) {
-			if (e->isValid()) {
-				e->draw(defaultShader);
-			}
-			else {
-				dout.warn("Invalid entity detected in scene '" + sceneName + "', attempted to draw. Probably hasn't been collected for garbage yet (entityId = '" + std::to_string(e->getId()) + "')");
-			}
-		}
-
-		catchOpenGLErrors("c");
-	}
-}
-
 void Scene::drawUI() {
 	if (!map->isLoaded() && hasMap) {
 		// Clear the screen to black
@@ -265,6 +162,9 @@ void Scene::tick(float deltaTime) {
 	for (auto& e : entities) {
 		// Check for entity failures we need to remove
 		if (!e->isValid()) {
+			// Remove the entity from the renderer first!
+			renderer->unregisterRenderable("entity" + std::to_string(e->getId()));
+
 			entities.erase(std::remove(entities.begin(), entities.end(), e), entities.end());
 		}
 		else {
@@ -276,6 +176,9 @@ void Scene::tick(float deltaTime) {
 int Scene::spawnEntity(string bpN, float x, float y, float z) {
 	std::shared_ptr<Entity> ent = std::shared_ptr<Entity>(new Entity(bpN));
 	
+	// Register the entity's model with the renderer
+	renderer->registerRenderable("entity" + std::to_string(ent->getId()),ent->getModelPtr());
+
 	// Put the entity on the terrain - TODO
 	
 	ent->setPosition(glm::vec3(x,y,z));
@@ -335,38 +238,5 @@ void Scene::issueEntityOrder(int id, LuaRef orderTable) {
 			// Issue an order
 			//ent->issueOrder(order);
 		}
-	}
-}
-
-void Scene::catchOpenGLErrors(string ref) {
-	// Catch our own GL errors, if for some reason we create them
-	GLenum error = glGetError();
-	if (error != GL_NO_ERROR) {
-		string errS = "Unknown";
-		switch (error) {
-		case GL_INVALID_ENUM:
-			errS = "GL_INVALID_ENUM";
-			break;
-		case GL_INVALID_VALUE:
-			errS = "GL_INVALID_VALUE";
-			break;
-		case GL_INVALID_OPERATION:
-			errS = "GL_INVALID_OPERATION";
-			break;
-		case GL_INVALID_FRAMEBUFFER_OPERATION:
-			errS = "GL_INVALID_FRAMEBUFFER_OPERATION";
-			break;
-		case GL_OUT_OF_MEMORY:
-			errS = "GL_OUT_OF_MEMORY";
-			break;
-		case GL_STACK_UNDERFLOW:
-			errS = "GL_STACK_UNDERFLOW";
-			break;
-		case GL_STACK_OVERFLOW:
-			errS = "GL_STACK_OVERFLOW";
-			break;
-		}
-
-		dout.error("Detected GL error: '" + errS + "' with ref " + ref);
 	}
 }

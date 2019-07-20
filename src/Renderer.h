@@ -18,6 +18,7 @@ Header file for Renderer.cpp. A class that handles a window and the rendering to
 #include "Camera.h"
 #include "Shader.h"
 #include "ApplicationSettings.h"
+#include "Renderable.h"
 
 namespace darksun {
 
@@ -36,11 +37,14 @@ namespace darksun {
 		// (Re)Creates the window with the specified settings (passed by reference)
 		void createWindow(sf::ContextSettings& settings);
 
-		// Clears the screen
-		void clearscreen();
+		// Draws all registered Renderables
+		void render();
 
-		// Applies the current lighting effects
-		void prepLights(std::shared_ptr<Shader> shader);
+		// Registers renderables
+		void registerRenderable(string name, std::shared_ptr<Renderable> n);
+
+		// Unregisteres a renderable
+		void unregisterRenderable(string name);
 
 		// sets the position of the light
 		void setLightPosition(int index, glm::vec3 p) { 
@@ -69,7 +73,7 @@ namespace darksun {
 			if (index < 0 || index >= NUMBER_OF_LIGHTS) { return false; } return lightAttenuates[index];
 		}
 		// sets if gamma correction is enabled in the shaders
-		void setGammaCorrection(std::shared_ptr<Shader> shader, bool g);
+		void setGammaCorrection(bool g);
 
 		unsigned int getShadowWidth() { return SHADOW_WIDTH; }
 		unsigned int getShadowHeight() { return SHADOW_HEIGHT; }
@@ -80,21 +84,25 @@ namespace darksun {
 			return depthMap;
 		}
 
+		sf::RenderWindow* getWindowHandle() {
+			return &defaultWindow;
+		}
+
+		Camera* getCamera() {
+			return &camera;
+		}
+
+		// Clears the screen
+		void clearscreen();
+
 		/*
 		Destruction
 		*/
 		void cleanup();
 
-		/*
-		Getters
-		*/
-		sf::RenderWindow* getWindowHandle();
-
-		Camera* getCamera();
-
 	private:
 
-		void initShadows();
+		std::map<string, std::shared_ptr<Renderable>> renderables;
 
 		sf::RenderWindow defaultWindow;
 
@@ -123,12 +131,32 @@ namespace darksun {
 			true
 		};
 
+		// Applies the current lighting effects
+		void prepLights(std::shared_ptr<Shader> shader);
+
+		// Inits the shadow buffers
+		void initShadows();
+
+		// Inits the shaders
+		void initShaders();
+
+		// Draws the scene
+		void draw(std::shared_ptr<Shader> shader);
+
+		// Default shader
+		std::shared_ptr<Shader> defaultShader;
+		// Shadow shader
+		std::shared_ptr<Shader> defaultShadowShader;
+
+		bool gammaCorrection = false;
+
 		// Shadows
-		
 		const unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
 		unsigned int depthMapFBO;
 		unsigned int depthMap;
 		float depthBorderColor[4] = { 1.0, 1.0, 1.0, 1.0 };
+
+		void catchOpenGLErrors(string ref);
 
 	};
 

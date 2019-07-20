@@ -50,17 +50,6 @@ namespace darksun {
 		bool cameraEnabled = false; // Marks if the camera input should be processed
 		bool hasMap = true; // Marks if we should create or care about terrain
 
-		// Default shader
-		std::shared_ptr<Shader> defaultShader;
-		// Shadow shader
-		std::shared_ptr<Shader> defaultShadowShader;
-		// Default shader
-		std::shared_ptr<Shader> defaultPointShader;
-		// Point shadow shader
-		std::shared_ptr<Shader> pointShadowShader;
-
-		void catchOpenGLErrors(string ref);
-
 		// Renderer
 		std::shared_ptr<Renderer> renderer;
 
@@ -71,7 +60,7 @@ namespace darksun {
 		std::unique_ptr<UIWrangler> loadingUi;
 
 		// Terrain
-		std::unique_ptr<Map> map;
+		std::shared_ptr<Map> map;
 
 		// app settings
 		ApplicationSettings appSettings;
@@ -93,7 +82,6 @@ namespace darksun {
 		Scene(std::shared_ptr<Renderer>, ApplicationSettings& appSettings, SceneInformation sceneInfo);
 
 		// Draw the scene
-		void draw();
 		void drawUI();
 
 		// Pass events

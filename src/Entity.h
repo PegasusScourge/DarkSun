@@ -61,9 +61,6 @@ namespace darksun {
 		string internalName;
 
 		// Position information
-		glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
-		glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
-		glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
 		glm::vec3 size = glm::vec3(0.5f, 0.5f, 0.5f);
 
 		// Pathfinding information
@@ -94,7 +91,7 @@ namespace darksun {
 		// Set a new target to move to in the world
 		void setMoveTarget(float x, float y, float z) {
 			targetPos = glm::vec3(x, y, z);
-			float dist = glm::distance(targetPos, position);
+			float dist = glm::distance(targetPos, model->getPosition());
 			recalculatePathfinding();
 		}
 
@@ -125,9 +122,6 @@ namespace darksun {
 		// Tick the entity
 		void tick(float deltaTime);
 
-		// Draw the entity
-		void draw(std::shared_ptr<Shader> shader);
-
 		// Returns if the entity init correctly
 		bool isValid() { return valid; }
 
@@ -135,13 +129,16 @@ namespace darksun {
 		int getId() { return myId; }
 
 		// Returns the position vector
-		glm::vec3 getPosition() { return position; }
+		glm::vec3 getPosition() { return model->getPosition(); }
 
 		// Sets the position of the entity
-		void setPosition(glm::vec3 newp) { position = newp; }
+		void setPosition(glm::vec3 newp) { model->setPosition(newp); }
 
 		// Kills the entity, needs more expansion
 		void kill() { valid = false; }
+
+		// Returns the model ptr
+		std::shared_ptr<Model> getModelPtr() { return model; }
 
 	};
 

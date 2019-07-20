@@ -22,7 +22,6 @@ namespace darksun {
 		int opengl_minorVersion;
 		bool opengl_vsync = false;
 		int opengl_framerateLimit = 60;
-		bool opengl_shadows = true;
 		float opengl_nearZ = 0.1f;
 		float opengl_farZ = 2000.0f;
 
