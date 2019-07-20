@@ -171,12 +171,35 @@ void Renderer::unregisterRenderable(string name) {
 	renderables.erase(name);
 }
 
+void Renderer::registerUI(string name, std::shared_ptr<UIWrangler> n) {
+	// Check for trying to overwrite a previous renderable
+	if (renderableUIs.count(name) > 0) {
+		dout.error("Tried to register UI with name=\"" + name + "\", but one with that name is already registered!");
+		return;
+	}
+
+	renderableUIs[name] = n;
+}
+
+void Renderer::unregisterUI(string name) {
+	renderableUIs.erase(name);
+}
+
 void Renderer::initShaders() {
 	// Create the shader for directional lights
 	defaultShader = std::shared_ptr<Shader>(new Shader("core/shader/lighting_vertex.shader", "core/shader/lighting_geometry.shader", "core/shader/lighting_fragment.shader"));
 	defaultShader->setInt("shadowMap", 10);
 	// Create the shadow shader for directional lights
 	defaultShadowShader = std::shared_ptr<Shader>(new Shader("core/shader/shadowDepth_vertex.shader", "core/shader/shadowDepth_fragment.shader"));
+}
+
+void Renderer::drawUi() {
+	profiler::ScopeProfiler drawProfiler("Renderer.cpp::Renderer::drawUi()");
+	defaultWindow.pushGLStates();
+	for (auto const& e : renderableUIs) {
+		e.second->draw();
+	}
+	defaultWindow.popGLStates();
 }
 
 void Renderer::draw(std::shared_ptr<Shader> shader) {
@@ -225,6 +248,7 @@ void Renderer::draw(std::shared_ptr<Shader> shader) {
 			// Bind the shadow map
 			glActiveTexture(GL_TEXTURE10);
 			glBindTexture(GL_TEXTURE_2D, getDepthMap());
+			catchOpenGLErrors("DepthMap bind");
 
 			// draw mesh
 			r.second->getMeshAt(i).GL_bindVertexArray();
@@ -293,4 +317,7 @@ void Renderer::render() {
 
 	// Draw again
 	draw(defaultShader);
+
+	// Draw the UI
+	drawUi();
 }

@@ -10,14 +10,14 @@ Wrangles the UI for scenes (with LuaEngine for UI handling)
 
 using namespace darksun;
 
-UIWrangler::UIWrangler(std::shared_ptr<Renderer> r, ApplicationSettings& settings, string uN) : renderer(r), uiName(uN) {
+UIWrangler::UIWrangler(sf::RenderWindow* windowHandle, ApplicationSettings& settings, string uN) : uiName(uN) {
 	dout.log("[ Init UI : " + uiName + " ]");
 	dout.log("Loading the LuaEngine");
 
 	uiEngine.addFilesRecursive("lua/ui/" + uiName + "/", ".lua");
 	dout.log("Added ui files to the engine");
 
-	gui = std::unique_ptr<tgui::Gui>(new tgui::Gui(*renderer->getWindowHandle()));
+	gui = std::unique_ptr<tgui::Gui>(new tgui::Gui(*windowHandle));
 
 	hookUIInterface(settings);
 

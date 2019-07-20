@@ -49,15 +49,16 @@ namespace darksun {
 
 		bool cameraEnabled = false; // Marks if the camera input should be processed
 		bool hasMap = true; // Marks if we should create or care about terrain
+		bool switchedUi = false;
 
 		// Renderer
 		std::shared_ptr<Renderer> renderer;
 
 		// UIWrangler
-		std::unique_ptr<UIWrangler> ui;
+		std::shared_ptr<UIWrangler> ui;
 
 		// UIWrangler
-		std::unique_ptr<UIWrangler> loadingUi;
+		std::shared_ptr<UIWrangler> loadingUi;
 
 		// Terrain
 		std::shared_ptr<Map> map;
@@ -80,9 +81,6 @@ namespace darksun {
 		static int createNewId();
 
 		Scene(std::shared_ptr<Renderer>, ApplicationSettings& appSettings, SceneInformation sceneInfo);
-
-		// Draw the scene
-		void drawUI();
 
 		// Pass events
 		void handleEvent(sf::Event& ev);

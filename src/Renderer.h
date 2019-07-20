@@ -19,6 +19,7 @@ Header file for Renderer.cpp. A class that handles a window and the rendering to
 #include "Shader.h"
 #include "ApplicationSettings.h"
 #include "Renderable.h"
+#include "UiHandler.h"
 
 #include "DarkSunProfiler.h"
 
@@ -47,6 +48,12 @@ namespace darksun {
 
 		// Unregisteres a renderable
 		void unregisterRenderable(string name);
+
+		// Registers uis
+		void registerUI(string name, std::shared_ptr<UIWrangler> n);
+
+		// Unregisteres a ui
+		void unregisterUI(string name);
 
 		// sets the position of the light
 		void setLightPosition(int index, glm::vec3 p) { 
@@ -105,6 +112,7 @@ namespace darksun {
 	private:
 
 		std::map<string, std::shared_ptr<Renderable>> renderables;
+		std::map <string, std::shared_ptr<UIWrangler>> renderableUIs;
 
 		sf::RenderWindow defaultWindow;
 
@@ -144,6 +152,9 @@ namespace darksun {
 
 		// Draws the scene
 		void draw(std::shared_ptr<Shader> shader);
+
+		// Draws the UI
+		void drawUi();
 
 		// Default shader
 		std::shared_ptr<Shader> defaultShader;

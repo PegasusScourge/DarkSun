@@ -110,10 +110,6 @@ void DarkSun::run() {
 
 		// Draw the scene
 		renderer->render();
-		// Draw the scene UI, area to optimise
-		window->pushGLStates();
-		activeScene->drawUI();
-		window->popGLStates();
 
 		// Finish drawing
 		// Do the displaying
@@ -149,8 +145,6 @@ void DarkSun::run() {
 		// Update any settings we need to
 		window->setVerticalSyncEnabled(appSettings.opengl_vsync);
 		window->setFramerateLimit(appSettings.opengl_framerateLimit);
-		
-		catchOpenGLErrors();
 
 		tickNo++;
 		lastElapsed = currentElapsed;
@@ -161,37 +155,4 @@ void DarkSun::run() {
 	// Output the profiling stuff
 	dout.log("DUMPING PROFILING INFO, this may take a moment....");
 	profiler::dumpFrames("DarkSun.profile");
-}
-
-void DarkSun::catchOpenGLErrors() {
-	// Catch our own GL errors, if for some reason we create them
-	GLenum error = glGetError();
-	if (error != GL_NO_ERROR) {
-		string errS = "Unknown";
-		switch (error) {
-		case GL_INVALID_ENUM:
-			errS = "GL_INVALID_ENUM";
-			break;
-		case GL_INVALID_VALUE:
-			errS = "GL_INVALID_VALUE";
-			break;
-		case GL_INVALID_OPERATION:
-			errS = "GL_INVALID_OPERATION";
-			break;
-		case GL_INVALID_FRAMEBUFFER_OPERATION:
-			errS = "GL_INVALID_FRAMEBUFFER_OPERATION";
-			break;
-		case GL_OUT_OF_MEMORY:
-			errS = "GL_OUT_OF_MEMORY";
-			break;
-		case GL_STACK_UNDERFLOW:
-			errS = "GL_STACK_UNDERFLOW";
-			break;
-		case GL_STACK_OVERFLOW:
-			errS = "GL_STACK_OVERFLOW";
-			break;
-		}
-
-		dout.error("Detected GL error: '" + errS + "'");
-	}
 }

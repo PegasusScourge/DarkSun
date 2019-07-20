@@ -29,7 +29,7 @@ Scene::Scene(std::shared_ptr<Renderer> r, ApplicationSettings& appSettings, Scen
 	dout.log("Scene constructor called");
 
 	// Create the ui
-	ui = std::unique_ptr<UIWrangler>(new UIWrangler(renderer, appSettings, sceneName));
+	ui = std::shared_ptr<UIWrangler>(new UIWrangler(renderer->getWindowHandle(), appSettings, sceneName));
 	hookClass(ui->getUiEngine()->getState());
 	EntityOrders::hookClass(ui->getUiEngine()->getState());
 
@@ -51,6 +51,17 @@ Scene::Scene(std::shared_ptr<Renderer> r, ApplicationSettings& appSettings, Scen
 	}
 
 	init();
+
+	// Check for map loading
+	if (hasMap) {
+		// Map needs to load, so we need to register the loading UI
+		renderer->registerUI(sceneName + "_loading", loadingUi);
+		switchedUi = false;
+	}
+	else {
+		// Register the standard UI
+		renderer->registerUI(sceneName + "_ui", ui);
+	}
 }
 
 void Scene::init() {
@@ -74,7 +85,7 @@ void Scene::init() {
 }
 
 void Scene::initLoadingUi(ApplicationSettings& appSettings) {
-	loadingUi = std::unique_ptr<UIWrangler>(new UIWrangler(renderer, appSettings, "loading"));
+	loadingUi = std::shared_ptr<UIWrangler>(new UIWrangler(renderer->getWindowHandle(), appSettings, "loading"));
 
 	// Hook the loading percentage into the lua engine
 	hookClass(loadingUi->getUiEngine()->getState());
@@ -118,19 +129,13 @@ void Scene::hookClass(lua::State *L) {
 }
 
 void Scene::close() {
-	// Do something?
-}
-
-void Scene::drawUI() {
-	if (!map->isLoaded() && hasMap) {
-		// Clear the screen to black
-		renderer->clearscreen();
-		loadingUi->draw();
-		return;
+	// Unregister the ui
+	if (!switchedUi && hasMap) {
+		renderer->unregisterUI(sceneName + "_loading");
 	}
-
-	// Draw the UI
-	ui->draw();
+	else {
+		renderer->unregisterUI(sceneName + "_ui");
+	}
 }
 
 void Scene::handleEvent(sf::Event& ev) {
@@ -150,6 +155,13 @@ void Scene::tick(float deltaTime) {
 		bar->setValue(map->getLoadedPercent() * 10);
 		loadingUi->tick(deltaTime);
 		return;
+	}
+	else if(map->isLoaded() && hasMap && !switchedUi) {
+		// we need to switch the UI over
+		renderer->unregisterUI(sceneName + "_loading");
+		// Register the running UI
+		renderer->registerUI(sceneName + "_ui", ui);
+		switchedUi = true;
 	}
 
 	// Move the camera light to below the camera

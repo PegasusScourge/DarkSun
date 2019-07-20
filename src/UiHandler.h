@@ -9,7 +9,8 @@ Header file for UiHandler.cpp, wrangles the UI for scenes (with LuaEngine for UI
 */
 
 #include <TGUI/TGUI.hpp>
-#include "Renderer.h"
+#include <SFML/Graphics.hpp>
+//#include "Renderer.h"
 #include "ApplicationSettings.h"
 #include "LuaEngine.h"
 
@@ -22,7 +23,7 @@ namespace darksun {
 	class UIWrangler {
 
 	private:
-		std::shared_ptr<Renderer> renderer;
+		//std::shared_ptr<Renderer> renderer;
 
 		std::unique_ptr<tgui::Gui> gui;
 
@@ -54,14 +55,14 @@ namespace darksun {
 		}
 
 		float getCameraX() {
-			return renderer->getCamera()->groundPosition.x;
+			return -1; //renderer->getCamera()->groundPosition.x;
 		}
 		float getCameraZ() {
-			return renderer->getCamera()->groundPosition.z;
+			return -1; //renderer->getCamera()->groundPosition.z;
 		}
 
 	public:
-		UIWrangler(std::shared_ptr<Renderer> r, ApplicationSettings& settings, string uN);
+		UIWrangler(sf::RenderWindow* windowHandle, ApplicationSettings& settings, string uN);
 		~UIWrangler();
 
 		// Tick the engine and the ui for events etc
