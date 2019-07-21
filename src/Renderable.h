@@ -8,6 +8,8 @@ Base class for all objects that can be rendered
 
 Exposed from main thread to Renderer opengl thread, needs thread safety
 
+Thread safed
+
 */
 
 #include "Mesh.h"

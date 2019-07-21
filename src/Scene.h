@@ -64,7 +64,7 @@ namespace darksun {
 		std::shared_ptr<Map> map;
 
 		// app settings
-		ApplicationSettings appSettings;
+		ApplicationSettings* appSettings;
 
 		// Hook the Ui with scene functions
 		void hookClass(lua::State *L);
@@ -80,7 +80,7 @@ namespace darksun {
 	public:
 		static int createNewId();
 
-		Scene(std::shared_ptr<Renderer>, ApplicationSettings& appSettings, SceneInformation sceneInfo);
+		Scene(std::shared_ptr<Renderer>, ApplicationSettings* appSettings, SceneInformation sceneInfo);
 
 		// Pass events
 		void handleEvent(sf::Event& ev);
@@ -92,7 +92,7 @@ namespace darksun {
 		void init();
 
 		// Inits the loading UI
-		void initLoadingUi(ApplicationSettings& appSettings);
+		void initLoadingUi();
 
 		// Close function used to shut down the scene
 		void close();

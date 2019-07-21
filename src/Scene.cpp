@@ -18,7 +18,7 @@ int Scene::createNewId() {
 	return ++LastSceneId;
 }
 
-Scene::Scene(std::shared_ptr<Renderer> r, ApplicationSettings& appSettings, SceneInformation sceneInfo) {
+Scene::Scene(std::shared_ptr<Renderer> r, ApplicationSettings* appSettings, SceneInformation sceneInfo) {
 	renderer = r;
 	sceneName = sceneInfo.n;
 	myId = sceneInfo.id;
@@ -29,14 +29,14 @@ Scene::Scene(std::shared_ptr<Renderer> r, ApplicationSettings& appSettings, Scen
 	dout.log("Scene constructor called");
 
 	// Create the ui
-	ui = std::shared_ptr<UIWrangler>(new UIWrangler(renderer->getWindowHandle(), appSettings, sceneName));
+	ui = std::shared_ptr<UIWrangler>(new UIWrangler(renderer->getWindowHandle(), renderer->getCamera(), appSettings, sceneName));
 	hookClass(ui->getUiEngine()->getState());
 	EntityOrders::hookClass(ui->getUiEngine()->getState());
 
 	ui->OnCreate();
 
 	// Create our loading UI
-	initLoadingUi(appSettings);
+	initLoadingUi();
 
 	// Create the Terrain
 	if (hasMap) {
@@ -71,7 +71,7 @@ void Scene::init() {
 	renderer->setGammaCorrection(false);
 
 	// Create the camera light
-	renderer->setLightPosition(0, renderer->getCamera()->position);
+	renderer->setLightPosition(0, renderer->getCamera()->getPosition());
 	renderer->setLightColor(0, glm::vec3(0.5f, 0.5f, 0.5f));
 	renderer->setLightAttenuation(0, true);
 
@@ -84,8 +84,8 @@ void Scene::init() {
 	valid = true;
 }
 
-void Scene::initLoadingUi(ApplicationSettings& appSettings) {
-	loadingUi = std::shared_ptr<UIWrangler>(new UIWrangler(renderer->getWindowHandle(), appSettings, "loading"));
+void Scene::initLoadingUi() {
+	loadingUi = std::shared_ptr<UIWrangler>(new UIWrangler(renderer->getWindowHandle(), renderer->getCamera(), appSettings, "loading"));
 
 	// Hook the loading percentage into the lua engine
 	hookClass(loadingUi->getUiEngine()->getState());
@@ -165,7 +165,7 @@ void Scene::tick(float deltaTime) {
 	}
 
 	// Move the camera light to below the camera
-	renderer->setLightPosition(0, renderer->getCamera()->position);
+	renderer->setLightPosition(0, renderer->getCamera()->getPosition());
 
 	sinArg += 0.05;
 

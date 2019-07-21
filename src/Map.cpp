@@ -5,6 +5,8 @@ Description:
 
 Creates a model from a height map, and textures it
 
+THREADING IN OPERATION, might be safe
+
 */
 
 #include "Map.h"

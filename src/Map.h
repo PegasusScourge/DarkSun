@@ -6,6 +6,8 @@ Description:
 
 Header for Map.cpp
 
+THREADING IN OPERATION, might be safe
+
 */
 
 #include <future>

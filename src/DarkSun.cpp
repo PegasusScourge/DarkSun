@@ -25,7 +25,7 @@ void DarkSun::run() {
 	ApplicationSettings appSettings;
 
 	std::shared_ptr<Renderer> renderer = std::shared_ptr<Renderer>(new Renderer());
-	renderer->create(appSettings);
+	renderer->create(&appSettings);
 
 	// we use this info for recreating scenes too, nice way of passing information
 	SceneInformation sceneInfo;
@@ -33,7 +33,7 @@ void DarkSun::run() {
 	sceneInfo.id = Scene::createNewId();
 	sceneInfo.hasMap = true;
 
-	std::unique_ptr<Scene> activeScene = std::unique_ptr<Scene>(new Scene(renderer, appSettings, sceneInfo));
+	std::unique_ptr<Scene> activeScene = std::unique_ptr<Scene>(new Scene(renderer, &appSettings, sceneInfo));
 	//activeScene->init();
 	//activeScene->initTest();
 
@@ -62,7 +62,7 @@ void DarkSun::run() {
 
 	while (running) {
 		profiler::newFrame();
-		//profiler::ScopeProfiler myProfiler("DarkSun.cpp::DarkSun::run()whileLoop");
+		profiler::ScopeProfiler myProfiler("DarkSun.cpp::DarkSun");
 		
 		//dout.log("Starting tick '" + to_string(tickNo) + "'");
 		
@@ -132,7 +132,7 @@ void DarkSun::run() {
 				sceneInfo.n = target;
 				sceneInfo.id = Scene::createNewId();
 				sceneInfo.hasMap = true;
-				activeScene = std::unique_ptr<Scene>(new Scene(renderer, appSettings, sceneInfo));
+				activeScene = std::unique_ptr<Scene>(new Scene(renderer, &appSettings, sceneInfo));
 				//activeScene->init();
 				if (!activeScene->isValid()) {
 					running = false;

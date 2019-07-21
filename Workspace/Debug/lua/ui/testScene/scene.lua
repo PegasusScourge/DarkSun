@@ -20,10 +20,10 @@ testScene = {
 		vsync_check = function(signal)
 			if signal == 'Checked' then
 				LOG('Vsync on')
-				Settings.opengl_vsync = true
+				Settings.set_opengl_vsync(true)
 			else
 				LOG('Vsync off')
-				Settings.opengl_vsync = false
+				Settings.set_opengl_vsync(false)
 			end
 		end,
 	},

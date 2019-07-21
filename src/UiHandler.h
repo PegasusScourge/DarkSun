@@ -12,6 +12,7 @@ Header file for UiHandler.cpp, wrangles the UI for scenes (with LuaEngine for UI
 #include <SFML/Graphics.hpp>
 //#include "Renderer.h"
 #include "ApplicationSettings.h"
+#include "Camera.h"
 #include "LuaEngine.h"
 
 namespace darksun {
@@ -24,6 +25,7 @@ namespace darksun {
 
 	private:
 		//std::shared_ptr<Renderer> renderer;
+		std::shared_ptr<Camera> cam;
 
 		std::unique_ptr<tgui::Gui> gui;
 
@@ -35,7 +37,7 @@ namespace darksun {
 		bool shdTransition = false;
 
 		// Hook the UI into the lua engine
-		void hookUIInterface(ApplicationSettings& settings);
+		void hookUIInterface(ApplicationSettings* settings);
 
 		/* LUA Functions */
 
@@ -55,14 +57,14 @@ namespace darksun {
 		}
 
 		float getCameraX() {
-			return -1; //renderer->getCamera()->groundPosition.x;
+			return cam->getGroundPosition().x;
 		}
 		float getCameraZ() {
-			return -1; //renderer->getCamera()->groundPosition.z;
+			return cam->getGroundPosition().z;
 		}
 
 	public:
-		UIWrangler(sf::RenderWindow* windowHandle, ApplicationSettings& settings, string uN);
+		UIWrangler(sf::RenderWindow* windowHandle, std::shared_ptr<Camera> cam, ApplicationSettings* settings, string uN);
 		~UIWrangler();
 
 		// Tick the engine and the ui for events etc

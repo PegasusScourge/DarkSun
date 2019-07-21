@@ -15,17 +15,18 @@ void Renderer::createWindow(sf::ContextSettings& settings) {
 	defaultWindow.create(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "DarkSun", sf::Style::Default, settings);
 }
 
-void Renderer::create(ApplicationSettings &settings) {
+void Renderer::create(ApplicationSettings* settings) {
 
 	appSettings = settings;
 
 	sf::ContextSettings s;
-	s.depthBits = settings.opengl_depthBits;
-	s.stencilBits = settings.opengl_stencilBits;
-	s.antialiasingLevel = settings.opengl_antialiasingLevel;
-	s.majorVersion = settings.opengl_majorVersion;
-	s.minorVersion = settings.opengl_minorVersion;
+	s.depthBits = settings->opengl_depthBits;
+	s.stencilBits = settings->opengl_stencilBits;
+	s.antialiasingLevel = settings->opengl_antialiasingLevel;
+	s.majorVersion = settings->opengl_majorVersion;
+	s.minorVersion = settings->opengl_minorVersion;
 	createWindow(s);
+	defaultWindow.setActive();
 
 	// Now we have a context, init glew
 	glewExperimental = GL_TRUE;
@@ -60,12 +61,17 @@ void Renderer::create(ApplicationSettings &settings) {
 	// Init the shaders
 	initShaders();
 
-	catchOpenGLErrors("SHADERS setup");
-
 	// Create the shadow stuffs
 	initShadows();
 
 	catchOpenGLErrors("SHADOWS setup");
+
+	// Create camera
+	{
+		std::lock_guard lock(camera_mutex);
+		camera = std::shared_ptr<Camera>(new Camera());
+	}
+	catchOpenGLErrors("CAMERA setup");
 
 	// Do a glew test:
 	GLuint vertexBuffer;
@@ -102,6 +108,26 @@ void Renderer::initShadows() {
 	}
 }
 
+void Renderer::initShaders() {
+	// Create the shader for directional lights
+	defaultShader = std::shared_ptr<Shader>(new Shader("core/shader/lighting_vertex.shader", "core/shader/lighting_geometry.shader", "core/shader/lighting_fragment.shader"));
+	defaultShader->use();
+	catchOpenGLErrors("defaultShader setup");
+	defaultShader->setInt("shadowMap", 10);
+	catchOpenGLErrors("shadowMap setup");
+
+	// Create the shadow shader for directional lights
+	defaultShadowShader = std::shared_ptr<Shader>(new Shader("core/shader/shadowDepth_vertex.shader", "core/shader/shadowDepth_fragment.shader"));
+	catchOpenGLErrors("defaultShadowShader setup");
+
+	if (defaultShader->ID == NULL) {
+		dout.error("DEFAULTSHADER == NULL");
+	}
+	if (defaultShadowShader->ID == NULL) {
+		dout.error("DEFAULTSHADOWSHADER == NULL");
+	}
+}
+
 void Renderer::clearscreen() {
 	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -110,10 +136,14 @@ void Renderer::clearscreen() {
 void Renderer::prepLights(std::shared_ptr<Shader> shader) {
 	shader->setVec3("objectColor", 1.0f, 1.0f, 1.0f);
 	// set light uniforms
-	glUniform3fv(glGetUniformLocation(shader->ID, "lightPositions"), NUMBER_OF_LIGHTS, &lightPositions[0][0]);
-	glUniform3fv(glGetUniformLocation(shader->ID, "lightColors"), NUMBER_OF_LIGHTS, &lightColors[0][0]);
-	glUniform1iv(glGetUniformLocation(shader->ID, "lightAttenuates"), NUMBER_OF_LIGHTS, &lightAttenuates[0]);
-	shader->setVec3("viewPos", camera.position);
+	{
+		std::scoped_lock lock(lightPositions_mutex, lightColors_mutex, lightAttenuates_mutex);
+		glUniform3fv(glGetUniformLocation(shader->ID, "lightPositions"), NUMBER_OF_LIGHTS, &lightPositions[0][0]);
+		glUniform3fv(glGetUniformLocation(shader->ID, "lightColors"), NUMBER_OF_LIGHTS, &lightColors[0][0]);
+		glUniform1iv(glGetUniformLocation(shader->ID, "lightAttenuates"), NUMBER_OF_LIGHTS, &lightAttenuates[0]);
+
+	}
+	shader->setVec3("viewPos", camera->getPosition());
 }
 
 void Renderer::setGammaCorrection(bool g) {
@@ -185,14 +215,6 @@ void Renderer::unregisterUI(string name) {
 	renderableUIs.erase(name);
 }
 
-void Renderer::initShaders() {
-	// Create the shader for directional lights
-	defaultShader = std::shared_ptr<Shader>(new Shader("core/shader/lighting_vertex.shader", "core/shader/lighting_geometry.shader", "core/shader/lighting_fragment.shader"));
-	defaultShader->setInt("shadowMap", 10);
-	// Create the shadow shader for directional lights
-	defaultShadowShader = std::shared_ptr<Shader>(new Shader("core/shader/shadowDepth_vertex.shader", "core/shader/shadowDepth_fragment.shader"));
-}
-
 void Renderer::drawUi() {
 	profiler::ScopeProfiler drawProfiler("Renderer.cpp::Renderer::drawUi()");
 	defaultWindow.pushGLStates();
@@ -204,6 +226,8 @@ void Renderer::drawUi() {
 
 void Renderer::draw(std::shared_ptr<Shader> shader) {
 	profiler::ScopeProfiler drawProfiler("Renderer.cpp::Renderer::draw()");
+
+	//dout.verbose("draw()");
 	
 	int numRenderables = renderables.size();
 	int numMeshes = 0;
@@ -261,9 +285,15 @@ void Renderer::draw(std::shared_ptr<Shader> shader) {
 }
 
 void Renderer::render() {
+	// Lock the renderables and renderableUIs
+	std::scoped_lock lock(renderables_mutex, renderableUIs_mutex);
+
 	profiler::ScopeProfiler renderProfiler("Renderer.cpp::Renderer::render()");
 
+	//dout.verbose("render()");
+
 	// We render shadows
+	//dout.verbose("defaultShadowShader use");
 	defaultShadowShader->use();
 
 	float near_plane = 0.1f, far_plane = 2.0f;
@@ -294,6 +324,7 @@ void Renderer::render() {
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	// Pass the space matrix to the drawing shader
+	//dout.verbose("defaultShader use");
 	defaultShader->use();
 	defaultShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
 	catchOpenGLErrors("lightSpaceMatrix bind");
@@ -308,8 +339,8 @@ void Renderer::render() {
 
 	// view/projection matricies input
 
-	glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, appSettings.opengl_nearZ, appSettings.opengl_farZ);
-	glm::mat4 view = camera.GetViewMatrix();
+	glm::mat4 projection = glm::perspective(glm::radians(camera->getZoom()), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, appSettings->opengl_nearZ.load(), appSettings->opengl_farZ.load());
+	glm::mat4 view = camera->GetViewMatrix();
 	//glm::mat4 view = glm::lookAt(camera->Position, glm::vec3(camera->Position.x, 0, camera->Position.z), camera->WorldUp);
 	defaultShader->setMat4("projection", projection);
 	defaultShader->setMat4("view", view);

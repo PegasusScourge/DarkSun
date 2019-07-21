@@ -10,7 +10,7 @@ Wrangles the UI for scenes (with LuaEngine for UI handling)
 
 using namespace darksun;
 
-UIWrangler::UIWrangler(sf::RenderWindow* windowHandle, ApplicationSettings& settings, string uN) : uiName(uN) {
+UIWrangler::UIWrangler(sf::RenderWindow* windowHandle, std::shared_ptr<Camera> cam, ApplicationSettings* settings, string uN) : cam(cam), uiName(uN) {
 	dout.log("[ Init UI : " + uiName + " ]");
 	dout.log("Loading the LuaEngine");
 
@@ -45,7 +45,7 @@ void UIWrangler::OnCreate() {
 	}
 }
 
-void UIWrangler::hookUIInterface(ApplicationSettings& settings) {
+void UIWrangler::hookUIInterface(ApplicationSettings* settings) {
 	lua::State *L = uiEngine.getState();
 
 	try {
@@ -95,13 +95,15 @@ void UIWrangler::hookUIInterface(ApplicationSettings& settings) {
 				.endClass()
 				.beginClass<ApplicationSettings>("ApplicationSettings")
 					//.addConstructor<void(*)(), RefCountedPtr<ApplicationSettings> /* creation policy */ >()
-					.addProperty("opengl_depthBits", &darksun::ApplicationSettings::opengl_depthBits, false)
-					.addProperty("opengl_stencilBits", &darksun::ApplicationSettings::opengl_stencilBits, false)
-					.addProperty("opengl_antialiasingLevel", &darksun::ApplicationSettings::opengl_antialiasingLevel)
-					.addProperty("opengl_majorVersion", &darksun::ApplicationSettings::opengl_majorVersion, false)
-					.addProperty("opengl_minorVersion", &darksun::ApplicationSettings::opengl_minorVersion, false)
-					.addProperty("opengl_vsync", &darksun::ApplicationSettings::opengl_vsync)
-					.addProperty("opengl_framerateLimit", &darksun::ApplicationSettings::opengl_framerateLimit)
+					.addFunction("opengl_depthBits", &darksun::ApplicationSettings::get_opengl_depthBits)
+					.addFunction("opengl_stencilBits", &darksun::ApplicationSettings::get_opengl_stencilBits)
+					.addFunction("opengl_antialiasingLevel", &darksun::ApplicationSettings::get_opengl_antialiasingLevel)
+					.addFunction("opengl_majorVersion", &darksun::ApplicationSettings::get_opengl_majorVersion)
+					.addFunction("opengl_minorVersion", &darksun::ApplicationSettings::get_opengl_minorVersion)
+					.addFunction("opengl_vsync", &darksun::ApplicationSettings::get_opengl_vsync)
+					.addFunction("set_opengl_vsync", &darksun::ApplicationSettings::set_opengl_vsync)
+					.addFunction("opengl_framerateLimit", &darksun::ApplicationSettings::get_opengl_framerateLimit)
+					.addFunction("set_opengl_framerateLimit", &darksun::ApplicationSettings::set_opengl_framerateLimit)
 				.endClass()
 			.endNamespace();
 
