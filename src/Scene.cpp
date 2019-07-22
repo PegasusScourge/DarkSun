@@ -171,6 +171,8 @@ void Scene::tick(float deltaTime) {
 
 	ui->tick(deltaTime);
 
+	processSpawnEntityRequests();
+
 	for (auto& e : entities) {
 		// Check for entity failures we need to remove
 		if (!e->isValid()) {
@@ -185,7 +187,26 @@ void Scene::tick(float deltaTime) {
 	}
 }
 
-int Scene::spawnEntity(string bpN, float x, float y, float z) {
+void Scene::processSpawnEntityRequests() {
+
+	for (auto& e : entitiesToCreate) {
+		std::shared_ptr<Entity> ent = std::shared_ptr<Entity>(new Entity(e.bp, e.wantedId));
+
+		// Register the entity's model with the renderer
+		renderer->registerRenderable("entity" + std::to_string(ent->getId()), ent->getModelPtr());
+
+		// Put the entity on the terrain - TODO
+
+		ent->setPosition(glm::vec3(e.x, e.y, e.z));
+		entities.push_back(ent);
+	}
+
+	entitiesToCreate.clear();
+}
+
+void Scene::spawnEntity(string bpN, float x, float y, float z) {
+	/*
+	
 	std::shared_ptr<Entity> ent = std::shared_ptr<Entity>(new Entity(bpN));
 	
 	// Register the entity's model with the renderer
@@ -197,8 +218,18 @@ int Scene::spawnEntity(string bpN, float x, float y, float z) {
 
 	int entId = ent->getId();
 	entities.push_back(ent);
+	*/
 
-	return entId;
+	EntityCreateInfo inf;
+	inf.bp = bpN;
+	inf.x = x;
+	inf.y = y;
+	inf.z = z;
+	inf.wantedId = Entity::createNewId();
+
+	entitiesToCreate.push_back(inf);
+
+	dout.verbose("Registered creation of entity " + std::to_string(inf.wantedId) + " on next tick");
 }
 
 void Scene::killEntity(int id) {

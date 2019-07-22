@@ -22,10 +22,22 @@ void DarkSun::processArgs(int argc, char *argv[]) {
 void DarkSun::run() {
 	dout.log("DarkSun init");
 
+	running = true;
+
 	ApplicationSettings appSettings;
 
 	std::shared_ptr<Renderer> renderer = std::shared_ptr<Renderer>(new Renderer());
-	renderer->create(&appSettings);
+	dout.verbose("Renderer pointer created");
+
+	// CREATE THE RENDERING THREAD
+	//std::thread renderingThread(&DarkSun::OpenGLThread, this, renderer, &appSettings);
+	std::future renderingThread = std::async(std::launch::async, &DarkSun::OpenGLThread, this, renderer, &appSettings);
+	dout.log("Rendering thread created, waiting for launch...");
+
+	while (!renderThreadStarted) {
+		// Spin our wheels
+	}
+	dout.log("Detected start of rendering thread");
 
 	// we use this info for recreating scenes too, nice way of passing information
 	SceneInformation sceneInfo;
@@ -33,54 +45,150 @@ void DarkSun::run() {
 	sceneInfo.id = Scene::createNewId();
 	sceneInfo.hasMap = true;
 
-	std::unique_ptr<Scene> activeScene = std::unique_ptr<Scene>(new Scene(renderer, &appSettings, sceneInfo));
-	//activeScene->init();
-	//activeScene->initTest();
-
-	if (!activeScene->isValid()) {
-		dout.error("SCENE IS NOT VALID!");
+	{
+		std::lock_guard lock(activeScene_mutex);
+		activeScene = std::unique_ptr<Scene>(new Scene(renderer, &appSettings, sceneInfo));
+		if (!activeScene->isValid()) {
+			dout.error("SCENE IS NOT VALID!");
+		}
 	}
-
-	sf::RenderWindow * window = renderer->getWindowHandle();
-	window->setVerticalSyncEnabled(appSettings.opengl_vsync);
-	window->setFramerateLimit(appSettings.opengl_framerateLimit);
 
 	dout.log("Entering the main game engine loop");
 
-	bool running = true;
-	bool hasFocus = false;
-	bool captureMouse = false;
+	hasFocus = false;
+	captureMouse = false;
 
 	int tickNo = 0;
 	float sinArg = 0.0f;
 
 	sf::Clock clock; // starts the clock
 	sf::Time elapsedTime = clock.getElapsedTime();
-	float lastElapsed = 0;
-	float currentElapsed = 0;
-	float deltaTime = 0;
 
 	while (running) {
 		profiler::newFrame();
-		profiler::ScopeProfiler myProfiler("DarkSun.cpp::DarkSun");
-		
-		//dout.log("Starting tick '" + to_string(tickNo) + "'");
+		profiler::ScopeProfiler myProfiler("DarkSun.cpp::DarkSun::run()");
 		
 		// We pretend as if time isn't moving forward here, and is only at the instance we take this clock reading
 		elapsedTime = clock.getElapsedTime();
-		currentElapsed = elapsedTime.asSeconds();
-		deltaTime = currentElapsed - lastElapsed;
+		deltaTime_main = elapsedTime.asSeconds();
+		clock.restart();
+
+		{
+			std::lock_guard lock(activeScene_mutex);
+			// tick the scene
+			activeScene->tick(deltaTime_main);
+		}
+
+		{
+			std::lock_guard lock(activeScene_mutex);
+			
+			// Pass events to the scene
+			for (auto& e : mtopengl::getEvents()) {
+				activeScene->handleEvent(e);
+			}
+
+			// Check for scene transitions
+			if (activeScene->shouldTransition()) {
+				string target = activeScene->getNewScene();
+
+				if (target.compare("exit") == 0) {
+					// Signal an exit
+					dout.log("Scene gave order to exit with transition");
+					running = false;
+				}
+				else {
+					// Assign the new scene
+					activeScene->close(); // Close old scene
+					sceneInfo.n = target;
+					sceneInfo.id = Scene::createNewId();
+					sceneInfo.hasMap = true;
+					activeScene = std::unique_ptr<Scene>(new Scene(renderer, &appSettings, sceneInfo));
+					//activeScene->init();
+					if (!activeScene->isValid()) {
+						running = false;
+						dout.error("TRIED TO SWITCH TO NEW SCENE '" + target + "' BUT SCENE WAS INVALID");
+					}
+					//activeScene->initTest();
+				}
+			}
+		}
+
+		tickNo++;
+
+		using namespace std::chrono_literals;
+		std::this_thread::sleep_for(4ms);
+	}
+
+	// Output the profiling stuff
+	dout.log("DUMPING PROFILING INFO, this may take a moment....");
+	profiler::dumpFrames("DarkSun.profile");
+
+	dout.log("Waiting for rendering thread to close...");
+	int returnVal = renderingThread.get();
+	dout.log("Rendering thread closed, return val of " + std::to_string(returnVal));
+
+	activeScene->close();
+}
+
+int DarkSun::OpenGLThread(std::shared_ptr<Renderer> renderer, ApplicationSettings* appSettings) {
+
+	renderer->create(appSettings);
+	dout.log("OpenGLThread() --> Rendering thread initialised");
+
+	sf::RenderWindow * window = renderer->getWindowHandle();
+	window->setVerticalSyncEnabled(appSettings->opengl_vsync);
+	window->setFramerateLimit(appSettings->opengl_framerateLimit);
+	dout.log("OpenGLThread() --> Access to window established");
+
+	renderThreadStarted = true;
+
+	// Wait for the active scene to be initialised
+	bool cont = false;
+	dout.log("OpenGLThread() --> Waiting for first scene to be created");
+	while (!cont) {
+		std::lock_guard lock(activeScene_mutex);
+		if (activeScene != NULL)
+			cont = true;
+	}
+	dout.log("OpenGLThread() --> Detected creation of scene");
+
+	sf::Clock clock; // starts the clock
+	sf::Time elapsedTime = clock.getElapsedTime();
+
+	dout.verbose("OpenGLThread() --> Entering rendering thread loop");
+
+	bool isCamEnabled = false;
+
+	while (running) {
+		profiler::ScopeProfiler myProfiler("DarkSun.cpp::OpenGLThread()");
+		
+		// We pretend as if time isn't moving forward here, and is only at the instance we take this clock reading
+		elapsedTime = clock.getElapsedTime();
+		deltaTime_render = elapsedTime.asSeconds();
+		clock.restart();
+
+		// Process requests from other threads
+		mtopengl::processTextureLoadRequests();
+		mtopengl::processVAOLoadRequests();
+
+		// Draw the scene
+		renderer->render();
+
+		// Finish drawing
+		// Do the displaying
+		renderer->getWindowHandle()->display();
 
 		sf::Event event;
 		while (window->pollEvent(event)) {
-			profiler::ScopeProfiler eventPollingProfiler("DarkSun.cpp::DarkSun::run()eventPolling");
-			
+			profiler::ScopeProfiler eventPollingProfiler("DarkSun.cpp::DarkSun::OpenGLThread()eventPolling");
+
 			// Check for window focus
 			hasFocus = window->hasFocus();
 
 			// Check for close orders
 			if (event.type == sf::Event::Closed) {
 				running = false;
+				dout.log("Window gave order to exit with X");
 			}
 
 			// Only process these events if we have focus
@@ -92,8 +200,16 @@ void DarkSun::run() {
 						break;
 					}
 				}
-				if (activeScene->isCameraEnabled()) { // Only allow the camera to recieve input if the scene allows it
-					renderer->getCamera()->handleEvent(event, deltaTime);
+
+				{
+					// Don't block the locking attempt on the active scene here, to prevent deadlocks
+					std::unique_lock lock(activeScene_mutex, std::try_to_lock);
+					if(lock.owns_lock())
+						isCamEnabled = activeScene->isCameraEnabled();
+				}
+
+				if (isCamEnabled) { // Only allow the camera to recieve input if the scene allows it
+					renderer->getCamera()->handleEvent(event, deltaTime_render);
 				}
 			}
 
@@ -101,58 +217,27 @@ void DarkSun::run() {
 			window->setMouseCursorGrabbed(hasFocus && captureMouse);
 			window->setMouseCursorVisible(!(hasFocus && captureMouse));
 
-			// Pass the event to the scene
-			activeScene->handleEvent(event);
+			//{
+			//	std::lock_guard lock(activeScene_mutex);
+			//	// Pass the event to the scene
+			//	activeScene->handleEvent(event);
+			//}
+			// Pass the event to the mtopengl solution
+			mtopengl::addEvent(event);
 		}
 		// Poll the keyboard checks for the mouse
-		if(hasFocus && activeScene->isCameraEnabled())
-			renderer->getCamera()->pollKeyboard(deltaTime);
-
-		// Draw the scene
-		renderer->render();
-
-		// Finish drawing
-		// Do the displaying
-		window->display();
-
-		// tick the scene
-		activeScene->tick(deltaTime);
-
-		// Check for scene transitions
-		if (activeScene->shouldTransition()) {
-			string target = activeScene->getNewScene();
-
-			if (target.compare("exit") == 0) {
-				// Signal an exit
-				running = false;
-			}
-			else {
-				// Assign the new scene
-				activeScene->close(); // Close old scene
-				sceneInfo.n = target;
-				sceneInfo.id = Scene::createNewId();
-				sceneInfo.hasMap = true;
-				activeScene = std::unique_ptr<Scene>(new Scene(renderer, &appSettings, sceneInfo));
-				//activeScene->init();
-				if (!activeScene->isValid()) {
-					running = false;
-					dout.error("TRIED TO SWITCH TO NEW SCENE '" + target + "' BUT SCENE WAS INVALID");
-				}
-				//activeScene->initTest();
-			}
-		}
+		if (hasFocus && activeScene->isCameraEnabled())
+			renderer->getCamera()->pollKeyboard(deltaTime_render);
 
 		// Update any settings we need to
-		window->setVerticalSyncEnabled(appSettings.opengl_vsync);
-		window->setFramerateLimit(appSettings.opengl_framerateLimit);
+		window->setVerticalSyncEnabled(appSettings->opengl_vsync);
+		window->setFramerateLimit(appSettings->opengl_framerateLimit);
 
-		tickNo++;
-		lastElapsed = currentElapsed;
+		using namespace std::chrono_literals;
+		std::this_thread::sleep_for(2ms);
 	}
 
-	activeScene->close();
+	dout.log("OpenGLThread() --> Rendering thread exiting...");
 
-	// Output the profiling stuff
-	dout.log("DUMPING PROFILING INFO, this may take a moment....");
-	profiler::dumpFrames("DarkSun.profile");
+	return 0;
 }

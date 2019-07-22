@@ -102,7 +102,7 @@ void Map::tick(float deltaTime) {
 
 				std::vector<Texture> texts;
 				Texture diffuse; // Create a specular map from the height map
-				diffuse.id = TextureFromFile(result.textInfo.diffuseSrc.c_str(), result.textInfo.diffuseGammaCorrection);
+				diffuse.id = mtopengl::getTexture(result.textInfo.diffuseSrc.c_str(), result.textInfo.diffuseGammaCorrection);
 				diffuse.type = "texture_diffuse"; // Set to the diffuse
 				diffuse.path = textureLoc.c_str();
 				texts.push_back(diffuse);
@@ -273,72 +273,4 @@ Map::LoadingResult Map::loadMap() {
 	result.exitValue = 0; // Valid exit
 
 	return result;
-}
-
-unsigned int Map::TextureFromFile(const string filename, bool gamma) {
-
-	unsigned int textureID;
-	glGenTextures(1, &textureID);
-
-	int width, height, nrComponents;
-	unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
-	if (data) {
-		GLenum format;
-		if (nrComponents == 1)
-			format = GL_RED;
-		else if (nrComponents == 3)
-			format = GL_RGB;
-		else if (nrComponents == 4)
-			format = GL_RGBA;
-
-		glBindTexture(GL_TEXTURE_2D, textureID);
-		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		stbi_image_free(data);
-	}
-	else {
-		dout.error("Texture failed to load at path: " + filename);
-		stbi_image_free(data);
-	}
-
-	return textureID;
-}
-
-void Map::catchOpenGLErrors(string ref) {
-	// Catch our own GL errors, if for some reason we create them
-	GLenum error = glGetError();
-	if (error != GL_NO_ERROR) {
-		string errS = "Unknown";
-		switch (error) {
-		case GL_INVALID_ENUM:
-			errS = "GL_INVALID_ENUM";
-			break;
-		case GL_INVALID_VALUE:
-			errS = "GL_INVALID_VALUE";
-			break;
-		case GL_INVALID_OPERATION:
-			errS = "GL_INVALID_OPERATION";
-			break;
-		case GL_INVALID_FRAMEBUFFER_OPERATION:
-			errS = "GL_INVALID_FRAMEBUFFER_OPERATION";
-			break;
-		case GL_OUT_OF_MEMORY:
-			errS = "GL_OUT_OF_MEMORY";
-			break;
-		case GL_STACK_UNDERFLOW:
-			errS = "GL_STACK_UNDERFLOW";
-			break;
-		case GL_STACK_OVERFLOW:
-			errS = "GL_STACK_OVERFLOW";
-			break;
-		}
-
-		dout.error("Detected GL error: '" + errS + "' with ref " + ref);
-	}
 }

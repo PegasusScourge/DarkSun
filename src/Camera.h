@@ -156,7 +156,7 @@ namespace darksun {
 			if (direction == BACKWARD)
 				groundPosition = groundPosition.load() - (Front.load() * velocity);
 			if (direction == LEFT)
-				groundPosition = groundPosition.load() + (Right.load() * velocity);
+				groundPosition = groundPosition.load() + (Right.load() * -velocity);
 			if (direction == RIGHT)
 				groundPosition = groundPosition.load() + (Right.load() * velocity);
 		}

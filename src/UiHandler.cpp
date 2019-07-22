@@ -17,7 +17,10 @@ UIWrangler::UIWrangler(sf::RenderWindow* windowHandle, std::shared_ptr<Camera> c
 	uiEngine.addFilesRecursive("lua/ui/" + uiName + "/", ".lua");
 	dout.log("Added ui files to the engine");
 
-	gui = std::unique_ptr<tgui::Gui>(new tgui::Gui(*windowHandle));
+	{
+		std::lock_guard lock(gui_mutex);
+		gui = std::unique_ptr<tgui::Gui>(new tgui::Gui(*windowHandle));
+	}
 
 	hookUIInterface(settings);
 
@@ -26,6 +29,7 @@ UIWrangler::UIWrangler(sf::RenderWindow* windowHandle, std::shared_ptr<Camera> c
 
 void UIWrangler::OnCreate() {
 	// Init the scene
+	//std::lock_guard lock(gui_mutex);
 	lua::State *L = uiEngine.getState();
 	try {
 		LuaRef sceneTable = getGlobal(L->getState(), uiName.c_str());
@@ -35,7 +39,7 @@ void UIWrangler::OnCreate() {
 		//dlua.verbose("Got scene table");
 		LuaRef onCreate = sceneTable["OnCreate"];
 		if (!onCreate.isFunction())
-			throw new std::exception("OnCreate function not found/mot a function");
+			throw new std::exception("OnCreate function not found/not a function");
 		//dlua.verbose("Got onCreate");
 		onCreate();
 	}
@@ -108,8 +112,11 @@ void UIWrangler::hookUIInterface(ApplicationSettings* settings) {
 			.endNamespace();
 
 		// Add this instance
-		push(L->getState(), this);
-		lua_setglobal(L->getState(), "Gui");
+		{
+			std::lock_guard lock(gui_mutex);
+			push(L->getState(), this);
+			lua_setglobal(L->getState(), "Gui");
+		}
 
 		// Add the application settings
 		push(L->getState(), settings);
@@ -123,18 +130,22 @@ void UIWrangler::hookUIInterface(ApplicationSettings* settings) {
 }
 
 void UIWrangler::draw() {
+	std::lock_guard lock(gui_mutex);
 	gui->draw();
 }
 
 void UIWrangler::handleEvent(sf::Event& ev) {
+	std::lock_guard lock(gui_mutex);
 	gui->handleEvent(ev);
 }
 
 UIWrangler::~UIWrangler() {
+	std::lock_guard lock(gui_mutex);
 	gui->removeAllWidgets();
 }
 
 void UIWrangler::tick(float deltaTime) {
+	//std::lock_guard lock(gui_mutex);
 	lua::State *L = uiEngine.getState();
 	try {
 		LuaRef sceneTable = getGlobal(L->getState(), uiName.c_str());
@@ -152,6 +163,7 @@ void UIWrangler::tick(float deltaTime) {
 }
 
 void UIWrangler::registerWidgetCallback(string n, string t) {
+	std::lock_guard lock(gui_mutex);
 	lua::State *L = uiEngine.getState();
 	try {
 		auto w = gui->get(n);
@@ -167,6 +179,7 @@ void UIWrangler::registerWidgetCallback(string n, string t) {
 }
 
 void UIWrangler::callbackFunc(tgui::Widget::Ptr widget, const std::string& signalName) {
+	//std::lock_guard lock(gui_mutex);
 	lua::State *L = uiEngine.getState();
 	try {
 		LuaRef sceneTable = getGlobal(L->getState(), uiName.c_str());
@@ -194,6 +207,7 @@ void UIWrangler::callbackFunc(tgui::Widget::Ptr widget, const std::string& signa
 }
 
 void UIWrangler::showWithEffect(string n, string eff, int interval) {
+	std::lock_guard lock(gui_mutex);
 	auto w = gui->get(n);
 	if (!isValidWidget(w)) { return; }
 	string effect = eff;
@@ -236,6 +250,7 @@ void UIWrangler::showWithEffect(string n, string eff, int interval) {
 }
 
 void UIWrangler::hideWithEffect(string n, string eff, int interval) {
+	std::lock_guard lock(gui_mutex);
 	auto w = gui->get(n);
 	if (!isValidWidget(w)) { return; }
 	string effect = eff;

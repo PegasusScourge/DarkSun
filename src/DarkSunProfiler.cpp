@@ -21,6 +21,8 @@ int fId = 0;
 
 sf::Clock frameTimer;
 
+std::mutex profilingMutex;
+
 profiler::ScopeProfiler::ScopeProfiler(string ref) {
 #ifdef ENABLE_DS_PROFILING
 	_ref = ref;
@@ -38,6 +40,7 @@ profiler::ScopeProfiler::~ScopeProfiler() {
 
 void profiler::addToCurrentFrame(string ref, int millis) {
 #ifdef ENABLE_DS_PROFILING
+	std::lock_guard lock(profilingMutex);
 	if (currentFrame.times.count(ref) > 0) {
 		// We already have an entry, increment it
 		currentFrame.times[ref] += millis;
@@ -51,6 +54,7 @@ void profiler::addToCurrentFrame(string ref, int millis) {
 
 void profiler::newFrame() {
 #ifdef ENABLE_DS_PROFILING
+	std::lock_guard lock(profilingMutex);
 	currentFrame.totalTime = frameTimer.getElapsedTime().asMicroseconds();
 	frameTimer.restart();
 	frames.push_back(currentFrame);
@@ -61,6 +65,7 @@ void profiler::newFrame() {
 
 void profiler::dumpFrames(string file) {
 #ifdef ENABLE_DS_PROFILING
+	std::lock_guard lock(profilingMutex);
 	// The out stream
 	std::ofstream outs(file);
 
@@ -73,16 +78,10 @@ void profiler::dumpFrames(string file) {
 		outs << " # ----- [ FRAME " << std::to_string(e.frameId) << " ] ----- #" << std::endl;
 		outs << "TOTAL FRAME TIME: " << std::to_string((float)e.totalTime / 1000.0f) << "ms" << std::endl;
 
-		int registeredTime = 0;
-
 		// Output the information for each reference
 		for (auto const& time : e.times) {
 			outs << " - Ref '" << time.first << "', " << std::to_string((float)time.second / 1000.0f) << "ms" << std::endl;
-			registeredTime += time.second;
 		}
-
-		int unknownTime = e.totalTime - registeredTime;
-		outs << " - Unknown Ref, " << std::to_string((float)unknownTime / 1000.0f) << "ms" << std::endl;
 	}
 
 	outs.flush();

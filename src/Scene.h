@@ -27,6 +27,14 @@ namespace darksun {
 		string mapName = "";
 		bool hasMap = false;
 	};
+
+	struct EntityCreateInfo {
+		string bp = "";
+		float x = 0;
+		float y = 0;
+		float z = 0;
+		int wantedId = 0;
+	};
 	
 	/* The base scene class, with standard things */
 	class Scene {
@@ -37,7 +45,7 @@ namespace darksun {
 
 		// Entities in this scene
 		std::vector<std::shared_ptr<Entity>> entities;
-		//UIOfSomeKind ui;
+		std::vector<EntityCreateInfo> entitiesToCreate;
 
 		// Naming stuff
 		int myId;
@@ -68,6 +76,9 @@ namespace darksun {
 
 		// Hook the Ui with scene functions
 		void hookClass(lua::State *L);
+
+		// Process requests to spawn entities
+		void processSpawnEntityRequests();
 
 		// Lua exposed things
 		void lua_setLightPosition(int l, float x, float y, float z) { renderer->setLightPosition(l, glm::vec3(x, y, z)); }
@@ -110,7 +121,7 @@ namespace darksun {
 		string getNewScene() { return ui->getNewScene(); }
 
 		// Entity spawning
-		int spawnEntity(string bpN, float x, float y, float z);
+		void spawnEntity(string bpN, float x, float y, float z);
 
 		// Entity removal
 		void killEntity(int id);

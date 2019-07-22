@@ -21,8 +21,7 @@ Header file for Model.cpp
 #include "Log.h"
 #include "Shader.h"
 #include "Renderable.h"
-
-#include "stb_image.h"
+#include "MultiThreadedOpenGL.h"
 
 using string = std::string;
 using namespace darksun;
@@ -32,7 +31,6 @@ namespace darksun {
 	class Model : public Renderable {
 	public:
 		/*  Model Data */
-		std::vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
 		string directory = "";
 
 		/*  Functions   */
@@ -47,8 +45,6 @@ namespace darksun {
 
 		// MUST HAVE A GENERIC FORWARD SLASHED PATH! Loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
 		void loadModel(string const &path);
-
-		unsigned int TextureFromFile(const char * path, const string &directory, bool gamma);
 	private:
 		/*  Functions   */
 

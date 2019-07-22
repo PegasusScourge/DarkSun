@@ -19,6 +19,7 @@ THREADING IN OPERATION, might be safe
 #include "Model.h"
 #include "Renderable.h"
 #include "LuaEngine.h"
+#include "MultiThreadedOpenGL.h"
 
 using namespace darksun;
 
@@ -41,8 +42,6 @@ namespace darksun {
 		}
 
 	private:
-
-		void catchOpenGLErrors(string ref);
 
 		struct ProtoTextureInfo {
 			string diffuseSrc;
@@ -76,8 +75,6 @@ namespace darksun {
 		std::atomic<int> sizeY = 0;
 
 		LuaEngine engine;
-
-		unsigned int TextureFromFile(const string filename, bool gamma);
 
 		LoadingResult loadMap();
 	};

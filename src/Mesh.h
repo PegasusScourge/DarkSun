@@ -8,27 +8,15 @@
 #include <memory>
 #include <algorithm>
 
-
 #include "Shader.h"
+#include "MultiThreadedOpenGL.h"
+
+#include "OpenGL.h"
 
 using string = std::string;
 using namespace darksun;
 
 namespace darksun {
-
-	struct Vertex {
-		glm::vec3 Position;
-		glm::vec3 Normal;
-		glm::vec2 TexCoords;
-		glm::vec3 Tangent;
-		glm::vec3 Bitangent;
-	};
-
-	struct Texture {
-		unsigned int id;
-		string type;
-		string path;
-	};
 
 	class Mesh {
 	public:
@@ -43,6 +31,8 @@ namespace darksun {
 		int getNumberOfIndices() {
 			return indices.size();
 		}
+		
+		// This is accessed through the OpenGL thread so IS FINE RIGHT HERE
 		void GL_bindVertexArray() {
 			glBindVertexArray(VAO);
 		}

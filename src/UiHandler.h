@@ -14,6 +14,7 @@ Header file for UiHandler.cpp, wrangles the UI for scenes (with LuaEngine for UI
 #include "ApplicationSettings.h"
 #include "Camera.h"
 #include "LuaEngine.h"
+#include <mutex>
 
 namespace darksun {
 
@@ -27,6 +28,7 @@ namespace darksun {
 		//std::shared_ptr<Renderer> renderer;
 		std::shared_ptr<Camera> cam;
 
+		std::mutex gui_mutex;
 		std::unique_ptr<tgui::Gui> gui;
 
 		LuaEngine uiEngine;
@@ -116,6 +118,7 @@ namespace darksun {
 
 		// Add the widget to the current active parent
 		void addNewWidget(tgui::Widget::Ptr widget, string n) {
+			std::lock_guard lock(gui_mutex);
 			WidgetData dat;
 			dat.widgetName = n;
 			widget->setUserData(dat);
@@ -151,72 +154,84 @@ namespace darksun {
 
 		// Set the size of a widget (in percentage)
 		void setWidgetSizePercent(string n, string x, string y) {
+			std::lock_guard lock(gui_mutex);
 			auto w = gui->get(n);
 			if (!isValidWidget(w)) { return; }
 			w->setSize(x, y);
 		}
 		// Set the size of a widget (absolute)
 		void setWidgetSize(string n, int x, int y) {
+			std::lock_guard lock(gui_mutex);
 			auto w = gui->get(n);
 			if (!isValidWidget(w)) { return; }
 			w->setSize(x, y);
 		}
 		// Set the position of a widget (in percentage)
 		void setWidgetPositionPercent(string n, string x, string y) {
+			std::lock_guard lock(gui_mutex);
 			auto w = gui->get(n);
 			if (!isValidWidget(w)) { return; }
 			w->setPosition(x, y);
 		}
 		// Set the position of a widget (absolute)
 		void setWidgetPosition(string n, int x, int y) {
+			std::lock_guard lock(gui_mutex);
 			tgui::Widget::Ptr w = gui->get(n);
 
 			w->setPosition(x, y);
 		}
 		// Set the text of a button widget
 		void setButtonWidgetText(string n, string text) {
+			std::lock_guard lock(gui_mutex);
 			tgui::Button::Ptr w = gui->get<tgui::Button>(n);
 			if (!isValidWidget(w)) { return; }
 			w->setText(text);
 		}
 		// Set a checkbox widget as checked
 		void setCheckBoxWidgetChecked(string n, bool t) {
+			std::lock_guard lock(gui_mutex);
 			tgui::CheckBox::Ptr w = gui->get<tgui::CheckBox>(n);
 			if (!isValidWidget(w)) { return; }
 			w->setChecked(t);
 		}
 		// Set a checkbox widget text
 		void setCheckBoxWidgetText(string n, string text) {
+			std::lock_guard lock(gui_mutex);
 			tgui::CheckBox::Ptr w = gui->get<tgui::CheckBox>(n);
 			if (!isValidWidget(w)) { ; return; }
 			w->setText(text);
 		}
 		// Set the text of a label widget
 		void setLabelWidgetText(string n, string text) {
+			std::lock_guard lock(gui_mutex);
 			tgui::Label::Ptr w = gui->get<tgui::Label>(n);
 			if (!isValidWidget(w)) { ; return; }
 			w->setText(text);
 		}
 		// Set the widget visible
 		void setWidgetVisible(string n, bool v) {
+			std::lock_guard lock(gui_mutex);
 			auto w = gui->get(n);
 			if (!isValidWidget(w)) { return; }
 			w->setVisible(v);
 		}
 		// Set the widget enabled
 		void setWidgetEnabled(string n, bool v) {
+			std::lock_guard lock(gui_mutex);
 			auto w = gui->get(n);
 			if (!isValidWidget(w)) { return; }
 			w->setEnabled(v);
 		}
 		// is the widget visible
 		bool isWidgetVisible(string n) {
+			std::lock_guard lock(gui_mutex);
 			auto w = gui->get(n);
 			if (!isValidWidget(w)) { return true; }
 			return w->isVisible();
 		}
 		// is the widget enabled
 		bool isWidgetEnabled(string n) {
+			std::lock_guard lock(gui_mutex);
 			auto w = gui->get(n);
 			if (!isValidWidget(w)) { return true; }
 			return w->isEnabled();
@@ -227,6 +242,7 @@ namespace darksun {
 		void hideWithEffect(string n, string eff, int interval);
 
 		tgui::Widget::Ptr getWidgetByName(string n) {
+			std::lock_guard lock(gui_mutex);
 			auto w = gui->get(n);
 			if (!isValidWidget(w)) { return NULL; }
 			return w;

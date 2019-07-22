@@ -188,6 +188,7 @@ void Renderer::cleanup() {
 }
 
 void Renderer::registerRenderable(string name, std::shared_ptr<Renderable> n) {
+	std::lock_guard lock(renderables_mutex);
 	// Check for trying to overwrite a previous renderable
 	if (renderables.count(name) > 0) {
 		dout.error("Tried to register renderable with name=\"" + name + "\", but one with that name is already registered!");
@@ -198,10 +199,12 @@ void Renderer::registerRenderable(string name, std::shared_ptr<Renderable> n) {
 }
 
 void Renderer::unregisterRenderable(string name) {
+	std::lock_guard lock(renderables_mutex);
 	renderables.erase(name);
 }
 
 void Renderer::registerUI(string name, std::shared_ptr<UIWrangler> n) {
+	std::lock_guard lock(renderableUIs_mutex);
 	// Check for trying to overwrite a previous renderable
 	if (renderableUIs.count(name) > 0) {
 		dout.error("Tried to register UI with name=\"" + name + "\", but one with that name is already registered!");
@@ -212,6 +215,7 @@ void Renderer::registerUI(string name, std::shared_ptr<UIWrangler> n) {
 }
 
 void Renderer::unregisterUI(string name) {
+	std::lock_guard lock(renderableUIs_mutex);
 	renderableUIs.erase(name);
 }
 

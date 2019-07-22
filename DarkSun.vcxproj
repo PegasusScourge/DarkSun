@@ -29,6 +29,7 @@
     <ClCompile Include="src\Map.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Model.cpp" />
+    <ClCompile Include="src\MultiThreadedOpenGL.cpp" />
     <ClCompile Include="src\Renderable.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\Scene.cpp" />
@@ -45,6 +46,8 @@
     <ClInclude Include="src\Map.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Model.h" />
+    <ClInclude Include="src\MultiThreadedOpenGL.h" />
+    <ClInclude Include="src\OpenGL.h" />
     <ClInclude Include="src\Renderable.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\Scene.h" />

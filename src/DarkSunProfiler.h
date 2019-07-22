@@ -16,6 +16,7 @@ Uses black magic to monitor the functions that are being used and for how long
 #include <SFML/System.hpp>
 #include <map>
 #include <vector>
+#include <mutex>
 
 #include <fstream>
 #include <sstream>

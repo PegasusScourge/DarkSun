@@ -2,6 +2,10 @@
 
 SFML + OpenGL RTS game engine
 
+## Pegasus' notes to himself:
+
+ - Never allow lua to call a c++ function that interacts with mutexes if possible, it will auto-destruct the game
+
 ## Versions of software used to build this
 SFML: version SFML-2.5.1-vc-64-bit (2.5.1)
 
