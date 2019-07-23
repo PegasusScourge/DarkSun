@@ -87,6 +87,11 @@ namespace darksun {
 		glm::vec3 lua_getLightPosition(int l) { return renderer->getLightPosition(l); }
 		glm::vec3 lua_getLightColor(int l) { return renderer->getLightColor(l); }
 		bool lua_getLightAttenuation(int l) { return renderer->getLightAttenuation(l); }
+		void lua_setCameraEnabled(bool a) { setCameraEnabled(a); }
+		void lua_setTacticalZoomSettings(float min, float max, float xDelta) { 
+			renderer->getCamera()->setTacticalZoomParams(min, max, xDelta); 
+			renderer->getCamera()->update(glm::vec3(0.0f, 0.0f, 0.0f), 0.5f);
+		}
 
 	public:
 		static int createNewId();

@@ -65,6 +65,9 @@ testScene = {
 		Scene:setLightColor(1, 1.0, 1.0, 1.0)
 		Scene:setLightAttenuation(1, true)
 		LOG('Lighting set')
+		
+		-- create the camera settings
+		Scene:setCameraEnabled(true)
 	end,
 	
 	sinArg = 0,

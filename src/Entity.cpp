@@ -12,6 +12,12 @@ A game engine actual entity, marrying together all aspects
 using namespace darksun;
 using namespace luabridge;
 
+/**
+
+darksun::EntityOrders
+
+*/
+
 void EntityOrders::hookClass(lua::State *L) {
 	try {
 		luabridge::getGlobalNamespace(L->getState())
@@ -31,6 +37,12 @@ void EntityOrders::hookClass(lua::State *L) {
 		return;
 	}
 }
+
+/**
+
+darksun::Entity
+
+*/
 
 int Entity::LastEntityId = 0;
 

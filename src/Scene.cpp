@@ -28,6 +28,8 @@ Scene::Scene(std::shared_ptr<Renderer> r, ApplicationSettings* appSettings, Scen
 
 	dout.log("Scene constructor called");
 
+	init();
+
 	// Create the ui
 	ui = std::shared_ptr<UIWrangler>(new UIWrangler(renderer->getWindowHandle(), renderer->getCamera(), appSettings, sceneName));
 	hookClass(ui->getUiEngine()->getState());
@@ -49,8 +51,6 @@ Scene::Scene(std::shared_ptr<Renderer> r, ApplicationSettings* appSettings, Scen
 		// Register the map with the renderer
 		r->registerRenderable("map", std::dynamic_pointer_cast<Renderable>(map));
 	}
-
-	init();
 
 	// Check for map loading
 	if (hasMap) {
@@ -78,7 +78,7 @@ void Scene::init() {
 	renderer->getCamera()->setTacticalZoomParams(14.0f, 1500.0f, 15.0f);
 	renderer->getCamera()->update(glm::vec3(0.0f, 0.0f, 0.0f), 0.5f);
 
-	setCameraEnabled(true);
+	setCameraEnabled(false);
 
 	dout.log("Scene creation complete");
 	valid = true;
@@ -114,6 +114,8 @@ void Scene::hookClass(lua::State *L) {
 					.addFunction("getLightPosition", &darksun::Scene::lua_getLightPosition)
 					.addFunction("getLightColor", &darksun::Scene::lua_getLightColor)
 					.addFunction("getLightAttenuation", &darksun::Scene::lua_getLightAttenuation)
+					.addFunction("setCameraEnabled", &darksun::Scene::lua_setCameraEnabled)
+					.addFunction("setTacticalZoomSettings", &darksun::Scene::lua_setTacticalZoomSettings)
 				.endClass()
 			.endNamespace();
 
