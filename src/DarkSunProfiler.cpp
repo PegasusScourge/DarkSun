@@ -11,8 +11,7 @@ Uses black magic to monitor the functions that are being used and for how long
 
 using namespace darksun;
 
-// Stores committed frames
-std::vector<profiler::ProfileFrame> frames;
+static string output = "DarkSun.profile";
 
 // Current profile frame being written to
 profiler::ProfileFrame currentFrame;
@@ -57,34 +56,48 @@ void profiler::newFrame() {
 	std::lock_guard lock(profilingMutex);
 	currentFrame.totalTime = frameTimer.getElapsedTime().asMicroseconds();
 	frameTimer.restart();
-	frames.push_back(currentFrame);
+	
+	dumpFrame();
+
 	currentFrame = ProfileFrame(); // Reset the current frame
 	currentFrame.frameId = ++fId;
 #endif
 }
 
-void profiler::dumpFrames(string file) {
+void profiler::dumpFrame() {
 #ifdef ENABLE_DS_PROFILING
-	std::lock_guard lock(profilingMutex);
+	//std::lock_guard lock(profilingMutex);
+	
+	// Only print detailed information for every 200th frame or if the total frame time is > 100ms
+	if (currentFrame.frameId % 200 != 0 && currentFrame.totalTime / 1000.0f < 100) {
+		return;
+	}
+
 	// The out stream
-	std::ofstream outs(file);
-
-	for (auto& e : frames) {
-		// Only print detailed information for every 20th frame or if the total frame time is > 100ms
-		if (e.frameId % 20 != 0 && e.totalTime / 1000.0f < 100) {
-			continue;
-		}
+	std::ofstream outs(output, std::ios_base::app);
 		
-		outs << " # ----- [ FRAME " << std::to_string(e.frameId) << " ] ----- #" << std::endl;
-		outs << "TOTAL FRAME TIME: " << std::to_string((float)e.totalTime / 1000.0f) << "ms" << std::endl;
+	outs << " # ----- [ FRAME " << std::to_string(currentFrame.frameId) << " ] ----- #" << std::endl;
+	outs << "TOTAL FRAME TIME: " << std::to_string((float)currentFrame.totalTime / 1000.0f) << "ms" << std::endl;
 
-		// Output the information for each reference
-		for (auto const& time : e.times) {
-			outs << " - Ref '" << time.first << "', " << std::to_string((float)time.second / 1000.0f) << "ms" << std::endl;
-		}
+	// Output the information for each reference
+	for (auto const& time : currentFrame.times) {
+		outs << " - Ref '" << time.first << "', " << std::to_string((float)time.second / 1000.0f) << "ms" << std::endl;
 	}
 
 	outs.flush();
 	outs.close(); // Close the stream
+#endif
+}
+
+void profiler::writeProfilingHeader() {
+#ifdef ENABLE_DS_PROFILING
+	std::lock_guard lock(profilingMutex);
+	// The out stream
+	std::ofstream outs(output);
+
+	outs << "[ PROFILING STARTED ]" << std::endl << std::endl;
+
+	outs.flush();
+	outs.close();
 #endif
 }

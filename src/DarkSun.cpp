@@ -22,6 +22,9 @@ void DarkSun::processArgs(int argc, char *argv[]) {
 void DarkSun::run() {
 	dout.log("DarkSun init");
 
+	// Start the profiling
+	profiler::writeProfilingHeader();
+
 	running = true;
 
 	ApplicationSettings appSettings;
@@ -118,10 +121,6 @@ void DarkSun::run() {
 		using namespace std::chrono_literals;
 		std::this_thread::sleep_for(4ms);
 	}
-
-	// Output the profiling stuff
-	dout.log("DUMPING PROFILING INFO, this may take a moment....");
-	profiler::dumpFrames("DarkSun.profile");
 
 	dout.log("Waiting for rendering thread to close...");
 	int returnVal = renderingThread.get();

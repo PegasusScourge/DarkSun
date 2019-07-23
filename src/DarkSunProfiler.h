@@ -61,6 +61,8 @@ namespace darksun::profiler {
 
 	void newFrame();
 
-	void dumpFrames(string file);
+	void dumpFrame();
+
+	void writeProfilingHeader();
 
 }
