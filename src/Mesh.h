@@ -20,11 +20,6 @@ namespace darksun {
 
 	class Mesh {
 	public:
-		/*  Mesh Data  */
-		std::vector<Vertex> vertices;
-		std::vector<unsigned int> indices;
-		std::vector<Texture> textures;
-
 		std::vector<Texture> getTextures() {
 			return textures;
 		}
@@ -37,13 +32,18 @@ namespace darksun {
 			glBindVertexArray(VAO);
 		}
 
-		/*  Functions  */
+		// Constructor
 		Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
 	private:
 		/*  Render data  */
 		unsigned int VAO, VBO, EBO;
 
-		/*  Functions    */
+		/*  Mesh Data  */
+		std::vector<Vertex> vertices;
+		std::vector<unsigned int> indices;
+		std::vector<Texture> textures;
+
+		// Construct the mesh
 		void setupMesh();
 	};
 

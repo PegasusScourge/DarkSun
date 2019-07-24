@@ -13,6 +13,13 @@ THREADING IN OPERATION, might be safe
 
 using namespace darksun;
 
+void mtopengl::process() {
+	// Call the vao
+	processVAOLoadRequests();
+	// Call the textures
+	processTextureLoadRequests();
+}
+
 /**
 
 sf::Event handling

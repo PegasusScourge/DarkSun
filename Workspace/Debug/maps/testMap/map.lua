@@ -1,6 +1,6 @@
 map = {
 	heightmap = 'setons_light_height.jpg',
-	texture = 'setons_light_height.jpg',
+	texture = 'engineflare1.jpg',
 	resources = {
 		-- define resource points here
 	},

@@ -47,6 +47,9 @@ namespace darksun::mtopengl {
 		std::vector<unsigned int> indices = std::vector<unsigned int>();
 	};
 
+	// Accessed by the OpenGL thread only
+	void process();
+
 	// Accessed by functions that want to get a textre from the multi-threading solution
 	unsigned int getTexture(const string filename, bool gamma);
 

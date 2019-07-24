@@ -170,7 +170,7 @@ Map::LoadingResult Map::loadMap() {
 	float lowestTemp = 100.0f;
 	float highestTemp = -100.0f;
 
-	// Loop through each y line from x0 to xn and fill the data
+	// Loop through each y line from xn to x0 and fill the data
 	for (int y = 0; y < heightmapBuffer_height; y++) {
 		for (int x = 0; x < heightmapBuffer_width; x++) {
 			// data is in unsigned char, 0 - 255

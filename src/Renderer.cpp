@@ -53,7 +53,7 @@ void Renderer::create(ApplicationSettings* settings) {
 	catchOpenGLErrors("FRAMEBUFFER_SRGB setup");
 
 	// Enable culling
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
 	catchOpenGLErrors("CULL_FACE setup");

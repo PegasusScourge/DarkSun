@@ -166,9 +166,8 @@ int DarkSun::OpenGLThread(std::shared_ptr<Renderer> renderer, ApplicationSetting
 		deltaTime_render = elapsedTime.asSeconds();
 		clock.restart();
 
-		// Process requests from other threads
-		mtopengl::processTextureLoadRequests();
-		mtopengl::processVAOLoadRequests();
+		// Process opengl requests from other threads
+		mtopengl::process();
 
 		// Draw the scene
 		renderer->render();
