@@ -110,7 +110,7 @@ void Renderer::initShadows() {
 
 void Renderer::initShaders() {
 	// Create the shader for directional lights
-	defaultShader = std::shared_ptr<Shader>(new Shader("core/shader/lighting_vertex.shader", "core/shader/lighting_geometry.shader", "core/shader/lighting_fragment_attenuateChange.shader"));
+	defaultShader = std::shared_ptr<Shader>(new Shader("core/shader/lighting_vertex.shader", "core/shader/lighting_geometry.shader", "core/shader/lighting_fragment.shader"));
 	defaultShader->use();
 	catchOpenGLErrors("defaultShader setup");
 	defaultShader->setInt("shadowMap", 10);
@@ -301,7 +301,7 @@ void Renderer::render() {
 	defaultShadowShader->use();
 
 	float near_plane = 0.1f, far_plane = 2.0f;
-	float lightProjMult = 100.0f;
+	float lightProjMult = 1.0f;
 	glm::mat4 lightProjection = glm::ortho(-1.0f * lightProjMult, 1.0f * lightProjMult, -1.0f * lightProjMult, 1.0f * lightProjMult, near_plane, far_plane);
 
 	glViewport(0, 0, getShadowWidth(), getShadowHeight());

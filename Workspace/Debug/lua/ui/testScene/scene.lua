@@ -61,7 +61,7 @@ testScene = {
 		Gui:registerWidgetCallback('vsync_check', 'unchecked')
 		
 		-- create lighting
-		Scene:setLightPosition(1, Scene:getMapSizeX() / 2, 30.0, Scene:getMapSizeY() / 2)
+		Scene:setLightPosition(1, Scene:getMapSizeX() / 2, 100.0, Scene:getMapSizeY() / 2)
 		Scene:setLightColor(1, 0.2, 0.2, 0.2)
 		Scene:setLightAttenuation(1, false)
 		LOG('Lighting set')

@@ -174,7 +174,7 @@ Map::LoadingResult Map::loadMap() {
 	for (int y = 0; y < heightmapBuffer_height; y++) {
 		for (int x = 0; x < heightmapBuffer_width; x++) {
 			// data is in unsigned char, 0 - 255
-			float value = glm::clamp((float)data[(y*heightmapBuffer_width) + x], 0.0f, 255.0f) * 0.1;
+			float value = glm::clamp((float)data[(y*heightmapBuffer_width) + x], 0.0f, 255.0f) * 0.12;
 			float textX = (float)x / (float)(heightmapBuffer_width-1);
 			float textY = (float)y / (float)(heightmapBuffer_height-1);
 			//dout.verbose("Coords:(" + std::to_string(x) + "," + std::to_string(y) + "), textCoords:(" + std::to_string(textX) + "," + std::to_string(textY) + ")");
@@ -227,10 +227,34 @@ Map::LoadingResult Map::loadMap() {
 
 	dout.verbose("Map::loadMap() --> Created and populated indiciesBuff");
 
-	// Calculate the normals correctly
 	glm::vec3 v4; glm::vec3 v2;
 	glm::vec3 v1; glm::vec3 v3;
 	glm::vec3 v0;
+
+	// Do an initial smoothing pass
+	float weightOthers = 0.2f;
+	float weightIndiv = weightOthers / 4.0;
+	float newY = 0.0f;
+	for (int y = 0; y < heightmapBuffer_height; y++) {
+		for (int x = 0; x < heightmapBuffer_width; x++) {
+			if (x > 0 && x < heightmapBuffer_width - 1 && y > 0 && y < heightmapBuffer_height - 1) {
+				Vertex *vert = &vertexBuff.at((y*heightmapBuffer_width) + x);
+
+				// Take an average of the surrounding points and weight
+				v0 = vert->Position;
+				v1 = vertexBuff.at((y*heightmapBuffer_width) + x - 1).Position - v0;
+				v3 = vertexBuff.at((y*heightmapBuffer_width) + x + 1).Position - v0;
+				v2 = vertexBuff.at(((y + 1)*heightmapBuffer_width) + x).Position - v0;
+				v4 = vertexBuff.at(((y - 1)*heightmapBuffer_width) + x).Position - v0;
+
+				newY = (v0.y * (1.0 - weightOthers)) + (v1.y * weightIndiv) + (v2.y * weightIndiv) + (v3.y * weightIndiv) + (v4.y * weightIndiv);
+
+				vert->Position.y = newY;
+			}
+		}
+	}
+
+	// Calculate the normals correctly
 	glm::vec3 v12; glm::vec3 v23;
 	glm::vec3 v34; glm::vec3 v41;
 	int normalsProcessed = 0;
