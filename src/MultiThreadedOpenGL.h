@@ -25,7 +25,7 @@ THREADING IN OPERATION, might be safe
 
 #include "Log.h"
 #include "DarkSunProfiler.h"
-#include "OpenGL.h"
+#include "OpenGLStructs.h"
 
 using string = std::string;
 

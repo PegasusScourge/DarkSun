@@ -110,7 +110,7 @@ void Renderer::initShadows() {
 
 void Renderer::initShaders() {
 	// Create the shader for directional lights
-	defaultShader = std::shared_ptr<Shader>(new Shader("core/shader/lighting_vertex.shader", "core/shader/lighting_geometry.shader", "core/shader/lighting_fragment.shader"));
+	defaultShader = std::shared_ptr<Shader>(new Shader("core/shader/lighting_vertex.shader", "core/shader/lighting_geometry.shader", "core/shader/lighting_fragment_attenuateChange.shader"));
 	defaultShader->use();
 	catchOpenGLErrors("defaultShader setup");
 	defaultShader->setInt("shadowMap", 10);
@@ -301,12 +301,15 @@ void Renderer::render() {
 	defaultShadowShader->use();
 
 	float near_plane = 0.1f, far_plane = 2.0f;
-	glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+	float lightProjMult = 100.0f;
+	glm::mat4 lightProjection = glm::ortho(-1.0f * lightProjMult, 1.0f * lightProjMult, -1.0f * lightProjMult, 1.0f * lightProjMult, near_plane, far_plane);
 
 	glViewport(0, 0, getShadowWidth(), getShadowHeight());
 
 	// Set the light view to LIGHT 1, only light 1 casts shadows
-	glm::mat4 lightView = glm::lookAt(getLightPosition(1), glm::vec3(0, 0.0f, 0), glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::vec3 lightPos = getLightPosition(1);
+	glm::vec3 lookingAt = glm::vec3(lightPos.x, 0, lightPos.z);
+	glm::mat4 lightView = glm::lookAt(lightPos, lookingAt, glm::vec3(0.0f, 1.0f, 0.0f));
 	// Create the light space matrix
 	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
@@ -319,7 +322,6 @@ void Renderer::render() {
 	catchOpenGLErrors("DepthMapFBO bind");
 
 	// Render scene to shadow buffer
-
 	draw(defaultShadowShader);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);

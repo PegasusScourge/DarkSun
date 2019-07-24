@@ -61,9 +61,9 @@ testScene = {
 		Gui:registerWidgetCallback('vsync_check', 'unchecked')
 		
 		-- create lighting
-		Scene:setLightPosition(1, 12.0, 20.0, 4.0)
-		Scene:setLightColor(1, 1.0, 1.0, 1.0)
-		Scene:setLightAttenuation(1, true)
+		Scene:setLightPosition(1, Scene:getMapSizeX() / 2, 30.0, Scene:getMapSizeY() / 2)
+		Scene:setLightColor(1, 0.2, 0.2, 0.2)
+		Scene:setLightAttenuation(1, false)
 		LOG('Lighting set')
 		
 		-- create the camera settings
@@ -79,8 +79,8 @@ testScene = {
 		Gui:setLabelWidgetText('cameraInfo', 'Pos = (' .. tostring(round(Gui:cameraX())) .. ',' .. tostring(round(Gui:cameraZ())) .. ')')
 		
 		-- Scene:setLightPosition(1, 40.0 + (math.sin(testScene.sinArg) * 20.0), 20.0, 40.0 + (math.cos(testScene.sinArg) * 20.0))
-		Scene:setLightPosition(1, 40, 20.0 + (math.cos(testScene.sinArg) * 20.0), 40.0)
-		testScene.sinArg = testScene.sinArg + (1 * deltaTime)
+		-- Scene:setLightPosition(1, 40, 20.0 + (math.cos(testScene.sinArg) * 20.0), 40.0)
+		-- testScene.sinArg = testScene.sinArg + (1 * deltaTime)
 		
 		Gui:setLabelWidgetText('lightInfo', 'Light YPos = ' .. tostring(Scene:getLightPosition(1).y))
 	end,

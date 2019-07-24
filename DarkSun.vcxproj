@@ -47,7 +47,7 @@
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\MultiThreadedOpenGL.h" />
-    <ClInclude Include="src\OpenGL.h" />
+    <ClInclude Include="src\OpenGLStructs.h" />
     <ClInclude Include="src\Renderable.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\Scene.h" />

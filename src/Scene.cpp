@@ -30,16 +30,6 @@ Scene::Scene(std::shared_ptr<Renderer> r, ApplicationSettings* appSettings, Scen
 
 	init();
 
-	// Create the ui
-	ui = std::shared_ptr<UIWrangler>(new UIWrangler(renderer->getWindowHandle(), renderer->getCamera(), appSettings, sceneName));
-	hookClass(ui->getUiEngine()->getState());
-	EntityOrders::hookClass(ui->getUiEngine()->getState());
-
-	ui->OnCreate();
-
-	// Create our loading UI
-	initLoadingUi();
-
 	// Create the Terrain
 	if (hasMap) {
 		map = std::shared_ptr<Map>(new Map("maps/testMap"));
@@ -51,6 +41,16 @@ Scene::Scene(std::shared_ptr<Renderer> r, ApplicationSettings* appSettings, Scen
 		// Register the map with the renderer
 		r->registerRenderable("map", std::dynamic_pointer_cast<Renderable>(map));
 	}
+
+	// Create the ui
+	ui = std::shared_ptr<UIWrangler>(new UIWrangler(renderer->getWindowHandle(), renderer->getCamera(), appSettings, sceneName));
+	hookClass(ui->getUiEngine()->getState());
+	EntityOrders::hookClass(ui->getUiEngine()->getState());
+
+	ui->OnCreate();
+
+	// Create our loading UI
+	initLoadingUi();
 
 	// Check for map loading
 	if (hasMap) {
@@ -116,6 +116,8 @@ void Scene::hookClass(lua::State *L) {
 					.addFunction("getLightAttenuation", &darksun::Scene::lua_getLightAttenuation)
 					.addFunction("setCameraEnabled", &darksun::Scene::lua_setCameraEnabled)
 					.addFunction("setTacticalZoomSettings", &darksun::Scene::lua_setTacticalZoomSettings)
+					.addFunction("getMapSizeX", & darksun::Scene::lua_getMapSizeX)
+					.addFunction("getMapSizeY", & darksun::Scene::lua_getMapSizeY)
 				.endClass()
 			.endNamespace();
 

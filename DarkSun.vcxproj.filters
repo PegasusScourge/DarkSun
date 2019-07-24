@@ -95,9 +95,6 @@
     <ClInclude Include="src\MultiThreadedOpenGL.h">
       <Filter>Header Files\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="src\OpenGL.h">
-      <Filter>Header Files\OpenGL</Filter>
-    </ClInclude>
     <ClInclude Include="src\Mesh.h">
       <Filter>Header Files\OpenGL</Filter>
     </ClInclude>
@@ -127,6 +124,9 @@
     </ClInclude>
     <ClInclude Include="src\UiHandler.h">
       <Filter>Header Files\GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OpenGLStructs.h">
+      <Filter>Header Files\OpenGL</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

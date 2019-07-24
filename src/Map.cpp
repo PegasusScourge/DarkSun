@@ -167,11 +167,14 @@ Map::LoadingResult Map::loadMap() {
 
 	float percentPerIteration = 25.0f / (float)(width*height); // This moves us forward by 25%
 
+	float lowestTemp = 100.0f;
+	float highestTemp = -100.0f;
+
 	// Loop through each y line from x0 to xn and fill the data
 	for (int y = 0; y < heightmapBuffer_height; y++) {
 		for (int x = 0; x < heightmapBuffer_width; x++) {
 			// data is in unsigned char, 0 - 255
-			float value = (float)data[(y*heightmapBuffer_width) + x] * glm::clamp(std::min(convX * 2, convY * 2), 0.1f, 1.0f);
+			float value = glm::clamp((float)data[(y*heightmapBuffer_width) + x], 0.0f, 255.0f) * 0.1;
 			float textX = (float)x / (float)(heightmapBuffer_width-1);
 			float textY = (float)y / (float)(heightmapBuffer_height-1);
 			//dout.verbose("Coords:(" + std::to_string(x) + "," + std::to_string(y) + "), textCoords:(" + std::to_string(textX) + "," + std::to_string(textY) + ")");
@@ -184,9 +187,17 @@ Map::LoadingResult Map::loadMap() {
 
 			vertexBuff.push_back(temp);
 
+			lowestTemp = std::min(lowestTemp, value);
+			highestTemp = std::max(highestTemp, value);
+
 			loadedPercent = loadedPercent + percentPerIteration; // Keep the user updated with a loaded percent value
 		}
 	}
+
+	lowestP = lowestTemp;
+	highestP = highestTemp;
+
+	dout.verbose("Map::loadMap() --> Got lowest point as: " + std::to_string(lowestP) + " with highest as: " + std::to_string(highestP));
 
 	// Free the data buffer
 	stbi_image_free(data);

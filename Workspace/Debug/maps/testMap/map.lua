@@ -1,6 +1,6 @@
 map = {
-	heightmap = 'heightmap.png',
-	texture = 'text.jpg',
+	heightmap = 'setons_light_height.jpg',
+	texture = 'engineflare1.jpg',
 	resources = {
 		-- define resource points here
 	},
@@ -8,5 +8,5 @@ map = {
 		sizeX = 200,
 		sizeY = 200,
 	},
-	texture_gammaCorrection = true,
+	texture_gammaCorrection = false,
 }

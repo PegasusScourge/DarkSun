@@ -11,7 +11,7 @@
 #include "Shader.h"
 #include "MultiThreadedOpenGL.h"
 
-#include "OpenGL.h"
+#include "OpenGLStructs.h"
 
 using string = std::string;
 using namespace darksun;

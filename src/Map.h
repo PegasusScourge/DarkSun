@@ -41,6 +41,13 @@ namespace darksun {
 			return loadedPercent;
 		}
 
+		int getSizeX() {
+			return sizeX.load();
+		}
+		int getSizeY() {
+			return sizeY.load();
+		}
+
 	private:
 
 		struct ProtoTextureInfo {
@@ -73,6 +80,8 @@ namespace darksun {
 
 		std::atomic<int> sizeX = 0;
 		std::atomic<int> sizeY = 0;
+		std::atomic<float> lowestP = 0;
+		std::atomic<float> highestP = 0;
 
 		LuaEngine engine;
 

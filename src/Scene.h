@@ -89,9 +89,11 @@ namespace darksun {
 		bool lua_getLightAttenuation(int l) { return renderer->getLightAttenuation(l); }
 		void lua_setCameraEnabled(bool a) { setCameraEnabled(a); }
 		void lua_setTacticalZoomSettings(float min, float max, float xDelta) { 
-			renderer->getCamera()->setTacticalZoomParams(min, max, xDelta); 
+			renderer->getCamera()->setTacticalZoomParams(min, max, xDelta);
 			renderer->getCamera()->update(glm::vec3(0.0f, 0.0f, 0.0f), 0.5f);
 		}
+		int lua_getMapSizeX() { if (!hasMap) { return -1; } return map->getSizeX(); }
+		int lua_getMapSizeY() { if (!hasMap) { return -1; } return map->getSizeY(); }
 
 	public:
 		static int createNewId();
