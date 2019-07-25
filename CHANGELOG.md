@@ -9,6 +9,7 @@
 #### Maps
  - Tweaked the output range of maps from the heightmap data to get a more consistent output
  - Added map smoothing to produce a better output
+ - Fixed 90 degree rotation of heightmaps
 #### Profiler
  - Changed profiling to output at the end of each frame if applicable, instead of hogging memory in the background
  - Changed frequency from every 20th frame to 200th

@@ -181,7 +181,7 @@ Map::LoadingResult Map::loadMap() {
 			float textY = (float)y / (float)(heightmapBuffer_height-1);
 			//dout.verbose("Coords:(" + std::to_string(x) + "," + std::to_string(y) + "), textCoords:(" + std::to_string(textX) + "," + std::to_string(textY) + ")");
 			Vertex temp;
-			temp.Position = glm::vec3(x*convX, value, y*convY);
+			temp.Position = glm::vec3(sizeY - (y*convY), value, x*convX);
 			temp.TexCoords = glm::vec2(textX, textY);
 			temp.Normal = glm::vec3(0, 1, 0);
 			temp.Tangent = glm::vec3(0, 0, 1);

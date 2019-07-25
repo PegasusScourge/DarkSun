@@ -1,5 +1,14 @@
 #pragma once
 
+/**
+
+File: Mesh.h
+Description:
+
+Stores information on verticies and indicies and the associated memory in GPU memory
+
+*/
+
 #include <GL/glew.h>
 
 #include <SFML/OpenGL.hpp>
