@@ -29,19 +29,31 @@ namespace darksun {
 		
 		// This is accessed through the OpenGL thread so IS FINE RIGHT HERE
 		void GL_bindVertexArray() {
-			glBindVertexArray(VAO);
+			glBindVertexArray(myDef.VAO);
 		}
+
+		void deformVertexPosition(int vertIndex, glm::vec3 amount) {
+			if (vertIndex < vertices.size() && vertIndex > 0) {
+				vertices[vertIndex].Position += amount;
+				updateVBO = true;
+			}
+		}
+
+		// tick function
+		void tick(float deltaTime);
 
 		// Constructor
 		Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
 	private:
 		/*  Render data  */
-		unsigned int VAO, VBO, EBO;
+		mtopengl::VAODef myDef;
 
 		/*  Mesh Data  */
 		std::vector<Vertex> vertices;
 		std::vector<unsigned int> indices;
 		std::vector<Texture> textures;
+
+		bool updateVBO = false;
 
 		// Construct the mesh
 		void setupMesh();

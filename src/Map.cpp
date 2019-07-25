@@ -78,6 +78,8 @@ Map::Map(string mapfolder) {
 
 void Map::tick(float deltaTime) {
 
+	Renderable::tick(deltaTime);
+
 	if (!valid) {
 		dout.error("INVALID Map ERROR");
 		throw new std::exception("Invalid Map");

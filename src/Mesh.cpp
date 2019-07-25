@@ -11,5 +11,14 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
 }
 
 void Mesh::setupMesh() {
-	VAO = mtopengl::getVAO(&vertices, &indices);
+	myDef = mtopengl::getVAO(&vertices, &indices);
+}
+
+void Mesh::tick(float deltaTime) {
+	// Check for VBO updates
+	if (updateVBO) {
+		updateVBO = false;
+
+		mtopengl::updateVBO(myDef.ref, &vertices);
+	}
 }

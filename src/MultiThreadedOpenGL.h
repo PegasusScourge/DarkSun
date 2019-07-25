@@ -69,7 +69,7 @@ namespace darksun::mtopengl {
 	void processTextureLoadRequests();
 
 	// Accessed by functions that want to get a VAO from the multi-threading solution
-	unsigned int getVAO(std::vector<Vertex>* vertices, std::vector<unsigned int>* indices);
+	mtopengl::VAODef getVAO(std::vector<Vertex>* vertices, std::vector<unsigned int>* indices);
 
 	// Accessed by the opengl thread ONLY
 	void processVAOLoadRequests();

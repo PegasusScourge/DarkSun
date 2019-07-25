@@ -232,6 +232,10 @@ void Entity::initLuaEngine() {
 
 void Entity::tick(float deltaTime) {
 	profiler::ScopeProfiler tickProfiler("Entity.cpp::Entity::tick()");
+	
+	// Tick the model
+	model->tick(deltaTime);
+	
 	if (hasScript) {
 		profiler::ScopeProfiler scriptProfiler("Entity.cpp::Entity::tick()script");
 		lua::State *L = engine.getState();

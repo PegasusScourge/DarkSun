@@ -43,6 +43,15 @@ namespace darksun {
 		// Destructor
 		~Renderable() {}
 
+		// Tick function
+		void tick(float deltaTime) {
+			std::lock_guard lock(meshesMutex);
+			// Allow the meshes to update
+			for (auto& e : meshes) {
+				e.tick(deltaTime);
+			}
+		}
+
 		// Get the position
 		glm::vec3 getPosition() { profiler::ScopeProfiler myProfiler("Renderable.h::Renderable::getPosition()"); return position.load(); }
 		// Get the rotation

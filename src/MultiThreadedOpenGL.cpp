@@ -14,6 +14,8 @@ THREADING IN OPERATION, might be safe
 using namespace darksun;
 
 void mtopengl::process() {
+	// NOTE: attempt to do functions in an order that would cause mutexes to be unlocked for a function (flip flop them)
+
 	// Process VAO allocations
 	processVAOLoadRequests();
 	// Process texture loads
@@ -55,10 +57,10 @@ static std::vector<mtopengl::VAODef> vaosToLoad = std::vector<mtopengl::VAODef>(
 
 static std::map<int, mtopengl::VAODef> loadedVAOs = std::map<int, mtopengl::VAODef>();
 
-static int VAO_REF_COUNTER = 0;
+static unsigned int VAO_REF_COUNTER = 0;
 
-unsigned int mtopengl::getVAO(std::vector<Vertex>* vertices, std::vector<unsigned int>* indices) {
-	int ref = ++VAO_REF_COUNTER;
+mtopengl::VAODef mtopengl::getVAO(std::vector<Vertex>* vertices, std::vector<unsigned int>* indices) {
+	unsigned int ref = ++VAO_REF_COUNTER;
 	
 	unsigned int vaoId = 0;
 	int countLoaded = 0;
@@ -94,10 +96,8 @@ unsigned int mtopengl::getVAO(std::vector<Vertex>* vertices, std::vector<unsigne
 	}
 
 	// It is loaded, set the return value and return
-	{
-		std::lock_guard lock(loadingVAOs_mutex);
-		vaoId = loadedVAOs[ref].VAO;
-	}
+	std::lock_guard lock(loadingVAOs_mutex);
+	vaoId = loadedVAOs[ref].VAO;
 
 	// Do a check on the return value
 	if (vaoId == 0) {
@@ -105,7 +105,7 @@ unsigned int mtopengl::getVAO(std::vector<Vertex>* vertices, std::vector<unsigne
 		dout.error("getVAO() is about to return a null pointer for VAO ref \"" + std::to_string(ref) + "\"");
 	}
 
-	return vaoId;
+	return loadedVAOs[ref];
 }
 
 void mtopengl::processVAOLoadRequests() {
