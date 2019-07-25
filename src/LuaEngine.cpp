@@ -145,33 +145,6 @@ void LuaEngine::lua_import(string f) {
 	}
 }
 
-string LuaEngine::getString(LuaRef r, string n) {
-	LuaRef ref = r[n];
-	if (ref.isString()) {
-		return ref.tostring();
-	}
-	dout.error("Attempted get of string '" + n + "' which is not a string or doesn't exist");
-	return "";
-}
-
-float LuaEngine::getFloat(LuaRef r, string n) {
-	LuaRef ref = r[n];
-	if (ref.isNumber()) {
-		return (float)ref;
-	}
-	dout.error("Attempted get of float '" + n + "' which is not a float or doesn't exist");
-	return 0.0f;
-}
-
-int LuaEngine::getInt(LuaRef r, string n) {
-	LuaRef ref = r[n];
-	if (ref.isNumber()) {
-		return (int)ref;
-	}
-	dout.error("Attempted get of int '" + n + "' which is not an int or doesn't exist");
-	return 0;
-}
-
 void lua_log(const char * s) {
 	dlua.log(s);
 }

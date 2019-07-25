@@ -68,15 +68,6 @@ namespace darksun {
 		/* Wraps a doString call on the state in a try-catch to prevent nastiness */
 		void doString(string s);
 
-		// Gets a string from a LuaRef
-		string getString(LuaRef r, string n);
-
-		// Gets an int from a LuaRef
-		int getInt(LuaRef r, string n);
-
-		// Gets a float from a LuaRef
-		float getFloat(LuaRef r, string n);
-
 		lua::State* getState();
 
 		bool isValid() { return validEngine; }

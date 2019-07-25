@@ -49,10 +49,12 @@ void ApplicationSettings::loadSettings(string settings) {
 		if (graphicsTable.isTable()) {
 			// We have graphics settings
 
-			int antiAlias = engine.getInt(graphicsTable, "antialiasing_level");
-			if (antiAlias >= 0 && antiAlias <= 8 && antiAlias % 2 == 0) {
-				opengl_antialiasingLevel = antiAlias;
-				dout.log("Settings --> graphics.antialiasing_level = '" + std::to_string(antiAlias) + "'");
+			if (graphicsTable["antialiasing_level"].isNumber()) {
+				int antiAlias = (int)graphicsTable["antialiasing_level"];
+				if (antiAlias >= 0 && antiAlias <= 8 && antiAlias % 2 == 0) {
+					opengl_antialiasingLevel = antiAlias;
+					dout.log("Settings --> graphics.antialiasing_level = '" + std::to_string(antiAlias) + "'");
+				}
 			}
 		}
 
