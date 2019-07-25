@@ -10,22 +10,18 @@ Thread safed
 
 */
 
+#include "LuaEngine.h"
 #include <atomic>
+
+using string = std::string;
 
 namespace darksun {
 
 	class ApplicationSettings {
 
 	public:
-		ApplicationSettings();
-		
-		std::atomic<int> opengl_depthBits;
-		std::atomic<int> opengl_stencilBits;
-		std::atomic<int> opengl_antialiasingLevel;
-		std::atomic<int> opengl_majorVersion;
-		std::atomic<int> opengl_minorVersion;
-		std::atomic<bool> opengl_vsync = false;
-		std::atomic<int> opengl_framerateLimit = 200;
+		ApplicationSettings(string settingsFile);
+
 		std::atomic<float> opengl_nearZ = 0.1f;
 		std::atomic<float> opengl_farZ = 2000.0f;
 
@@ -58,6 +54,18 @@ namespace darksun {
 		}
 
 	private:
+
+		std::atomic<int> opengl_depthBits;
+		std::atomic<int> opengl_stencilBits;
+		std::atomic<int> opengl_antialiasingLevel;
+		std::atomic<int> opengl_majorVersion;
+		std::atomic<int> opengl_minorVersion;
+		std::atomic<bool> opengl_vsync = false;
+		std::atomic<int> opengl_framerateLimit = 200;
+
+		LuaEngine engine;
+
+		void loadSettings(string file);
 	};
 
 }

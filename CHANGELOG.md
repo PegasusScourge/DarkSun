@@ -2,10 +2,15 @@
 (2019-07-23 00:39 GMT)
 
 ### Version [ALPHA][0.2.0] (unreleased)
+#### Settings
+ - Added external settings file, 'settings.lua'
+ - Added 'antialiasing_level' as test value
 #### OpenGL
  - Added theoretical implementation to change vertex buffer content to enable mesh deformation (map building, unit destruction etc)
 #### General lighting
  - Fixed directional lighting behaviour being a bit odd
+#### LuaEngines
+ - Added internal implementations to standardise variable access
 #### Maps
  - Tweaked the output range of maps from the heightmap data to get a more consistent output
  - Added map smoothing to produce a better output

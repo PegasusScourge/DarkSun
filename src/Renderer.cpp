@@ -20,11 +20,11 @@ void Renderer::create(ApplicationSettings* settings) {
 	appSettings = settings;
 
 	sf::ContextSettings s;
-	s.depthBits = settings->opengl_depthBits;
-	s.stencilBits = settings->opengl_stencilBits;
-	s.antialiasingLevel = settings->opengl_antialiasingLevel;
-	s.majorVersion = settings->opengl_majorVersion;
-	s.minorVersion = settings->opengl_minorVersion;
+	s.depthBits = settings->get_opengl_depthBits();
+	s.stencilBits = settings->get_opengl_stencilBits();
+	s.antialiasingLevel = settings->get_opengl_antialiasingLevel();
+	s.majorVersion = settings->get_opengl_majorVersion();
+	s.minorVersion = settings->get_opengl_minorVersion();
 	createWindow(s);
 	defaultWindow.setActive();
 

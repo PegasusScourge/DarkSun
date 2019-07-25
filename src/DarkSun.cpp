@@ -27,7 +27,8 @@ void DarkSun::run() {
 
 	running = true;
 
-	ApplicationSettings appSettings;
+	// Load settings
+	ApplicationSettings appSettings("settings.lua");
 
 	std::shared_ptr<Renderer> renderer = std::shared_ptr<Renderer>(new Renderer());
 	dout.verbose("Renderer pointer created");
@@ -135,8 +136,8 @@ int DarkSun::OpenGLThread(std::shared_ptr<Renderer> renderer, ApplicationSetting
 	dout.log("OpenGLThread() --> Rendering thread initialised");
 
 	sf::RenderWindow * window = renderer->getWindowHandle();
-	window->setVerticalSyncEnabled(appSettings->opengl_vsync);
-	window->setFramerateLimit(appSettings->opengl_framerateLimit);
+	window->setVerticalSyncEnabled(appSettings->get_opengl_vsync());
+	window->setFramerateLimit(appSettings->get_opengl_framerateLimit());
 	dout.log("OpenGLThread() --> Access to window established");
 
 	renderThreadStarted = true;
@@ -228,8 +229,8 @@ int DarkSun::OpenGLThread(std::shared_ptr<Renderer> renderer, ApplicationSetting
 			renderer->getCamera()->pollKeyboard(deltaTime_render);
 
 		// Update any settings we need to
-		window->setVerticalSyncEnabled(appSettings->opengl_vsync);
-		window->setFramerateLimit(appSettings->opengl_framerateLimit);
+		window->setVerticalSyncEnabled(appSettings->get_opengl_vsync());
+		window->setFramerateLimit(appSettings->get_opengl_framerateLimit());
 
 		using namespace std::chrono_literals;
 		std::this_thread::sleep_for(2ms);

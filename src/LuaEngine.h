@@ -68,8 +68,14 @@ namespace darksun {
 		/* Wraps a doString call on the state in a try-catch to prevent nastiness */
 		void doString(string s);
 
-		/* Executes the tick() function of the engine (if present) for a single tick of the engine */
-		void tick(float deltaTime);
+		// Gets a string from a LuaRef
+		string getString(LuaRef r, string n);
+
+		// Gets an int from a LuaRef
+		int getInt(LuaRef r, string n);
+
+		// Gets a float from a LuaRef
+		float getFloat(LuaRef r, string n);
 
 		lua::State* getState();
 

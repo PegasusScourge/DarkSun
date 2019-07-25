@@ -22,24 +22,6 @@ LuaEngine::LuaEngine() {
 	//dlua.log("Engine value = " + BoolToString(validEngine));
 }
 
-void LuaEngine::tick(float deltaTime) {
-	if (!validEngine) {// Only continue if the engine is valid
-		dlua.error("Invalid engine, destroy!");
-		return;
-	}
-
-	try {
-		LuaRef t = getGlobal(L.getState(), "tick");
-		t(deltaTime);
-	}
-	catch (std::exception& e) {
-		string what = e.what();
-		dlua.error("tick() error: " + what);
-		dlua.log("Did you declare tick()?");
-		//validEngine = false; // Fail the engine here so execution stops
-	}
-}
-
 void LuaEngine::addFile(string f) {
 	if (!validEngine) // Only continue if the engine is valid
 		return;
@@ -161,6 +143,33 @@ void LuaEngine::lua_import(string f) {
 		string what = e.what();
 		dlua.error("Attempted to import " + f + " at request of engine: " + what);
 	}
+}
+
+string LuaEngine::getString(LuaRef r, string n) {
+	LuaRef ref = r[n];
+	if (ref.isString()) {
+		return ref.tostring();
+	}
+	dout.error("Attempted get of string '" + n + "' which is not a string or doesn't exist");
+	return "";
+}
+
+float LuaEngine::getFloat(LuaRef r, string n) {
+	LuaRef ref = r[n];
+	if (ref.isNumber()) {
+		return (float)ref;
+	}
+	dout.error("Attempted get of float '" + n + "' which is not a float or doesn't exist");
+	return 0.0f;
+}
+
+int LuaEngine::getInt(LuaRef r, string n) {
+	LuaRef ref = r[n];
+	if (ref.isNumber()) {
+		return (int)ref;
+	}
+	dout.error("Attempted get of int '" + n + "' which is not an int or doesn't exist");
+	return 0;
 }
 
 void lua_log(const char * s) {
