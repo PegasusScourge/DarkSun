@@ -2,6 +2,8 @@
 (2019-07-23 00:39 GMT)
 
 ### Version [ALPHA][0.2.0] (unreleased)
+#### OpenGL
+ - Added theoretical implementation to change vertex buffer content to enable mesh deformation (map building, unit destruction etc)
 #### General lighting
  - Fixed directional lighting behaviour being a bit odd
 #### Maps

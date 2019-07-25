@@ -14,10 +14,12 @@ THREADING IN OPERATION, might be safe
 using namespace darksun;
 
 void mtopengl::process() {
-	// Call the vao
+	// Process VAO allocations
 	processVAOLoadRequests();
-	// Call the textures
+	// Process texture loads
 	processTextureLoadRequests();
+	// Process VBO updates
+	processVBOUpdateRequests();
 }
 
 /**
@@ -120,13 +122,14 @@ void mtopengl::processVAOLoadRequests() {
 		glGenBuffers(1, &def.EBO);
 
 		glBindVertexArray(def.VAO);
+
+		def.VBOSize = def.vertices.size() * sizeof(Vertex);
 		glBindBuffer(GL_ARRAY_BUFFER, def.VBO);
+		glBufferData(GL_ARRAY_BUFFER, def.VBOSize, &def.vertices[0], GL_STATIC_DRAW);
 
-		glBufferData(GL_ARRAY_BUFFER, def.vertices.size() * sizeof(Vertex), &def.vertices[0], GL_STATIC_DRAW);
-
+		def.EBOSize = def.indices.size() * sizeof(unsigned int);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, def.EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, def.indices.size() * sizeof(unsigned int),
-			&def.indices[0], GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, def.EBOSize, &def.indices[0], GL_STATIC_DRAW);
 
 		// vertex positions
 		glEnableVertexAttribArray(0);
@@ -150,6 +153,56 @@ void mtopengl::processVAOLoadRequests() {
 	// clear the toLoad pile
 	vaosToLoad.clear();
 }
+
+/**
+
+VAO Updating
+
+*/
+// We use the loadingVAOs mutex for these functions
+
+static std::vector<mtopengl::VBOUpdateDef> vbosToUpdate = std::vector<mtopengl::VBOUpdateDef>();
+
+void mtopengl::updateVBO(int vaoRef, std::vector<Vertex>* vertices) {
+	profiler::ScopeProfiler profiler("MultiThreadedOpenGL.cpp::mtopengl::updateVBO()");
+	// Acquire the locks for the duration of the processing
+	std::lock_guard lock(loadingVAOs_mutex);
+
+	// Check to see if the VAO exists:
+	if(loadedVAOs.count(vaoRef) <= 0) {
+		dout.error("MultiThreadedOpenGL.cpp::mtopengl::updateVBO() --> Attempted to add VBO update of VAORef='" + std::to_string(vaoRef) + "' where such VAORef doesn't exist");
+		return;
+	}
+	
+	VBOUpdateDef def;
+	def.vaoDefRef = vaoRef;
+	def.vertices = std::vector<Vertex>(*vertices);
+
+	vbosToUpdate.push_back(def);
+}
+
+void mtopengl::processVBOUpdateRequests() {
+	profiler::ScopeProfiler profiler("MultiThreadedOpenGL.cpp::mtopengl::processVBOUpdateRequests()");
+	// Acquire the locks for the duration of the processing
+	std::lock_guard lock(loadingVAOs_mutex);
+
+	for (auto& def : vbosToUpdate) {
+		// VAOref is assumed to exist, otherwise it wouldn't have made it into the list
+		glBindVertexArray(loadedVAOs[def.vaoDefRef].VAO);
+
+		// bind the VBO we want to update
+		glBindBuffer(GL_ARRAY_BUFFER, loadedVAOs[def.vaoDefRef].VBO);
+
+		// Do the data swap
+		glBufferSubData(GL_ARRAY_BUFFER, 0, loadedVAOs[def.vaoDefRef].VBOSize, &def.vertices[0]);
+
+		// Unbind
+		glBindVertexArray(0);
+	}
+
+	vbosToUpdate.clear();
+}
+
 
 /**
 
