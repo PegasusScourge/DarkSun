@@ -2,6 +2,8 @@
 
 SFML + OpenGL RTS game engine
 
+Documentation by Doxygen
+
 ## Pegasus' notes to himself:
 
  - Never allow lua to call a c++ function that interacts with mutexes if possible, it will auto-destruct the game
