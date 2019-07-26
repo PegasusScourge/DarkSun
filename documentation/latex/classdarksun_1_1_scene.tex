@@ -1,0 +1,62 @@
+\hypertarget{classdarksun_1_1_scene}{}\section{darksun\+::Scene Class Reference}
+\label{classdarksun_1_1_scene}\index{darksun::Scene@{darksun::Scene}}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_scene_ae5fd2d6588fa33a14b71b7a21bdd22df}\label{classdarksun_1_1_scene_ae5fd2d6588fa33a14b71b7a21bdd22df}} 
+{\bfseries Scene} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classdarksun_1_1_renderer}{Renderer}} $>$, \mbox{\hyperlink{classdarksun_1_1_application_settings}{Application\+Settings}} $\ast$app\+Settings, \mbox{\hyperlink{structdarksun_1_1_scene_information}{Scene\+Information}} scene\+Info)
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_scene_a2e24a903e8da52ebd6bcc2be9403ae07}\label{classdarksun_1_1_scene_a2e24a903e8da52ebd6bcc2be9403ae07}} 
+void {\bfseries handle\+Event} (sf\+::\+Event \&ev)
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_scene_acc25651700df8a99ac494624e4bbd7d9}\label{classdarksun_1_1_scene_acc25651700df8a99ac494624e4bbd7d9}} 
+void {\bfseries tick} (float delta\+Time)
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_scene_abb3b6efc6fdba03cd96436edaf08a967}\label{classdarksun_1_1_scene_abb3b6efc6fdba03cd96436edaf08a967}} 
+void {\bfseries init} ()
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_scene_a2ff2b4ce3e60dd041ad6c507d4650228}\label{classdarksun_1_1_scene_a2ff2b4ce3e60dd041ad6c507d4650228}} 
+void {\bfseries init\+Loading\+Ui} ()
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_scene_a0e43e56ad2195c20887b3e30e590296d}\label{classdarksun_1_1_scene_a0e43e56ad2195c20887b3e30e590296d}} 
+void {\bfseries close} ()
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_scene_a788c9a541c947803fdb1e2962a0c6caa}\label{classdarksun_1_1_scene_a788c9a541c947803fdb1e2962a0c6caa}} 
+bool {\bfseries is\+Valid} ()
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_scene_ab1b9ca9b821a082cfd3d47cb549a7038}\label{classdarksun_1_1_scene_ab1b9ca9b821a082cfd3d47cb549a7038}} 
+bool {\bfseries is\+Camera\+Enabled} ()
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_scene_ab2a1934a6763135d7c94b301436210be}\label{classdarksun_1_1_scene_ab2a1934a6763135d7c94b301436210be}} 
+void {\bfseries set\+Camera\+Enabled} (bool m)
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_scene_a7d904c6e6b36d8c66440a519f6799756}\label{classdarksun_1_1_scene_a7d904c6e6b36d8c66440a519f6799756}} 
+bool {\bfseries should\+Transition} ()
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_scene_a3bc16462fc717c2edd139f284fdb8a34}\label{classdarksun_1_1_scene_a3bc16462fc717c2edd139f284fdb8a34}} 
+string {\bfseries get\+New\+Scene} ()
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_scene_aa7ecbe5ad643fd611e339c87eb521b3d}\label{classdarksun_1_1_scene_aa7ecbe5ad643fd611e339c87eb521b3d}} 
+void {\bfseries spawn\+Entity} (string bpN, float x, float y, float z)
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_scene_a92462f19ccaed45a8282442543bd8f54}\label{classdarksun_1_1_scene_a92462f19ccaed45a8282442543bd8f54}} 
+void {\bfseries kill\+Entity} (int id)
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_scene_a1a9d237cd6e5853681a822e932f88e60}\label{classdarksun_1_1_scene_a1a9d237cd6e5853681a822e932f88e60}} 
+void {\bfseries issue\+Entity\+Order} (int id, Lua\+Ref order)
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_scene_a7bd7329bbcfd6109cf5eabc63a31ca08}\label{classdarksun_1_1_scene_a7bd7329bbcfd6109cf5eabc63a31ca08}} 
+float {\bfseries get\+Terrain\+Percent\+Loaded} ()
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_scene_ab4d349a60d2e7f0dee0f369759421ebf}\label{classdarksun_1_1_scene_ab4d349a60d2e7f0dee0f369759421ebf}} 
+static int {\bfseries create\+New\+Id} ()
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/Scene.\+h\item 
+src/Scene.\+cpp\end{DoxyCompactItemize}

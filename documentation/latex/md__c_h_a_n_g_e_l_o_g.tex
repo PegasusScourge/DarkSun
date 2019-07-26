@@ -1,0 +1,52 @@
+(2019-\/07-\/23 00\+:39 G\+MT)
+
+\subsubsection*{Version \mbox{[}A\+L\+P\+HA\mbox{]}\mbox{[}0.\+2.\+0\mbox{]} (unreleased)}
+
+\paragraph*{Settings}
+
+
+\begin{DoxyItemize}
+\item Added external settings file, \textquotesingle{}settings.\+lua\textquotesingle{}
+\item Added \textquotesingle{}antialiasing\+\_\+level\textquotesingle{} as test value \paragraph*{Open\+GL}
+\end{DoxyItemize}
+
+
+\begin{DoxyItemize}
+\item Added theoretical implementation to change vertex buffer content to enable mesh deformation (map building, unit destruction etc) \paragraph*{General lighting}
+\end{DoxyItemize}
+
+
+\begin{DoxyItemize}
+\item Fixed directional lighting behaviour being a bit odd \paragraph*{Maps}
+\end{DoxyItemize}
+
+
+\begin{DoxyItemize}
+\item Tweaked the output range of maps from the heightmap data to get a more consistent output
+\item Added map smoothing to produce a better output
+\item Fixed 90 degree rotation of heightmaps \paragraph*{Profiler}
+\end{DoxyItemize}
+
+
+\begin{DoxyItemize}
+\item Changed profiling to output at the end of each frame if applicable, instead of hogging memory in the background
+\item Changed frequency from every 20th frame to 200th \paragraph*{Scenes}
+\end{DoxyItemize}
+
+
+\begin{DoxyItemize}
+\item Added exposure of the following functions to lua scenes\+:
+\begin{DoxyItemize}
+\item Scene\+:set\+Camera\+Enabled(enabled) -\/-\/$>$ Sets the in-\/game camera to be enabled/disabled
+\item Scene\+:set\+Tactical\+Zoom\+Settings(min\+Height, max\+Height, x\+Delta) -\/-\/$>$ Sets the tactical zoom paramaters for the camera. x\+Delta is the distance the camera is at min\+Height
+\item Scene\+:get\+Map\+Size\+X() -\/-\/$>$ Returns the width of the map currently loaded, or -\/1 if no map is loaded
+\item Scene\+:get\+Map\+Size\+Y() -\/-\/$>$ Returns the height of the map currently loaded, or -\/1 if no map is loaded
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\subsubsection*{Version \mbox{[}A\+L\+P\+HA\mbox{]}\mbox{[}0.\+1.\+0\mbox{]}}
+
+
+\begin{DoxyItemize}
+\item First public release 
+\end{DoxyItemize}

@@ -1,0 +1,92 @@
+\hypertarget{classdarksun_1_1_renderer}{}\section{darksun\+::Renderer Class Reference}
+\label{classdarksun_1_1_renderer}\index{darksun::Renderer@{darksun::Renderer}}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_renderer_af7a21a7a0d396e7cc0ce9477903224f0}\label{classdarksun_1_1_renderer_af7a21a7a0d396e7cc0ce9477903224f0}} 
+void {\bfseries create} (\mbox{\hyperlink{classdarksun_1_1_application_settings}{Application\+Settings}} $\ast$settings)
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_renderer_ab2ec7ca942ed7a56651c9c8b16fcf910}\label{classdarksun_1_1_renderer_ab2ec7ca942ed7a56651c9c8b16fcf910}} 
+void {\bfseries create\+Window} (sf\+::\+Context\+Settings \&settings)
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_renderer_af7e5f8f68742f198e315fb4683a605a4}\label{classdarksun_1_1_renderer_af7e5f8f68742f198e315fb4683a605a4}} 
+void {\bfseries render} ()
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_renderer_a5a3848af701c8a6a922af248e91a8be7}\label{classdarksun_1_1_renderer_a5a3848af701c8a6a922af248e91a8be7}} 
+void {\bfseries register\+Renderable} (string name, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classdarksun_1_1_renderable}{Renderable}} $>$ n)
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_renderer_a5fcbe46aa3c11e42752b5ea72a21f482}\label{classdarksun_1_1_renderer_a5fcbe46aa3c11e42752b5ea72a21f482}} 
+void {\bfseries unregister\+Renderable} (string name)
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_renderer_ac9dcf99f0695acdec5d4bcb14e8c81e4}\label{classdarksun_1_1_renderer_ac9dcf99f0695acdec5d4bcb14e8c81e4}} 
+void {\bfseries register\+UI} (string name, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classdarksun_1_1_u_i_wrangler}{U\+I\+Wrangler}} $>$ n)
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_renderer_a22bce680be79cb034e276c00e5a5187c}\label{classdarksun_1_1_renderer_a22bce680be79cb034e276c00e5a5187c}} 
+void {\bfseries unregister\+UI} (string name)
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_renderer_ace90ca3d7002f9763f68d052f1b2a303}\label{classdarksun_1_1_renderer_ace90ca3d7002f9763f68d052f1b2a303}} 
+void {\bfseries set\+Light\+Position} (int index, glm\+::vec3 p)
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_renderer_a60cc8c02e6129a52a5b8a4f3bf79ecd5}\label{classdarksun_1_1_renderer_a60cc8c02e6129a52a5b8a4f3bf79ecd5}} 
+glm\+::vec3 {\bfseries get\+Light\+Position} (int index)
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_renderer_a81a354f70c489e36a066a50efb12f821}\label{classdarksun_1_1_renderer_a81a354f70c489e36a066a50efb12f821}} 
+void {\bfseries set\+Light\+Color} (int index, glm\+::vec3 p)
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_renderer_ad7e6720e9425509f59b56c0e98c57240}\label{classdarksun_1_1_renderer_ad7e6720e9425509f59b56c0e98c57240}} 
+glm\+::vec3 {\bfseries get\+Light\+Color} (int index)
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_renderer_a4a35c76ccd5fda5e56b08f3b770c232e}\label{classdarksun_1_1_renderer_a4a35c76ccd5fda5e56b08f3b770c232e}} 
+void {\bfseries set\+Light\+Attenuation} (int index, bool a)
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_renderer_aaadab1bf8e2cbf95b2c4d5231879ba15}\label{classdarksun_1_1_renderer_aaadab1bf8e2cbf95b2c4d5231879ba15}} 
+bool {\bfseries get\+Light\+Attenuation} (int index)
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_renderer_a5f8bcae17aa0eac880df39522dbc2045}\label{classdarksun_1_1_renderer_a5f8bcae17aa0eac880df39522dbc2045}} 
+void {\bfseries set\+Gamma\+Correction} (bool g)
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_renderer_a7bd14a9cbb265e8186906958e69da0da}\label{classdarksun_1_1_renderer_a7bd14a9cbb265e8186906958e69da0da}} 
+unsigned int {\bfseries get\+Shadow\+Width} ()
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_renderer_ad5dc7ff0d1f7e4368569e9f1a32a7d73}\label{classdarksun_1_1_renderer_ad5dc7ff0d1f7e4368569e9f1a32a7d73}} 
+unsigned int {\bfseries get\+Shadow\+Height} ()
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_renderer_a63460a0a62356702d3426035367704f6}\label{classdarksun_1_1_renderer_a63460a0a62356702d3426035367704f6}} 
+unsigned int {\bfseries get\+Depth\+Map\+F\+BO} ()
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_renderer_ab9702305962c795d524ce418a7dd7c88}\label{classdarksun_1_1_renderer_ab9702305962c795d524ce418a7dd7c88}} 
+unsigned int {\bfseries get\+Depth\+Map} ()
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_renderer_aee318e094913bda8adc6c5d5ea426cc3}\label{classdarksun_1_1_renderer_aee318e094913bda8adc6c5d5ea426cc3}} 
+sf\+::\+Render\+Window $\ast$ {\bfseries get\+Window\+Handle} ()
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_renderer_a6e49562a2746a35a876da2f33b88fccd}\label{classdarksun_1_1_renderer_a6e49562a2746a35a876da2f33b88fccd}} 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classdarksun_1_1_camera}{Camera}} $>$ {\bfseries get\+Camera} ()
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_renderer_a93d30fb7a9929ae5fb38bef3da40e4c9}\label{classdarksun_1_1_renderer_a93d30fb7a9929ae5fb38bef3da40e4c9}} 
+void {\bfseries clearscreen} ()
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_renderer_a40b6ff3f5a306181f0ddc04e47462f41}\label{classdarksun_1_1_renderer_a40b6ff3f5a306181f0ddc04e47462f41}} 
+void {\bfseries cleanup} ()
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_renderer_a803de6769d1e09bf565272fc8db337c1}\label{classdarksun_1_1_renderer_a803de6769d1e09bf565272fc8db337c1}} 
+const int {\bfseries S\+C\+R\+E\+E\+N\+\_\+\+W\+I\+D\+TH} = 1768
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_renderer_a43dbc9664c083388c7031dea1c5dc0b5}\label{classdarksun_1_1_renderer_a43dbc9664c083388c7031dea1c5dc0b5}} 
+const int {\bfseries S\+C\+R\+E\+E\+N\+\_\+\+H\+E\+I\+G\+HT} = 992
+\end{DoxyCompactItemize}
+\subsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classdarksun_1_1_renderer_a870e5231bf0216e2ebc3377fb6f5f089}\label{classdarksun_1_1_renderer_a870e5231bf0216e2ebc3377fb6f5f089}} 
+static const int {\bfseries N\+U\+M\+B\+E\+R\+\_\+\+O\+F\+\_\+\+L\+I\+G\+H\+TS} = 4
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/Renderer.\+h\item 
+src/Renderer.\+cpp\end{DoxyCompactItemize}
