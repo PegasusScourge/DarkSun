@@ -5,6 +5,16 @@
  - [ ] Expose Map to LuaScene
  - [x] Add documentation
  - [ ] Add map specification of a sun position / colour
- - [ ] Add full settings file (.lua)
+ - [x] Add settings file (.lua)
  - [ ] Implement Audio (OpenAL?)
  - [ ] Fix entity pathfinding
+ - [ ] Rename .h files to .hpp to clarify C++ format
+ 
+### Planned Features
+ - [ ] Implement economy
+ - [ ] Armies
+ - [ ] Settings menu and export to settings.lua
+ - [ ] Implement multi-light solution for multiple lights etc
+ 
+### Considered Features
+ - [ ] Day / night cycle
