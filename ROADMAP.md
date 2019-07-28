@@ -7,7 +7,7 @@
  - [x] Add settings file (.lua)
  - [ ] Implement Audio (OpenAL?)
  - [ ] Fix entity pathfinding
- - [ ] Rename .h files to .hpp to clarify C++ format
+ - [x] Rename .h files to .hpp to clarify C++ format
  
 ### Planned Features
  - [ ] Implement economy
