@@ -8,7 +8,7 @@ Stores information on verticies and indicies and the associated memory in GPU me
 
 */
 
-#include "Mesh.h"
+#include "Mesh.hpp"
 
 using namespace darksun;
 

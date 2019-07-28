@@ -36,24 +36,24 @@
     <ClCompile Include="src\UiHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\ApplicationSettings.h" />
-    <ClInclude Include="src\Camera.h" />
-    <ClInclude Include="src\DarkSun.h" />
-    <ClInclude Include="src\DarkSunProfiler.h" />
-    <ClInclude Include="src\Entity.h" />
-    <ClInclude Include="src\Log.h" />
-    <ClInclude Include="src\LuaEngine.h" />
-    <ClInclude Include="src\Map.h" />
-    <ClInclude Include="src\Mesh.h" />
-    <ClInclude Include="src\Model.h" />
-    <ClInclude Include="src\MultiThreadedOpenGL.h" />
-    <ClInclude Include="src\OpenGLStructs.h" />
-    <ClInclude Include="src\Renderable.h" />
-    <ClInclude Include="src\Renderer.h" />
-    <ClInclude Include="src\Scene.h" />
-    <ClInclude Include="src\Shader.h" />
-    <ClInclude Include="src\stb_image.h" />
-    <ClInclude Include="src\UiHandler.h" />
+    <ClInclude Include="src\ApplicationSettings.hpp" />
+    <ClInclude Include="src\Camera.hpp" />
+    <ClInclude Include="src\DarkSun.hpp" />
+    <ClInclude Include="src\DarkSunProfiler.hpp" />
+    <ClInclude Include="src\Entity.hpp" />
+    <ClInclude Include="src\Log.hpp" />
+    <ClInclude Include="src\LuaEngine.hpp" />
+    <ClInclude Include="src\Map.hpp" />
+    <ClInclude Include="src\Mesh.hpp" />
+    <ClInclude Include="src\Model.hpp" />
+    <ClInclude Include="src\MultiThreadedOpenGL.hpp" />
+    <ClInclude Include="src\OpenGLStructs.hpp" />
+    <ClInclude Include="src\Renderable.hpp" />
+    <ClInclude Include="src\Renderer.hpp" />
+    <ClInclude Include="src\Scene.hpp" />
+    <ClInclude Include="src\Shader.hpp" />
+    <ClInclude Include="src\stb_image.hpp" />
+    <ClInclude Include="src\UiHandler.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

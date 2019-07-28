@@ -7,7 +7,7 @@ Model file
 
 */
 
-#include "Model.h"
+#include "Model.hpp"
 
 using namespace darksun;
 

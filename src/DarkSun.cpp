@@ -7,7 +7,7 @@ Main app
 
 */
 
-#include "DarkSun.h"
+#include "DarkSun.hpp"
 
 using namespace darksun;
 

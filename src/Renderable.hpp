@@ -1,7 +1,7 @@
 #pragma once
 /**
 
-File: Renderable.h
+File: Renderable.hpp
 Description:
 
 Base class for all objects that can be rendered
@@ -12,11 +12,11 @@ Thread safed
 
 */
 
-#include "Mesh.h"
+#include "Mesh.hpp"
 #include <atomic>
 #include <mutex>
 
-#include "DarkSunProfiler.h"
+#include "DarkSunProfiler.hpp"
 
 using namespace darksun;
 
@@ -53,13 +53,13 @@ namespace darksun {
 		}
 
 		// Get the position
-		glm::vec3 getPosition() { profiler::ScopeProfiler myProfiler("Renderable.h::Renderable::getPosition()"); return position.load(); }
+		glm::vec3 getPosition() { profiler::ScopeProfiler myProfiler("Renderable.hpp::Renderable::getPosition()"); return position.load(); }
 		// Get the rotation
-		glm::vec3 getRotation() { profiler::ScopeProfiler myProfiler("Renderable.h::Renderable::getRotation()");return rotation.load(); }
+		glm::vec3 getRotation() { profiler::ScopeProfiler myProfiler("Renderable.hpp::Renderable::getRotation()");return rotation.load(); }
 		// Get the scale
-		glm::vec3 getScale() { profiler::ScopeProfiler myProfiler("Renderable.h::Renderable::getScale()");return scale.load(); }
+		glm::vec3 getScale() { profiler::ScopeProfiler myProfiler("Renderable.hpp::Renderable::getScale()");return scale.load(); }
 		// Get gamma correction
-		bool getGammaCorrection() { profiler::ScopeProfiler myProfiler("Renderable.h::Renderable::getGammaCorrection()");return gammaCorrection.load(); }
+		bool getGammaCorrection() { profiler::ScopeProfiler myProfiler("Renderable.hpp::Renderable::getGammaCorrection()");return gammaCorrection.load(); }
 		// Get the meshes
 		//std::vector<Mesh> getMeshes();
 		// Get number of meshes
@@ -77,7 +77,7 @@ namespace darksun {
 		// Set the scale
 		void setScale(float x, float y, float z); void setScale(float s); void setScale(glm::vec3 n);
 		// Set the gamma correction
-		void setGammaCorrection(bool g) { profiler::ScopeProfiler myProfiler("Renderable.h::Renderable::setGammaCorrection()"); gammaCorrection.store(g); }
+		void setGammaCorrection(bool g) { profiler::ScopeProfiler myProfiler("Renderable.hpp::Renderable::setGammaCorrection()"); gammaCorrection.store(g); }
 
 		bool isLoaded() {
 			return loaded.load();

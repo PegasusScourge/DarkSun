@@ -1,7 +1,7 @@
 #pragma once
 /**
 
-File: Log.h
+File: Log.hpp
 Description:
 
 Header file for Log.cpp, provides standard logging functionality for the program

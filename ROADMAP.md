@@ -1,7 +1,6 @@
 # DarkSun Roadmap
 
 ### Version 0.2.0
- - [ ] Rename lua 'Scene' object to LuaScene (and similar for all other Lua objects) to improve ability to document
  - [ ] Expose Map to LuaScene
  - [x] Add documentation
  - [ ] Add map specification of a sun position / colour
@@ -13,6 +12,10 @@
 ### Planned Features
  - [ ] Implement economy
  - [ ] Armies
+ - [ ] Particle system
+ - [ ] In-world UI elements
+ - [ ] Projectile + beam weapon systems
+ - [ ] Server-client model
  - [ ] Settings menu and export to settings.lua
  - [ ] Implement multi-light solution for multiple lights etc
  

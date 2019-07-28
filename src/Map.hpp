@@ -1,7 +1,7 @@
 #pragma once
 /**
 
-File: Map.h
+File: Map.hpp
 Description:
 
 Header for Map.cpp
@@ -16,10 +16,10 @@ THREADING IN OPERATION, might be safe
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Model.h"
-#include "Renderable.h"
-#include "LuaEngine.h"
-#include "MultiThreadedOpenGL.h"
+#include "Model.hpp"
+#include "Renderable.hpp"
+#include "LuaEngine.hpp"
+#include "MultiThreadedOpenGL.hpp"
 
 using namespace darksun;
 

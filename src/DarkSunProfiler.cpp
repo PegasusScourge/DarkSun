@@ -1,13 +1,13 @@
 /**
 
-File: DarkSunProfiler.h
+File: DarkSunProfiler.hpp
 Description:
 
 Uses black magic to monitor the functions that are being used and for how long
 
 */
 
-#include "DarkSunProfiler.h"
+#include "DarkSunProfiler.hpp"
 
 using namespace darksun;
 

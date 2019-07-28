@@ -1,7 +1,7 @@
 #pragma once
 /**
 
-File: LuaEngine.h
+File: LuaEngine.hpp
 Description:
 
 Header file for LuaEngine.cpp, wrapping a Lua instace and state for running game logic
@@ -21,7 +21,7 @@ Header file for LuaEngine.cpp, wrapping a Lua instace and state for running game
 #include <LuaState.h>
 #include <LuaValue.h>
 
-#include "Log.h"
+#include "Log.hpp"
 
 using namespace luabridge;
 using string = std::string;

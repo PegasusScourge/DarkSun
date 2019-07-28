@@ -1,7 +1,7 @@
 #pragma once
 /**
 
-File: Renderer.h
+File: Renderer.hpp
 Description:
 
 Header file for Renderer.cpp. A class that handles a window and the rendering to and from it
@@ -19,14 +19,14 @@ Attempted thread safety
 #include <atomic>
 #include <mutex>
 
-#include "Log.h"
-#include "Camera.h"
-#include "Shader.h"
-#include "ApplicationSettings.h"
-#include "Renderable.h"
-#include "UiHandler.h"
+#include "Log.hpp"
+#include "Camera.hpp"
+#include "Shader.hpp"
+#include "ApplicationSettings.hpp"
+#include "Renderable.hpp"
+#include "UiHandler.hpp"
 
-#include "DarkSunProfiler.h"
+#include "DarkSunProfiler.hpp"
 
 namespace darksun {
 

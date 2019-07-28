@@ -1,7 +1,7 @@
 #pragma once
 /**
 
-File: OpenGLStructs.h
+File: OpenGLStructs.hpp
 Description:
 
 Basic opengl structs/defs etc

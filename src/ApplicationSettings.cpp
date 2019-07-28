@@ -7,7 +7,7 @@ Stores settings for the application in a central place
 
 */
 
-#include "ApplicationSettings.h"
+#include "ApplicationSettings.hpp"
 
 using namespace darksun;
 

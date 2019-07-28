@@ -6,7 +6,7 @@ Description:
 Wrangles the UI for scenes (with LuaEngine for UI handling)
 
 */
-#include "UiHandler.h"
+#include "UiHandler.hpp"
 
 using namespace darksun;
 

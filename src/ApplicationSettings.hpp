@@ -1,7 +1,7 @@
 #pragma once
 /**
 
-File: ApplicationSettings.h
+File: ApplicationSettings.hpp
 Description:
 
 Stores settings for the application in a central place
@@ -10,7 +10,7 @@ Thread safed
 
 */
 
-#include "LuaEngine.h"
+#include "LuaEngine.hpp"
 #include <atomic>
 
 using string = std::string;

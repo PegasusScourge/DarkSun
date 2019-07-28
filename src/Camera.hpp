@@ -1,7 +1,7 @@
 #pragma once
 /**
 
-File: Camera.h
+File: Camera.hpp
 Description:
 
 Camera
@@ -10,11 +10,11 @@ Thread safe
 
 */
 
-//#include <GL/glew.h>
+//#include <GL/glew.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-//#include <SFML/Window.hpp>
+//#include <SFML/Window.hpppp>
 #include <SFML/Window/Event.hpp>
 
 #include <vector>

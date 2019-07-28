@@ -1,7 +1,7 @@
 #pragma once
 /**
 
-File: UiHandler.h
+File: UiHandler.hpp
 Description:
 
 Header file for UiHandler.cpp, wrangles the UI for scenes (with LuaEngine for UI handling)
@@ -10,10 +10,10 @@ Header file for UiHandler.cpp, wrangles the UI for scenes (with LuaEngine for UI
 
 #include <TGUI/TGUI.hpp>
 #include <SFML/Graphics.hpp>
-//#include "Renderer.h"
-#include "ApplicationSettings.h"
-#include "Camera.h"
-#include "LuaEngine.h"
+//#include "Renderer.hpp"
+#include "ApplicationSettings.hpp"
+#include "Camera.hpp"
+#include "LuaEngine.hpp"
 #include <mutex>
 
 namespace darksun {

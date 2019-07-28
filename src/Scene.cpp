@@ -7,7 +7,7 @@ Defines all scenes
 
 */
 
-#include "Scene.h"
+#include "Scene.hpp"
 
 using namespace darksun;
 

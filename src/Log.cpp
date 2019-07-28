@@ -6,7 +6,7 @@ Description:
 Provides standard logging functionality for the program
 
 */
-#include "Log.h"
+#include "Log.hpp"
 
 using namespace darksun;
 

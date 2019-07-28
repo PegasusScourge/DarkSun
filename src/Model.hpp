@@ -1,7 +1,7 @@
 #pragma once
 /**
 
-File: Model.h
+File: Model.hpp
 Description:
 
 Header file for Model.cpp
@@ -18,10 +18,10 @@ Header file for Model.cpp
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include "Log.h"
-#include "Shader.h"
-#include "Renderable.h"
-#include "MultiThreadedOpenGL.h"
+#include "Log.hpp"
+#include "Shader.hpp"
+#include "Renderable.hpp"
+#include "MultiThreadedOpenGL.hpp"
 
 using string = std::string;
 using namespace darksun;

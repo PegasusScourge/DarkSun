@@ -1,10 +1,10 @@
 #pragma once
 /**
 
-File: Entity.h
+File: Entity.hpp
 Description:
 
-Header file for Entity.h, a game engine actual entity, marrying together all aspects
+Header file for Entity.hpp, a game engine actual entity, marrying together all aspects
 
 */
 
@@ -15,12 +15,12 @@ Header file for Entity.h, a game engine actual entity, marrying together all asp
 #include <glm/gtx/vector_angle.hpp>
 #include <algorithm>
 
-#include "Model.h"
-#include "LuaEngine.h"
-#include "Shader.h"
-#include "Log.h"
+#include "Model.hpp"
+#include "LuaEngine.hpp"
+#include "Shader.hpp"
+#include "Log.hpp"
 
-#include "DarkSunProfiler.h"
+#include "DarkSunProfiler.hpp"
 
 using string = std::string;
 #define to_str std::to_string

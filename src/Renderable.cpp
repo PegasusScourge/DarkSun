@@ -11,7 +11,7 @@ Thread safed
 
 */
 
-#include "Renderable.h"
+#include "Renderable.hpp"
 
 // Constructor
 Renderable::Renderable() {

@@ -1,7 +1,7 @@
 #pragma once
 /**
 
-File: MultiThreadedOpenGL.h
+File: MultiThreadedOpenGL.hpp
 Description:
 
 Handles all openGL calls and requests to the correct thread
@@ -21,11 +21,11 @@ THREADING IN OPERATION, might be safe
 #include <map>
 #include <filesystem>
 #include <chrono>
-#include "stb_image.h"
+#include "stb_image.hpp"
 
-#include "Log.h"
-#include "DarkSunProfiler.h"
-#include "OpenGLStructs.h"
+#include "Log.hpp"
+#include "DarkSunProfiler.hpp"
+#include "OpenGLStructs.hpp"
 
 using string = std::string;
 

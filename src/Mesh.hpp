@@ -2,7 +2,7 @@
 
 /**
 
-File: Mesh.h
+File: Mesh.hpp
 Description:
 
 Stores information on verticies and indicies and the associated memory in GPU memory
@@ -17,10 +17,10 @@ Stores information on verticies and indicies and the associated memory in GPU me
 #include <memory>
 #include <algorithm>
 
-#include "Shader.h"
-#include "MultiThreadedOpenGL.h"
+#include "Shader.hpp"
+#include "MultiThreadedOpenGL.hpp"
 
-#include "OpenGLStructs.h"
+#include "OpenGLStructs.hpp"
 
 using string = std::string;
 using namespace darksun;

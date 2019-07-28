@@ -4,11 +4,11 @@
 
 /**
 
-Borrowed from https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/shader_s.h
+Borrowed from https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/shader_s.hpp
 
 */
 
-#include "Log.h"
+#include "Log.hpp"
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>

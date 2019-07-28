@@ -9,7 +9,7 @@ THREADING IN OPERATION, might be safe
 
 */
 
-#include "Map.h"
+#include "Map.hpp"
 
 Map::Map(string mapfolder) {
 

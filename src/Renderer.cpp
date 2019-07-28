@@ -7,7 +7,7 @@ A class that handles a window and the rendering to and from it
 
 */
 
-#include "Renderer.h"
+#include "Renderer.hpp"
 
 using namespace darksun;
 

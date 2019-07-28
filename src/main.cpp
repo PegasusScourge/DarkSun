@@ -7,10 +7,10 @@ Entry point of the application (main())
 
 */
 
-// Needed first for std_image.h so it behaves correctly
+// Needed first for std_image.hpp so it behaves correctly
 #define STB_IMAGE_IMPLEMENTATION
 
-#include "DarkSun.h"
+#include "DarkSun.hpp"
 
 int main(int argc, char *argv[]) {
 	darksun::DarkSun engine;

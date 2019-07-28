@@ -1,7 +1,7 @@
 #pragma once
 /**
 
-File: Scene.h
+File: Scene.hpp
 Description:
 
 Header file for Scene.cpp, defines all scenes
@@ -10,12 +10,12 @@ Header file for Scene.cpp, defines all scenes
 
 #include <vector>
 
-#include "Entity.h"
-#include "Shader.h"
-#include "Renderer.h"
-#include "Log.h"
-#include "UiHandler.h"
-#include "Map.h"
+#include "Entity.hpp"
+#include "Shader.hpp"
+#include "Renderer.hpp"
+#include "Log.hpp"
+#include "UiHandler.hpp"
+#include "Map.hpp"
 
 #include <TGUI/TGUI.hpp>
 

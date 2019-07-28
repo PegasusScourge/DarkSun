@@ -9,7 +9,7 @@ THREADING IN OPERATION, might be safe
 
 */
 
-#include "MultiThreadedOpenGL.h"
+#include "MultiThreadedOpenGL.hpp"
 
 using namespace darksun;
 

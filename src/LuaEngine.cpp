@@ -6,7 +6,7 @@ Description:
 Wraps a Lua instace and executes code for game logic
 
 */
-#include "LuaEngine.h"
+#include "LuaEngine.hpp"
 
 using namespace darksun;
 

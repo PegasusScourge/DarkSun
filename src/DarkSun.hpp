@@ -1,7 +1,7 @@
 #pragma once
 /**
 
-File: DarkSun.h
+File: DarkSun.hpp
 Description:
 
 Main app
@@ -16,14 +16,14 @@ Main app
 
 #include <chrono>
 
-#include "ApplicationSettings.h"
+#include "ApplicationSettings.hpp"
 
-#include "Renderer.h"
-#include "Log.h"
+#include "Renderer.hpp"
+#include "Log.hpp"
 
-#include "DarkSunProfiler.h"
+#include "DarkSunProfiler.hpp"
 
-#include "Scene.h"
+#include "Scene.hpp"
 
 #include <SFML/Graphics.hpp>
 #include <glm/glm.hpp>

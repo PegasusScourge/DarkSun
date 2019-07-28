@@ -7,7 +7,7 @@ A game engine actual entity, marrying together all aspects
 
 */
 
-#include "Entity.h"
+#include "Entity.hpp"
 
 using namespace darksun;
 using namespace luabridge;
@@ -149,7 +149,7 @@ void Entity::init(string blueprintn, int newId) {
 			subRef = ref["hasGravity"];
 			if (subRef.isBool()) {
 				hasGravity = (bool)subRef;
-				dout.verbose("Entity::init -> Physics.hasGravity = '" + subRef.tostring() + "'");
+				dout.verbose("Entity::init -> Physics.hppasGravity = '" + subRef.tostring() + "'");
 			}
 			subRef = ref["size"];
 			if (subRef.isTable()) {
