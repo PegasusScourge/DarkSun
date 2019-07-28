@@ -5,14 +5,14 @@
 testSpider = {
 	OnCreate = function()
 		-- Nothing
-		LOG('I am called ' .. myEntity.internalName)
+		LOG('I am called ' .. thisEntity.internalName)
 	end,
 	
 	OnTick = function()
-		if not myEntity:isPathfinding() then
+		if not thisEntity:isPathfinding() then
 			local xNew = math.random(10, 100)
 			local zNew = math.random(10, 100)
-			myEntity:moveTo(xNew, 6.0, zNew)
+			thisEntity:moveTo(xNew, 6.0, zNew)
 			LOG('Navigating to X=' .. tostring(xNew) .. ', Z=' .. tostring(zNew))
 		end
 	end,

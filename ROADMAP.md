@@ -2,7 +2,8 @@
 
 ### Version 0.2.0
  - [ ] Expose Map to LuaScene
- - [x] Add documentation
+ - [x] Add C++ documentation
+ - [ ] Add lua documentation
  - [ ] Add map specification of a sun position / colour
  - [x] Add settings file (.lua)
  - [ ] Implement Audio (OpenAL?)

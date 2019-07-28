@@ -23,11 +23,11 @@ void EntityOrders::hookClass(lua::State *L) {
 		luabridge::getGlobalNamespace(L->getState())
 			.beginNamespace("darksun")
 				.beginClass<EntityOrders>("EntityOrders")
-					.addStaticFunction("ORDER_STOP", &darksun::EntityOrders::getORDER_STOP)
-					.addStaticFunction("ORDER_ASSIST", &darksun::EntityOrders::getORDER_ASSIST)
-					.addStaticFunction("ORDER_ATTACK", &darksun::EntityOrders::getORDER_ATTACK)
-					.addStaticFunction("ORDER_MOVE", &darksun::EntityOrders::getORDER_MOVE)
-					.addStaticFunction("ORDER_REPAIR", &darksun::EntityOrders::getORDER_REPAIR)
+					.addStaticProperty("ORDER_STOP", &darksun::EntityOrders::getORDER_STOP)
+					.addStaticProperty("ORDER_ASSIST", &darksun::EntityOrders::getORDER_ASSIST)
+					.addStaticProperty("ORDER_ATTACK", &darksun::EntityOrders::getORDER_ATTACK)
+					.addStaticProperty("ORDER_MOVE", &darksun::EntityOrders::getORDER_MOVE)
+					.addStaticProperty("ORDER_REPAIR", &darksun::EntityOrders::getORDER_REPAIR)
 				.endClass()
 			.endNamespace();
 	}
@@ -227,7 +227,7 @@ void Entity::initLuaEngine() {
 
 	// Add this instance
 	push(L->getState(), this);
-	lua_setglobal(L->getState(), "myEntity");
+	lua_setglobal(L->getState(), "thisEntity");
 }
 
 void Entity::tick(float deltaTime) {

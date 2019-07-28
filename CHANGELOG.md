@@ -22,6 +22,9 @@
    - Scene:setTacticalZoomSettings(minHeight, maxHeight, xDelta)	--> Sets the tactical zoom paramaters for the camera. xDelta is the distance the camera is at minHeight
    - Scene:getMapSizeX() --> Returns the width of the map currently loaded, or -1 if no map is loaded
    - Scene:getMapSizeY() --> Returns the height of the map currently loaded, or -1 if no map is loaded
+   - EntityOrders changed from function value return to static properties 
+#### Entities
+ - Lua script reference for host entity of script changed to 'thisEntity' from 'myEntity' to clarify the entity being discussed 
 
 ### Version [ALPHA][0.1.0]
 
