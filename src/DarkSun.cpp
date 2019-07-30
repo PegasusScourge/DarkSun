@@ -69,8 +69,8 @@ void DarkSun::run() {
 	float sinArg = 0.0f;
 
 	/* TEST AUDIO */
-	AudioEngine::addSound("sounds/LCday_3.ogg");
-	AudioEngine::playSound("sounds/LCday_3.ogg", true);
+	//AudioEngine::addSound("sounds/LCday_3.ogg");
+	AudioEngine::playSound("sounds/LCday_3_mono.ogg", true);
 
 	sf::Clock clock; // starts the clock
 	sf::Time elapsedTime = clock.getElapsedTime();
@@ -237,6 +237,10 @@ int DarkSun::OpenGLThread(std::shared_ptr<Renderer> renderer, ApplicationSetting
 		// Poll the keyboard checks for the mouse
 		if (hasFocus && activeScene->isCameraEnabled())
 			renderer->getCamera()->pollKeyboard(deltaTime_render);
+
+		// Update the listener from the AudioEngine
+		renderer->getCamera()->updateCameraVectors();
+		AudioEngine::update(renderer->getCamera()->getPosition(), glm::vec3(0, 1, 0), renderer->getCamera()->getFrontVector());
 
 		// Update any settings we need to
 		window->setVerticalSyncEnabled(appSettings->get_opengl_vsync());

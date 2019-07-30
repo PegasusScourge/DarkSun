@@ -19,8 +19,6 @@ std::vector<string> AudioEngine::soundsToStop = std::vector<string>();
 
 void AudioEngine::init() {
 
-	dout.log("---------- Audio engine init ----------");
-
 	sf::Listener::setGlobalVolume(50.0f);
 	sf::Listener::setPosition(0, 0, 0);
 	sf::Listener::setUpVector(0, 1, 0);
@@ -104,7 +102,10 @@ void AudioEngine::tick(float deltaTime) {
 				// Set any other properties
 				soundPlayers[i].sound.setLoop(s.looped);
 				soundPlayers[i].sound.setPlayingOffset(sf::milliseconds(s.startIndex));
-				soundPlayers[i].sound.setAttenuation(0.0f); // NO ATTENUATION
+				soundPlayers[i].sound.setAttenuation(0.1f);
+				soundPlayers[i].sound.setMinDistance(100.0f);
+				soundPlayers[i].sound.setRelativeToListener(false);
+				soundPlayers[i].sound.setPosition(0, 0, 0);
 				soundPlayers[i].sound.setVolume(100.0f);
 
 				// Set the sound going
@@ -116,4 +117,10 @@ void AudioEngine::tick(float deltaTime) {
 		}
 	}
 	soundsToPlay.clear();
+}
+
+void AudioEngine::update(glm::vec3 listenerPos, glm::vec3 listenerUp, glm::vec3 listenerForward) {
+	sf::Listener::setPosition(listenerPos.x, listenerPos.y, listenerPos.z);
+	sf::Listener::setUpVector(listenerUp.x, listenerUp.y, listenerUp.z);
+	sf::Listener::setDirection(listenerForward.x, listenerForward.y, listenerForward.z);
 }

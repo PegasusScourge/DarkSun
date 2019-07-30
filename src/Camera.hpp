@@ -78,6 +78,14 @@ namespace darksun {
 			return position.load();
 		}
 
+		glm::vec3 getUpVector() {
+			return Up.load();
+		}
+
+		glm::vec3 getFrontVector() {
+			return Front.load();
+		}
+
 		float getZoom() {
 			return Zoom.load();
 		}
@@ -152,13 +160,13 @@ namespace darksun {
 		{
 			float velocity = movementSpeed * deltaTime * (1.0f + (tacticalZPercent*3.0f));
 			if (direction == FORWARD)
-				groundPosition = groundPosition.load() + (Front.load() * velocity);
+				groundPosition = groundPosition.load() + (glm::vec3(1, 0, 0) * velocity);
 			if (direction == BACKWARD)
-				groundPosition = groundPosition.load() - (Front.load() * velocity);
+				groundPosition = groundPosition.load() - (glm::vec3(1, 0, 0) * velocity);
 			if (direction == LEFT)
-				groundPosition = groundPosition.load() + (Right.load() * -velocity);
+				groundPosition = groundPosition.load() + (glm::vec3(0, 0, 1) * -velocity);
 			if (direction == RIGHT)
-				groundPosition = groundPosition.load() + (Right.load() * velocity);
+				groundPosition = groundPosition.load() + (glm::vec3(0, 0, 1) * velocity);
 		}
 
 		void update(glm::vec3 nPos, float nZoom) {
@@ -177,6 +185,15 @@ namespace darksun {
 			tacticalHeightDelta = maxHeight - minHeight;
 			tacticalXDelta = xDelta;
 			tacticalZoom(0, 0);
+		}
+
+		void updateCameraVectors() {
+			// Calculate the new Front vector
+			Front = groundPosition.load() - position.load();
+			Front = glm::vec3(Front.load().x, 0, Front.load().z);
+			// Also re-calculate the Right and Up vector
+			Right = glm::normalize(glm::cross(Front.load(), glm::vec3(0,1,0)));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+			Up = glm::normalize(glm::cross(Right.load(), Front.load()));
 		}
 	};
 }

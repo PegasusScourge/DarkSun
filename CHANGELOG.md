@@ -9,6 +9,7 @@
  - Added theoretical implementation to change vertex buffer content to enable mesh deformation (map building, unit destruction etc)
 ##### Sounds
  - Added initial sound engine and test sound
+ - Only mono sounds will be spatially rendered by SFML, moved to mono test sound to reflect this and test this
 ##### General lighting
  - Fixed directional lighting behaviour being a bit odd
 ##### Maps

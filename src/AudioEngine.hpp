@@ -12,6 +12,8 @@ Audio control
 #include <SFML/Audio.hpp>
 #include <map>
 
+#include <glm/vec3.hpp>
+
 #include "Log.hpp"
 
 #define MAX_SOUND_PLAYERS 128
@@ -87,6 +89,9 @@ namespace darksun {
 
 		// Tick the engine
 		static void tick(float deltaTime);
+
+		// Update the engine
+		static void update(glm::vec3 listenerPos, glm::vec3 listenerUp, glm::vec3 listenerForward);
 
 		// Register a sound
 		static void addSound(string source);
