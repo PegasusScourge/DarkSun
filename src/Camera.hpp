@@ -165,7 +165,7 @@ namespace darksun {
 			groundPosition = glm::vec3(nPos.x, 0.0f, nPos.y);
 			if (nZoom >= 0.0f && nZoom <= 0.8f)
 				tacticalZPercent = nZoom;
-			tacticalZoom(0, 0);
+			update();
 		}
 
 		void update() {

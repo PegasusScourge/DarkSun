@@ -25,6 +25,8 @@ Main app
 
 #include "Scene.hpp"
 
+#include "AudioEngine.hpp"
+
 #include <SFML/Graphics.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

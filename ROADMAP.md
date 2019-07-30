@@ -6,7 +6,7 @@
  - [ ] Add lua documentation
  - [ ] Add map specification of a sun position / colour
  - [x] Add settings file (.lua)
- - [ ] Implement Audio (OpenAL?)
+ - [x] Implement Audio (OpenAL?)
  - [x] Fix entity pathfinding
  - [x] Rename .h files to .hpp to clarify C++ format
  

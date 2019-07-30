@@ -57,6 +57,9 @@ void DarkSun::run() {
 		}
 	}
 
+	// Init the audio engine
+	AudioEngine::init();
+
 	dout.log("Entering the main game engine loop");
 
 	hasFocus = false;
@@ -64,6 +67,10 @@ void DarkSun::run() {
 
 	int tickNo = 0;
 	float sinArg = 0.0f;
+
+	/* TEST AUDIO */
+	AudioEngine::addSound("sounds/LCday_3.ogg");
+	AudioEngine::playSound("sounds/LCday_3.ogg", true);
 
 	sf::Clock clock; // starts the clock
 	sf::Time elapsedTime = clock.getElapsedTime();
@@ -82,6 +89,9 @@ void DarkSun::run() {
 			// tick the scene
 			activeScene->tick(deltaTime_main);
 		}
+
+		// tick the audio engine
+		AudioEngine::tick(deltaTime_main);
 
 		{
 			std::lock_guard lock(activeScene_mutex);

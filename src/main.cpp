@@ -12,7 +12,15 @@ Entry point of the application (main())
 
 #include "DarkSun.hpp"
 
+#include <iostream>
+#include <fstream>
+
 int main(int argc, char *argv[]) {
+	// Redirec the cout
+	//std::ofstream out("cout.log");
+	//std::streambuf* coutbuf = std::cout.rdbuf(); //save old buf
+	//std::cout.rdbuf(out.rdbuf()); //redirect std::cout
+	
 	darksun::DarkSun engine;
 
 	engine.processArgs(argc, argv);

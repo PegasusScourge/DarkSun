@@ -7,6 +7,8 @@
  - Added 'antialiasing_level' as test value
 ##### OpenGL
  - Added theoretical implementation to change vertex buffer content to enable mesh deformation (map building, unit destruction etc)
+##### Sounds
+ - Added initial sound engine and test sound
 ##### General lighting
  - Fixed directional lighting behaviour being a bit odd
 ##### Maps
