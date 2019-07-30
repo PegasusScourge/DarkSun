@@ -313,9 +313,10 @@ void Entity::moveOnTick(glm::vec3& p, float deltaTime) {
 		currentSpeed = 0;
 	}
 	else {
-		//position += FORWARD * speed;
-		float positionx = -(speed * cosf(model->getRotation().y * (3.14f / 180.0f)));
-		float positionz = speed * sinf(model->getRotation().y * (3.14f / 180.0f));
+		//position += FORWARD * speed
+		float positionx = model->getPosition().x -(speed * cosf(model->getRotation().y * (3.14f / 180.0f)));
+		float positionz = model->getPosition().z + speed * sinf(model->getRotation().y * (3.14f / 180.0f));
+		//dout.verbose("Tick speed: " + std::to_string(speed) + " New position: (" + std::to_string(positionx) + "," + std::to_string(positionz) + ")");
 		model->setPosition(positionx, model->getPosition().y, positionz);
 	}
 }
@@ -378,13 +379,13 @@ void Entity::rotateToward(glm::vec3& p, float deltaTime) {
 	float rotDiff = targetRot.y - model->getRotation().y;
 	float rotMag = abs(rotDiff);
 
-	if (rotMag > 90.0f) {
-		currentSpeed = 0;
-		readyToMove = false;
-	} 
-	else {
+	//if (rotMag > 90.0f) {
+	//	currentSpeed = 0;
+	//	readyToMove = false;
+	//} 
+	//else {
 		readyToMove = true;
-	}
+	//}
 
 	glm::vec3 newRot = model->getRotation();
 

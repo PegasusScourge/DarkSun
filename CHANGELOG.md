@@ -25,6 +25,7 @@
    - EntityOrders changed from function value return to static properties 
 #### Entities
  - Lua script reference for host entity of script changed to 'thisEntity' from 'myEntity' to clarify the entity being discussed 
+ - Entity pathfinding fixed, still bugged by entity actually moves now
 
 ### Version [ALPHA][0.1.0]
 

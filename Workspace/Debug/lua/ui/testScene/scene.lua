@@ -13,9 +13,9 @@ testScene = {
 		end,
 		testButton = function(signal)
 			LOG('Spawning entities')
-			for i=0,2,1 do
+			--for i=0,2,1 do
 				Scene:spawnEntity('test', 30, 20, 30)
-			end
+			--end
 		end,
 		vsync_check = function(signal)
 			if signal == 'Checked' then
@@ -39,7 +39,7 @@ testScene = {
 		
 		Gui:addNewButton('testButton')
 		Gui:setWidgetPositionPercent('testButton', '10%', '14%')
-		Gui:setButtonWidgetText('testButton', 'Spawn 10 entities')
+		Gui:setButtonWidgetText('testButton', 'Spawn test')
 		Gui:registerWidgetCallback('testButton', 'pressed')
 		
 		Gui:addNewLabel('fpsLabel')
