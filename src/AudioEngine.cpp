@@ -21,7 +21,7 @@ void AudioEngine::init() {
 
 	dout.log("---------- Audio engine init ----------");
 
-	sf::Listener::setGlobalVolume(0.5f);
+	sf::Listener::setGlobalVolume(50.0f);
 	sf::Listener::setPosition(0, 0, 0);
 	sf::Listener::setUpVector(0, 1, 0);
 	sf::Listener::setDirection(0, 0, 1);
@@ -107,6 +107,9 @@ void AudioEngine::tick(float deltaTime) {
 
 				// Set the sound going
 				soundPlayers[i].play();
+
+				dout.verbose("AudioEngine --> playing sound in bay " + std::to_string(i) + " from source '" + s.ref);
+				break;
 			}
 		}
 	}
