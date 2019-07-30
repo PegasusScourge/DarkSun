@@ -108,7 +108,7 @@ void AudioEngine::tick(float deltaTime) {
 				// Set the sound going
 				soundPlayers[i].play();
 
-				dout.verbose("AudioEngine --> playing sound in bay " + std::to_string(i) + " from source '" + s.ref);
+				dout.verbose("AudioEngine --> playing sound in bay " + std::to_string(i) + " from source '" + s.ref + "'");
 				break;
 			}
 		}
