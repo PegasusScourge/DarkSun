@@ -44,13 +44,6 @@ namespace darksun {
 				}
 				sound.stop();
 			}
-			void pause() {
-				if (!isAttached) {
-					dout.error("Attempted to pause SoundObject that has no attached sound");
-					return;
-				}
-				sound.pause();
-			}
 			bool isStopped() {
 				if (sound.getStatus() == sf::SoundSource::Status::Stopped)
 					return true;

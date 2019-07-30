@@ -88,8 +88,10 @@ void AudioEngine::tick(float deltaTime) {
 		// Check for the ref existing
 		if (loadedBuffers.count(s.ref) == 0) {
 			// Doesn't exist
-			dout.error("Tried to play sound '" + s.ref + "' but it isn't loaded!");
-			continue; // Next request
+			dout.warn("Tried to play sound '" + s.ref + "' but it isn't loaded! Loading the sound");
+			//continue; // Next request
+
+			addSound(s.ref);
 		}
 
 		for (int i = 0; i < MAX_SOUND_PLAYERS; i++) {
