@@ -80,7 +80,9 @@ namespace darksun {
 			string ref;
 			bool looped;
 			int startIndex;
-			int volume;
+			float volume;
+			float attenuation;
+			glm::vec3 pos;
 		};
 
 		/* Private variables */
@@ -109,7 +111,7 @@ namespace darksun {
 		static void removeSound(string ref);
 
 		// Play the sound
-		static void playSound(string ref, string cat, bool loop = false, int startIndex = 0);
+		static void playSound(string ref, string cat, glm::vec3 pos, bool loop = false, int startIndex = 0);
 
 		// Stop the sound
 		static void stopSound(string ref);
@@ -121,6 +123,7 @@ namespace darksun {
 			cat.attentuationCharacteristic = 1.0f;
 			cat.volume = 100.0f;
 			categories[ref] = cat;
+			dout.verbose("AudioEngine --> registered audio category '" + categories[ref].catName + "'");
 		}
 
 		// Set the volume of a category

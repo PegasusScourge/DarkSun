@@ -10,6 +10,7 @@
 ##### Sounds
  - Added initial sound engine and test sound
  - Only mono sounds will be spatially rendered by SFML, moved to mono test sound to reflect this and test this
+ - Sound requests now allow positional playing and respect category settings
 ##### General lighting
  - Fixed directional lighting behaviour being a bit odd
 ##### Maps

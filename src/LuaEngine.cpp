@@ -129,7 +129,7 @@ bool LuaEngine::initConnection() {
 	}
 	catch (std::exception& e) {
 		string what = e.what();
-		dlua.error("Self test file load error: " + what);
+		dlua.error("Init file load error: " + what);
 		return false;
 	}
 	return true;

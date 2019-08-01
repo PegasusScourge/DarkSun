@@ -70,7 +70,7 @@ testScene = {
 		Scene:setCameraEnabled(true)
 		
 		-- Play some music
-		Audio:playSound('sounds/LCday_3_mono.ogg', 'default', false)
+		Audio:playSound('sounds/LCday_3_mono.ogg', 'default', 0, 0, 0, false)
 	end,
 	
 	sinArg = 0,

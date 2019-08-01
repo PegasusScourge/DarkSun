@@ -59,7 +59,7 @@ namespace darksun {
 		void lua_import(string f);
 
 		/* AUDIO ENGINE HOOKS */
-		void lua_audio_playSound(string soundName, string cat, bool loop) { AudioEngine::playSound(soundName, cat, loop); }
+		void lua_audio_playSound(string soundName, string cat, float posX, float posY, float posZ, bool loop) { AudioEngine::playSound(soundName, cat, glm::vec3(posX, posY, posZ), loop); }
 		void lua_audio_newCategory(string catName) { AudioEngine::newCategory(catName); }
 		void lua_audio_setCatVol(string catName, float vol) { AudioEngine::setCategoryVolume(catName, vol); }
 		void lua_audio_setCatAtt(string catName, float att) { AudioEngine::setCategoryAttenuation(catName, att); }

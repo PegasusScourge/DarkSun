@@ -16,11 +16,13 @@ function recursiveList(object)
 	end
 end
 
+-- rounds a number to the specified number of decimal places
 function round(num, numDecimalPlaces)
   local mult = 10^(numDecimalPlaces or 0)
   return math.floor(num * mult + 0.5) / mult
 end
 
+-- Setup the blueprints table
 blueprints = {}
 
 -- Setup the access to importing
@@ -30,8 +32,8 @@ end
 
 -- Setup the audio access
 Audio = {
-	playSound = function(self, soundPath, category, shouldLoop)
-		LuaEngine:playSound(soundPath, category, shouldLoop)
+	playSound = function(self, soundPath, category, posX, posY, posZ, shouldLoop)
+		LuaEngine:playSound(soundPath, category, posX, posY, posZ, shouldLoop)
 	end,
 	
 	newCategory = function(self, category)

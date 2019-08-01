@@ -30,6 +30,9 @@ void DarkSun::run() {
 	// Load settings
 	ApplicationSettings appSettings("settings.lua");
 
+	// Init the audio engine
+	AudioEngine::init();
+
 	std::shared_ptr<Renderer> renderer = std::shared_ptr<Renderer>(new Renderer());
 	dout.verbose("Renderer pointer created");
 
@@ -56,9 +59,6 @@ void DarkSun::run() {
 			dout.error("SCENE IS NOT VALID!");
 		}
 	}
-
-	// Init the audio engine
-	AudioEngine::init();
 
 	dout.log("Entering the main game engine loop");
 
@@ -225,11 +225,6 @@ int DarkSun::OpenGLThread(std::shared_ptr<Renderer> renderer, ApplicationSetting
 			window->setMouseCursorGrabbed(hasFocus && captureMouse);
 			window->setMouseCursorVisible(!(hasFocus && captureMouse));
 
-			//{
-			//	std::lock_guard lock(activeScene_mutex);
-			//	// Pass the event to the scene
-			//	activeScene->handleEvent(event);
-			//}
 			// Pass the event to the mtopengl solution
 			mtopengl::addEvent(event);
 		}

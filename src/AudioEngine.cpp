@@ -59,13 +59,20 @@ void AudioEngine::removeSound(string ref) {
 	}
 }
 
-void AudioEngine::playSound(string ref, string cat, bool loop, int startIndex) {
+void AudioEngine::playSound(string ref, string cat, glm::vec3 pos, bool loop, int startIndex) {
 	PlayRequest request;
 	request.ref = ref;
 	request.looped = loop;
 	request.startIndex = startIndex;
+	request.pos = pos;
 
-	// Do something with category
+	// Apply settings based on the category
+	if (categories.count(cat) == 0) {
+		dout.warn("Attempted to play sound on category " + cat + " but that category isn't registered");
+		cat = "default"; // Make sure we have a valid cat
+	}
+	request.volume = categories[cat].volume;
+	request.attenuation = categories[cat].attentuationCharacteristic;
 
 	soundsToPlay.push_back(request);
 }
@@ -108,11 +115,11 @@ void AudioEngine::tick(float deltaTime) {
 				// Set any other properties
 				soundPlayers[i].sound.setLoop(s.looped);
 				soundPlayers[i].sound.setPlayingOffset(sf::milliseconds(s.startIndex));
-				soundPlayers[i].sound.setAttenuation(0.1f);
+				soundPlayers[i].sound.setAttenuation(s.attenuation);
 				soundPlayers[i].sound.setMinDistance(100.0f);
 				soundPlayers[i].sound.setRelativeToListener(false);
-				soundPlayers[i].sound.setPosition(0, 0, 0);
-				soundPlayers[i].sound.setVolume(100.0f);
+				soundPlayers[i].sound.setPosition(s.pos.x, s.pos.y, s.pos.z);
+				soundPlayers[i].sound.setVolume(s.volume);
 
 				// Set the sound going
 				soundPlayers[i].play();
