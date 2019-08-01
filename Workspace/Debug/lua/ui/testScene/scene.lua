@@ -68,6 +68,9 @@ testScene = {
 		
 		-- create the camera settings
 		Scene:setCameraEnabled(true)
+		
+		-- Play some music
+		Audio:playSound('sounds/LCday_3_mono.ogg', 'default', false)
 	end,
 	
 	sinArg = 0,

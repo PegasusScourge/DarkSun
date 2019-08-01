@@ -25,5 +25,24 @@ blueprints = {}
 
 -- Setup the access to importing
 function import(file)
-	myEngine:import(file)
+	LuaEngine:import(file)
 end
+
+-- Setup the audio access
+Audio = {
+	playSound = function(self, soundPath, category, shouldLoop)
+		LuaEngine:playSound(soundPath, category, shouldLoop)
+	end,
+	
+	newCategory = function(self, category)
+		LuaEngine:newSoundCategory(category)
+	end,
+	
+	setCategoryVolume = function(self, category, newVolume)
+		LuaEngine:setSoundCategoryVolume(category, newVolume)
+	end,
+	
+	setCategoryAttenuation = function(self, category, newAttentuationFactor)
+		LuaEngine:setSoundCategoryAttenuation(category, newAttentuationFactor)
+	end,
+}

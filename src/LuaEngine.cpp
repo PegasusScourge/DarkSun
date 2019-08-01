@@ -102,13 +102,17 @@ void LuaEngine::luabridge_bind() {
 				.endClass()
 				.beginClass<LuaEngine>("LuaEngine")
 					.addFunction("import", &darksun::LuaEngine::lua_import)
+					.addFunction("playSound", &darksun::LuaEngine::lua_audio_playSound)
+					.addFunction("newSoundCategory", &darksun::LuaEngine::lua_audio_newCategory)
+					.addFunction("setSoundCategoryVolume", &darksun::LuaEngine::lua_audio_setCatVol)
+					.addFunction("setSoundCategoryAttenuation", &darksun::LuaEngine::lua_audio_setCatAtt)
 				.endClass()
 			.endNamespace()
 			.addFunction("LOG", lua_log);
 
 		// Add this instance
 		push(L.getState(), this);
-		lua_setglobal(L.getState(), "myEngine");
+		lua_setglobal(L.getState(), "LuaEngine");
 	}
 	catch (std::exception& e) {
 		string what = e.what();

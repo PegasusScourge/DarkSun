@@ -14,6 +14,7 @@ using namespace darksun;
 // Init static vars
 AudioEngine::SoundPlayer AudioEngine::soundPlayers[MAX_SOUND_PLAYERS];
 std::map<string, AudioEngine::SoundBuf> AudioEngine::loadedBuffers = std::map<string, AudioEngine::SoundBuf>();
+std::map<string, SoundCategory> AudioEngine::categories = std::map<string, SoundCategory>();
 std::vector<AudioEngine::PlayRequest> AudioEngine::soundsToPlay = std::vector<AudioEngine::PlayRequest>();
 std::vector<string> AudioEngine::soundsToStop = std::vector<string>();
 
@@ -24,6 +25,9 @@ void AudioEngine::init() {
 	sf::Listener::setUpVector(0, 1, 0);
 	sf::Listener::setDirection(0, 0, 1);
 
+	newCategory("default");
+	setCategoryVolume("default", 50.0f);
+	setCategoryAttenuation("default", 0.0f);
 
 	dout.log("Audio engine init complete");
 }
@@ -55,11 +59,13 @@ void AudioEngine::removeSound(string ref) {
 	}
 }
 
-void AudioEngine::playSound(string ref, bool loop, int startIndex) {
+void AudioEngine::playSound(string ref, string cat, bool loop, int startIndex) {
 	PlayRequest request;
 	request.ref = ref;
 	request.looped = loop;
 	request.startIndex = startIndex;
+
+	// Do something with category
 
 	soundsToPlay.push_back(request);
 }

@@ -21,6 +21,8 @@ Header file for LuaEngine.cpp, wrapping a Lua instace and state for running game
 #include <LuaState.h>
 #include <LuaValue.h>
 
+#include "AudioEngine.hpp"
+
 #include "Log.hpp"
 
 using namespace luabridge;
@@ -55,6 +57,12 @@ namespace darksun {
 
 		/* Import a file into the lua engine */
 		void lua_import(string f);
+
+		/* AUDIO ENGINE HOOKS */
+		void lua_audio_playSound(string soundName, string cat, bool loop) { AudioEngine::playSound(soundName, cat, loop); }
+		void lua_audio_newCategory(string catName) { AudioEngine::newCategory(catName); }
+		void lua_audio_setCatVol(string catName, float vol) { AudioEngine::setCategoryVolume(catName, vol); }
+		void lua_audio_setCatAtt(string catName, float att) { AudioEngine::setCategoryAttenuation(catName, att); }
 
 	public:
 		LuaEngine();

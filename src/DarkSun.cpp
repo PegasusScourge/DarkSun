@@ -69,8 +69,7 @@ void DarkSun::run() {
 	float sinArg = 0.0f;
 
 	/* TEST AUDIO */
-	//AudioEngine::addSound("sounds/LCday_3.ogg");
-	AudioEngine::playSound("sounds/LCday_3_mono.ogg", true);
+	//AudioEngine::playSound("sounds/LCday_3_mono.ogg", "default", true);
 
 	sf::Clock clock; // starts the clock
 	sf::Time elapsedTime = clock.getElapsedTime();

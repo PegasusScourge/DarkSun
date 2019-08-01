@@ -29,6 +29,10 @@
 #### Entities
  - Lua script reference for host entity of script changed to 'thisEntity' from 'myEntity' to clarify the entity being discussed 
  - Entity pathfinding fixed, still bugged by entity actually moves now
+#### Lua scripts
+ - Renamed base LuaEngine from 'myEngine' to 'LuaEngine'
+ - Added 'Audio' table which provides a good access to the audio functions in init.lua
+ - Currently unable to stop sounds currently playing
 
 ### Version [ALPHA][0.1.0]
 
