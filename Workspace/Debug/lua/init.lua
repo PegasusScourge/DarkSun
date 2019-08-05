@@ -18,8 +18,15 @@ end
 
 -- rounds a number to the specified number of decimal places
 function round(num, numDecimalPlaces)
-  local mult = 10^(numDecimalPlaces or 0)
-  return math.floor(num * mult + 0.5) / mult
+	local mult = 10^(numDecimalPlaces or 0)
+	return math.floor(num * mult + 0.5) / mult
+end
+
+-- Counts the number of elements in a table
+function tablelength(T)
+	local count = 0
+	for _ in pairs(T) do count = count + 1 end
+	return count
 end
 
 -- Setup the blueprints table

@@ -48,6 +48,21 @@ namespace darksun {
 			return sizeY.load();
 		}
 
+		glm::vec3 getSunPosition() {
+			return sunPosition.load();
+		}
+
+		glm::vec3 getSunColor() {
+			return sunColor.load();
+		}
+
+		bool sunIsSpecified() {
+			return sunSpecified.load();
+		}
+
+		// Hooks the class to a lua engine
+		void hookClass(lua::State* L);
+
 	private:
 
 		struct ProtoTextureInfo {
@@ -83,7 +98,12 @@ namespace darksun {
 		std::atomic<float> lowestP = 0;
 		std::atomic<float> highestP = 0;
 
-		LuaEngine engine;
+		// Lighting information
+		std::atomic<bool> sunSpecified = false;
+		std::atomic<glm::vec3> sunColor = glm::vec3(0, 0, 0);
+		std::atomic<glm::vec3> sunPosition = glm::vec3(0, 0, 0);
+
+		LuaEngine loadingEngine;
 
 		LoadingResult loadMap();
 	};

@@ -46,7 +46,8 @@ Scene::Scene(std::shared_ptr<Renderer> r, ApplicationSettings* appSettings, Scen
 	ui = std::shared_ptr<UIWrangler>(new UIWrangler(renderer->getWindowHandle(), renderer->getCamera(), appSettings, sceneName));
 	hookClass(ui->getUiEngine()->getState());
 	EntityOrders::hookClass(ui->getUiEngine()->getState());
-
+	if(hasMap)
+		map->hookClass(ui->getUiEngine()->getState()); // Hook the map for the scene UI
 	ui->OnCreate();
 
 	// Create our loading UI
@@ -170,6 +171,12 @@ void Scene::tick(float deltaTime) {
 
 	// Move the camera light to below the camera
 	renderer->setLightPosition(0, renderer->getCamera()->getPosition());
+
+	// Edit the sun position if it was specified in the map
+	if (map->sunIsSpecified()) {
+		renderer->setLightPosition(1, map->getSunPosition());
+		renderer->setLightColor(1, map->getSunColor());
+	}
 
 	sinArg += 0.05;
 

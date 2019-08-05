@@ -25,17 +25,22 @@ Map::Map(string mapfolder) {
 	luaLoc = dir + "map.lua";
 
 	// Attempt to load the map file
-	engine.addFile(luaLoc);
-	if (!engine.isValid()) {
+	loadingEngine.addFile(luaLoc);
+	if (!loadingEngine.isValid()) {
 		dout.error("Could not load map.lua of " + mapfolder);
 		return;
 	}
 
 	// Check to see if the map table exists
-	LuaRef mapTable = getGlobal(engine.getState()->getState(), "map");
+	LuaRef mapTable = getGlobal(loadingEngine.getState()->getState(), "map");
 	if (!mapTable.isTable()) {
 		// It isn't a table
 		dout.error("Loaded map.lua, but the map table is invalid or missing entirely (" + mapfolder + ")");
+		return;
+	}
+	LuaRef tableLenFunc = getGlobal(loadingEngine.getState()->getState(), "tablelength");
+	if (!tableLenFunc.isFunction()) {
+		dout.error("Failed to find the tablelength function in the lua init file");
 		return;
 	}
 
@@ -65,6 +70,35 @@ Map::Map(string mapfolder) {
 		setGammaCorrection((bool)mapTable["texture_gammaCorrection"]);
 	}
 
+	// Try to load lighting information
+	if (mapTable["lighting"].isTable()) {
+		LuaRef lightingTable = mapTable["lighting"];
+		if (lightingTable["sun_color"].isTable()) {
+			sunSpecified = true;
+			// We have a sun property
+			LuaRef sunClr = lightingTable["sun_color"];
+			if (tableLenFunc(sunClr) == 3) {
+				// There are three entries in the sun color table, thus valid
+				sunColor = glm::vec3(sunClr["r"], sunClr["g"], sunClr["b"]);
+			}
+			else {
+				dout.error("Failed to interpret lighting.sun_color table in map file: table not 3 elements long"); // Invalid table
+			}
+		}
+		if (lightingTable["sun_position"].isTable()) {
+			sunSpecified = true;
+			// We have a sun property
+			LuaRef sunPos = lightingTable["sun_position"];
+			if (tableLenFunc(sunPos) == 3) {
+				// There are three entries in the sun color table, thus valid
+				sunPosition = glm::vec3(sunPos["x"], sunPos["y"], sunPos["z"]);
+			}
+			else {
+				dout.error("Failed to interpret lighting.sun_position table in map file: table not 3 elements long"); // Invalid table
+			}
+		}
+	}
+
 	// Make sure we aren't marked as loaded
 	setLoaded(false);
 
@@ -74,6 +108,27 @@ Map::Map(string mapfolder) {
 
 	//dout.log("Loaded map model and texture");
 	valid = true;
+}
+
+void Map::hookClass(lua::State* L) {
+	try {
+		luabridge::getGlobalNamespace(L->getState())
+			.beginNamespace("darksun")
+				.beginClass<Map>("Map")
+					.addFunction("sizeX", &darksun::Map::getSizeX)
+					.addFunction("sizeY", &darksun::Map::getSizeY)
+				.endClass()
+			.endNamespace();
+
+		// Add this instance
+		push(L->getState(), this);
+		lua_setglobal(L->getState(), "Map");
+	}
+	catch (std::exception& e) {
+		string what = e.what();
+		dlua.error("Failed EntityOrders exposure proccess: " + what);
+		return;
+	}
 }
 
 void Map::tick(float deltaTime) {

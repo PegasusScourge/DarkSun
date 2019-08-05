@@ -20,10 +20,10 @@ testScene = {
 		vsync_check = function(signal)
 			if signal == 'Checked' then
 				LOG('Vsync on')
-				Settings.set_opengl_vsync(true)
+				Settings:set_opengl_vsync(true)
 			else
 				LOG('Vsync off')
-				Settings.set_opengl_vsync(false)
+				Settings:set_opengl_vsync(false)
 			end
 		end,
 	},
@@ -71,6 +71,8 @@ testScene = {
 		
 		-- Play some music
 		Audio:playSound('sounds/LCday_3_mono.ogg', 'default', 0, 0, 0, false)
+		
+		LOG('Map dimensions: (' .. Map:sizeX() .. ',' .. Map:sizeY() .. ')')
 	end,
 	
 	sinArg = 0,
