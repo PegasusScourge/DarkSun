@@ -8,7 +8,7 @@ The following are the available instances:
  - Scene scripts
  
 This documentation is presented as follows:
- - <type>: name[(arguments)]
+ - \<type\>: name[(arguments)]
  
 Functions are called on tables using the : system, not the .
 
@@ -27,7 +27,7 @@ e.g. "Audio:playSound(xyz)"
  - function: import(path)														--> Loads the specified file
 
 ## Entity blueprints
- - table: blueprints															--> Table for blueprints to be entered into. Use "blueprints.<bpName>" to get the blueprint information
+ - table: blueprints															--> Table for blueprints to be entered into. Use "blueprints.\<bpName\>" to get the blueprint information
 
 ## Entity scripts
  - table: thisEntity															--> The entity this script is running on
