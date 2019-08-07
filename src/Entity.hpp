@@ -62,6 +62,9 @@ namespace darksun {
 		// Internal name
 		string internalName;
 
+		// Display name
+		string displayName;
+
 		// Position information
 		glm::vec3 size = glm::vec3(0.5f, 0.5f, 0.5f);
 

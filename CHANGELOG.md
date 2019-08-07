@@ -2,6 +2,9 @@
 (2019-07-23 00:39 GMT)
 
 ### Version [ALPHA][0.2.0] (unreleased)
+##### Documentation
+ - Added documentation for C++ code
+ - Added documentation for lua scripting
 ##### Settings
  - Added external settings file, 'settings.lua'
  - Added 'antialiasing_level' as test value

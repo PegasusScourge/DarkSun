@@ -66,7 +66,7 @@ namespace darksun {
 	private:
 
 		struct ProtoTextureInfo {
-			string diffuseSrc;
+			string diffuseSrc; 
 			bool diffuseGammaCorrection;
 		};
 

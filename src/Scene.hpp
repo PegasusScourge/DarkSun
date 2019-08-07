@@ -92,8 +92,7 @@ namespace darksun {
 			renderer->getCamera()->setTacticalZoomParams(min, max, xDelta);
 			renderer->getCamera()->update(glm::vec3(0.0f, 0.0f, 0.0f), 0.5f);
 		}
-		int lua_getMapSizeX() { if (!hasMap) { return -1; } return map->getSizeX(); }
-		int lua_getMapSizeY() { if (!hasMap) { return -1; } return map->getSizeY(); }
+		bool lua_hasMap() { return hasMap; }
 
 	public:
 		static int createNewId();

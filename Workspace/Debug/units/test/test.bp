@@ -1,11 +1,11 @@
 blueprints.test = {
-	InternalName = 'testSpider',
-	Script = 'units/test/test_script.lua',
-	Model = {
+	displayName = 'testSpider',
+	script = 'units/test/test_script.lua',
+	model = {
 		lod_0 = 'units/test/spider.obj',
 		UniformScale = 0.06,
 	},
-	Physics = {
+	physics = {
 		maxSpeed = 8.0,
 		acceleration = 5.0,
 		hasGravity = false,

@@ -80,12 +80,14 @@ void Entity::init(string blueprintn, int newId) {
 		return;
 	}
 
+	// Set the internal name to the blueprintn
+	internalName = bpName;
 	try {
 		/****** Load information from the blueprint ******/
 		// Top level information
-		if (myBp["InternalName"].isString()) {
-			internalName = myBp["InternalName"].tostring();
-			dout.verbose("Entity::init -> InternalName = '" + internalName + "'");
+		if (myBp["displayName"].isString()) {
+			displayName = myBp["displayName"].tostring();
+			dout.verbose("Entity::init -> displayName = '" + displayName + "'");
 		}
 		else {
 			// We need a valid string InternalName to function, fail the entity here
@@ -94,7 +96,7 @@ void Entity::init(string blueprintn, int newId) {
 		}
 		
 		// Model
-		LuaRef modelInf = myBp["Model"]; // Get the sub-table
+		LuaRef modelInf = myBp["model"]; // Get the sub-table
 		if (!modelInf.isTable()) {
 			dlua.error("Got non-table LuaRef when loading blueprint, 'Model' sub-table not found");
 			return;
@@ -121,7 +123,7 @@ void Entity::init(string blueprintn, int newId) {
 			return;
 		}
 
-		ref = modelInf["UniformScale"];
+		ref = modelInf["uniformScale"];
 		if (ref.isNumber()) {
 			// We have the field UniformScale, extract
 			// Set the scale uniformly
@@ -133,7 +135,7 @@ void Entity::init(string blueprintn, int newId) {
 		}
 
 		// Physics
-		ref = myBp["Physics"];
+		ref = myBp["physics"];
 		if (ref.isTable()) {
 			// We have physics defs!
 			LuaRef subRef = ref["maxSpeed"];
@@ -214,6 +216,7 @@ void Entity::initLuaEngine() {
 			.beginClass<Entity>("Entity")
 				//.addConstructor<void(*)(string blueprintn, int newId), RefCountedPtr<Entity> /* creation policy */ >()
 				.addProperty("internalName", &darksun::Entity::internalName, false) // Read only
+				.addProperty("displayName", &darksun::Entity::displayName) // Read write
 				.addProperty("bpName", &darksun::Entity::bpName, false) // Read only
 				.addProperty("id", &darksun::Entity::myId, false) // Read only
 				.addFunction("moveTo", &darksun::Entity::setMoveTarget)

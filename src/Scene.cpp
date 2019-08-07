@@ -117,8 +117,6 @@ void Scene::hookClass(lua::State *L) {
 					.addFunction("getLightAttenuation", &darksun::Scene::lua_getLightAttenuation)
 					.addFunction("setCameraEnabled", &darksun::Scene::lua_setCameraEnabled)
 					.addFunction("setTacticalZoomSettings", &darksun::Scene::lua_setTacticalZoomSettings)
-					.addFunction("getMapSizeX", & darksun::Scene::lua_getMapSizeX)
-					.addFunction("getMapSizeY", & darksun::Scene::lua_getMapSizeY)
 				.endClass()
 			.endNamespace();
 
